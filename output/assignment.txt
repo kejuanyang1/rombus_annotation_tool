@@ -1,3 +1,3 @@
 Matt: scene 01_0 to scene 27_2
-Kendra: scene 28_0 to scene 56_2
-Lak: scene 57_0 to scene 80_2
+Kendra: scene 28_0 to scene 55_2
+Lak: scene 56_0 to scene 80_2

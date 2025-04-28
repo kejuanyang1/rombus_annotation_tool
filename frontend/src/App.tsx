@@ -5,7 +5,7 @@ import axios from "axios";
 const API = "http://localhost:8000/api";
 
 export default function App() {
-  const [startId, setStartId] = useState("scene_05_2");
+  const [startId, setStartId] = useState("scene_01_0");
   const [ids,   setIds]   = useState<string[]>([]);
   const [idx,   setIdx]   = useState(0);
 

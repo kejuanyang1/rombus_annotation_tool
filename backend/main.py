@@ -1,37 +1,112 @@
-from fastapi import FastAPI, UploadFile, HTTPException
+"""
+backend/main.py  –  FastAPI for RGB-depth annotation (multi-bbox version)
+"""
+from pathlib import Path
+import json, ast, math
+import numpy as np
+import cv2
+# import quaternion
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
-from pathlib import Path
-import json, cv2, numpy as np
+from pydantic import BaseModel, Field
+from typing import List
 import open3d as o3d
-import quaternion  # pip install numpy-quaternion
-import math
-import ast
+import quaternion
 
-
-DATA_DIR   = Path("../data")
-OUT_DIR    = Path("../output")
+# -------------------------------------------------------------- paths -----
+ROOT          = Path(__file__).parent.parent
+DATA_DIR      = ROOT / "data"
+OUT_DIR       = ROOT / "output"
+HELPER_DIR    = ROOT / "outputs_helper"
 OUT_DIR.mkdir(exist_ok=True)
 
+# -------------------------------------------------------------- FastAPI ---
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"]
 )
 
-# ---------- Models ----------
+# ------------------------------------------------------------ Pydantic ----
 class BBox(BaseModel):
-    cx: float   # pixel
-    cy: float
-    w:  float   # pixel width  (long side) – still in image plane
-    h:  float   # pixel height
-    angle: float  # degrees, CCW; 0 points right
+    cx: float; cy: float; w: float; h: float; angle: float = 0.0
 
-class AnnotationIn(BaseModel):
-    image_id: str    # e.g. "scene_05_2"
-    label: str
-    bbox:  BBox
+class Annotation(BaseModel):
+    bbox:   BBox
+    label:  str = Field(alias="category")
+    conf:   float | None = None          # optional
+
+class AnnotationList(BaseModel):
+    image_id: str
+    annos:    List[Annotation]
+
+# ----------------------------------------------------------- utilities ----
+def read_json(path: Path, default):
+    try:   return json.loads(path.read_text())
+    except FileNotFoundError: return default
+
+def load_helper_boxes(image_id: str) -> list:
+    """
+    Convert helper format
+      {bbox:{cx,cy,w,h,angle}, category, conf}
+    ➜ common format
+      {"name": category, "bbox": [x,y,w,h,angle]}
+    """
+    p = HELPER_DIR / f"{image_id}.json"
+    if not p.exists():
+        return []
+
+    raw = read_json(p, {})
+    items = raw.get(f"{image_id}_rgb", [])
+    out   = []
+    for it in items:
+        bb = it["bbox"]
+        out.append({
+            "name": it["category"],
+            "bbox": [
+                bb["cx"] - bb["w"]/2,
+                bb["cy"] - bb["h"]/2,
+                bb["w"],
+                bb["h"],
+                bb.get("angle", 0.0)
+            ],
+            "conf": it.get("conf", None)
+        })
+    return out
+
+def load_saved_boxes(image_id: str):
+    p = OUT_DIR / f"{image_id}_bbox.json"
+    if not p.exists():
+        return []
+
+    raw = read_json(p, {})
+    items = raw
+    out   = []
+    for it in items:
+        bb = it["bbox"]
+        out.append({
+            "name": it["category"],
+            "bbox": [
+                bb["cx"] - bb["w"]/2,
+                bb["cy"] - bb["h"]/2,
+                bb["w"],
+                bb["h"],
+                bb.get("angle", 0.0)
+            ],
+            "conf": it.get("conf", None)
+        })
+    return out
+
+def get_common_boxes(image_id: str) -> list:
+    """
+    Manual (if any) overrides helper; otherwise helper list.
+    """
+    manual = load_saved_boxes(image_id)
+    return manual if manual else load_helper_boxes(image_id)
+
+def save_boxes(image_id: str, annos: list):
+    (OUT_DIR / f"{image_id}_bbox.json").write_text(json.dumps(annos, indent=2))
 
 # ---------- Utils ----------
 def load_metadata(image_id: str):
@@ -117,6 +192,10 @@ def ply_to_depth_png(ply_path: str,
     out_png : str
         Where to save the depth image (16-bit PNG)
     """
+    # if out_png already exists, skip
+    if Path(out_png).exists():
+        print(f"Skipping {out_png} (already exists)")
+        return
     pc  = o3d.io.read_point_cloud(ply_path)
     xyz = np.asarray(pc.points)                     # (N,3) in metres
     valid_z = xyz[:, 2] > 1e-6
@@ -193,7 +272,9 @@ def metric_size_and_height(
         K: np.ndarray,
         depth_m: np.ndarray,     # depth in metres, same resolution as RGB
         rect: tuple,             # ((cx,cy),(w,h),angle_deg)  from cv2.minAreaRect
-        z_tol: float = 0.02      # ignore outliers farther than ±z_tol from median
+        z_pos: float,            # depth of the table height (translation z from metadata)
+        z_tol: float = 0.5      # ignore outliers farther than ±z_tol from median
+        
     ):
     """
     Returns (w_m, h_m, height_m) where height_m = maxZ - minZ inside the box.
@@ -206,7 +287,7 @@ def metric_size_and_height(
     cv2.fillPoly(mask, [poly], 1)
 
     zs = depth_m[mask == 1]
-    zs = zs[np.isfinite(zs) & (zs > 0)]
+    zs = zs[np.isfinite(zs) & (zs > 0)]  # drop NaN / Inf / 0
     if zs.size == 0:
         return None, None, None
 
@@ -216,14 +297,20 @@ def metric_size_and_height(
 
     if zs.size == 0:
         return None, None, None
+    print(zs.max(), zs.min())
+    height_m = float(z_pos - zs.min())
 
-    height_m = float(zs.max() - zs.min())
+    if height_m < 0.03:
+        height_m = 0.03
+    
+    if height_m > 0.18:
+        height_m = 0.18
 
     # w, h like before (use bbox edges & median depth)
     w_px, h_px = rect[1]
     depth_for_size = float(med)         # robust depth for size estimate
-    w_m = w_px * depth_for_size / fx
-    h_m = h_px * depth_for_size / fy
+    w_m = np.abs(w_px) * depth_for_size / fx
+    h_m = np.abs(h_px) * depth_for_size / fy
     return w_m, h_m, height_m
 
 
@@ -231,10 +318,9 @@ def metric_size_and_height(
 # ---------- End‑points ----------
 @app.get("/api/images")
 def list_images(start: str):
-    """Return RGB image IDs ≥ start (inclusive, lexicographic)."""
     imgs = sorted(p.stem[:-4] for p in DATA_DIR.glob("*_rgb.png"))
     if start not in imgs:
-        raise HTTPException(404, f"{start} not found")
+        raise HTTPException(404, "start image not found")
     return [im for im in imgs if im >= start]
 
 @app.get("/api/image/{image_id}/rgb")
@@ -243,25 +329,46 @@ def get_rgb(image_id: str):
     if not f.exists(): raise HTTPException(404)
     return FileResponse(f)
 
+@app.get("/api/image/{image_id}/objects")  # dropdown helper
+def get_object_candidates(image_id: str):
+    def add_article(name: str) -> str:
+        name = name.strip()
+        article = "an" if name[0].lower() in "aeiou" else "a"
+        return f"{article} {name}"
+    meta = read_json(DATA_DIR / f"{image_id}_metadata.json", {})
+    container = meta.get("container_name", [])
+    if isinstance(container, str):
+        try: container = ast.literal_eval(container)
+        except Exception: container = [container]
+    if isinstance(container, str): container = [container]
+    if isinstance(container, list):
+        container = [add_article(c) for c in container]
+    else:
+        container = [add_article(container)]
+    return [*map(str.strip, container), *map(str.strip, meta.get("object_names", []))]
+
+@app.get("/api/image/{image_id}/annotations")
+def get_init_annotations(image_id: str):
+    return get_common_boxes(image_id)
+
 @app.post("/api/annotate")
-def annotate(ann: AnnotationIn):
+def annotate_list(payload: AnnotationList):
     """
-    Store *two* things for the current image:
-
-    1. 3‑D record  →  output/<image_id>.json     (unchanged)
-    2. 2‑D box     →  output/<image_id>_bbox.json  (new)
-       box = [x, y, w, h, angle_deg]  (COCO‑like, top‑left origin)
+    • Save 2-D boxes  → output/<id>.json
+    • Save 3-D info   → output/<id>_3d.json
     """
-    img_id = ann.image_id
-    bbox   = ann.bbox
+    annos2d = [a.dict(by_alias=True) for a in payload.annos]
+    save_boxes(payload.image_id, annos2d)
 
-    # ---------- intrinsics & extrinsics ----------
+    img_id = payload.image_id
+
     K, trans, q_cam2base, height, width = load_metadata(img_id)
     fx, fy = K[0, 0], K[1, 1]
     cx, cy = K[0, 2], K[1, 2]
-    # print(fx, fy, cx, cy)
 
-    # ---------- depth image ----------
+
+    # ---------- build 3-D records ----------
+    # load assets once
     cloud_path = DATA_DIR / f"{img_id}_cloud.ply"
     K_for_depth = dict(fx=fx, fy=fy, cx=cx, cy=cy)
     depth_path = DATA_DIR / f"{img_id}_depth_new.png"
@@ -272,84 +379,33 @@ def annotate(ann: AnnotationIn):
     
     # print(depth_meters.shape, depth_meters.dtype, depth_meters.max(), depth_meters.min())
     # print(depth_meters)
-    depth_meters = depth_meters.astype(np.float32) / 1000.0  # mm to m
+    depth_m = depth_meters.astype(np.float32) / 1000.0  # mm to m
     # print(np.sum(depth_meters == 0), "zero pixels")
     # print(np.sum(depth_meters > 0), "non-zero pixels")
 
-    u, v = int(bbox.cx), int(bbox.cy)
-    # print(depth_meters[u, v])
-    depth_m = filtered_depth(depth_meters, u, v)
-    # print(depth_m)
-    if depth_m is None:
-        raise HTTPException(422, "depth invalid at bbox centre")
 
-    # ---------- 3‑D centre in base‑link ----------
-    p_cam  = pixel_to_cam(K, u, v, depth_m)
-    p_base = cam_to_base(p_cam, trans, q_cam2base)
+    rec3d = []
+    print(annos2d)
+    for a in annos2d:
+        bb = a["bbox"]
+        cx, cy = int(bb["cx"]), int(bb["cy"])
+        depth_c = filtered_depth(depth_m, cx, cy)
+        if depth_c is None: continue
 
-    # ---------- metric (w, h) ----------
-    rect  = ((bbox.cx, bbox.cy), (bbox.w, bbox.h), -bbox.angle)
-    w_m, h_m, height_m = metric_size_and_height(K.copy(), depth_meters, rect)
+        # position
+        pt_cam  = pixel_to_cam(K, cx, cy, depth_c)
+        pt_base = cam_to_base(pt_cam, trans, q_cam2base)
 
-    if w_m is None:          # fall-back in degenerate cases
-        w_m = bbox.w * depth_m / K[0,0]
-        h_m = bbox.h * depth_m / K[1,1]
-        height_m = 0.0
+        # size (w, h, height)
+        rect = ((bb["cx"], bb["cy"]), (bb["w"], bb["h"]), -bb["angle"])
+        w_m, h_m, hZ = metric_size_and_height(K, depth_m, rect, depth_c)
+        print(a)
+        rec3d.append({
+            "name": a["category"],
+            "position": pt_base.tolist(),
+            "orientation": yaw_to_quat(bb["angle"]),
+            "size": [w_m, h_m, hZ]
+        })
 
-    # ---------- orientation ----------
-    orient_quat = yaw_to_quat(bbox.angle)
-
-    # ---------- 3‑D record (unchanged file) ----------
-    rec3d = {
-        "name": ann.label,
-        "position": p_base.tolist(),
-        "orientation": orient_quat,
-        "size": [w_m, h_m, height_m]                 # metres now
-    }
-    rec3d_path = OUT_DIR / f"{img_id}.json"
-    rec3d_list = json.loads(rec3d_path.read_text()) if rec3d_path.exists() else []
-    rec3d_list.append(rec3d)
-    rec3d_path.write_text(json.dumps(rec3d_list, indent=2))
-
-    # ---------- 2‑D bounding‑box record ----------
-    # Common COCO‑like format: [x, y, w, h, angle_deg] in *image* pixels
-    # x,y originate at top‑left corner of image
-    x_tl = bbox.cx - bbox.w / 2
-    y_tl = bbox.cy - bbox.h / 2
-    rec2d = {
-        "name": ann.label,
-        "bbox": [x_tl, y_tl, bbox.w, bbox.h, bbox.angle]
-    }
-    rec2d_path = OUT_DIR / f"{img_id}_bbox.json"
-    rec2d_list = json.loads(rec2d_path.read_text()) if rec2d_path.exists() else []
-    rec2d_list.append(rec2d)
-    rec2d_path.write_text(json.dumps(rec2d_list, indent=2))
-
-    return {
-        "status": "ok",
-        "3d": rec3d,
-        "2d": rec2d
-    }
-
-
-@app.get("/api/image/{image_id}/objects")
-def get_objects(image_id: str):
-    """Return container_name + object_names as a flat list for a drop-down."""
-    meta_path = DATA_DIR / f"{image_id}_metadata.json"
-    if not meta_path.exists():
-        return []
-
-    meta = json.loads(meta_path.read_text())
-
-    # container_name may be a stringified list: "['item1','item2']"
-    container = meta.get("container_name", [])
-    if isinstance(container, str):
-        try:
-            container = ast.literal_eval(container)
-        except Exception:
-            container = [container]
-    if isinstance(container, str):
-        container = [container]
-
-    objs = meta.get("object_names", [])
-    return [s.strip() for s in container] + [s.strip() for s in objs]
+    (OUT_DIR / f"{payload.image_id}_3d.json").write_text(json.dumps(rec3d, indent=2))
+    return {"status": "ok", "boxes_saved": len(annos2d), "rec3d": len(rec3d)}

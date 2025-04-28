@@ -12,6 +12,7 @@ project/
 │  └─ …
 ├─ output/                 # ⇦ annotated Json here
 │
+├─ outputs_helper/         # optional, used a owl-vit to generated a first set of bboxs for each image
 ├─ backend/
 │  ├─ main.py
 │  └─ requirements.txt

@@ -1,206 +1,205 @@
 // frontend/src/ImageAnnotator.tsx
-import React, { useRef, useState, useEffect } from "react";
-import { Stage, Layer, Image as KonvaImage, Rect, Transformer } from "react-konva";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Stage, Layer, Image as KonvaImage,
+  Rect, Transformer, Text, Group
+} from "react-konva";
 import useImage from "use-image";
 import axios from "axios";
 
 /* -------------------------------------------------------------------------- */
-/*                                BBox helper                                 */
+/*                               type helpers                                 */
 /* -------------------------------------------------------------------------- */
+type BoxArr  = [number, number, number, number, number]; // [x,y,w,h,angle]
+type BBox    = { cx: number; cy: number; w: number; h: number; angle: number };
+type Anno    = { bbox: BBox; label: string; conf?: number };
 
-interface BBoxProps {
-  shapeProps: any;
-  isSelected: boolean;
-  onSelect: () => void;
-  onChange: (newProps: any) => void;
-}
+interface Props { imageId: string; api: string }
 
-const BBox: React.FC<BBoxProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
-  const shapeRef = useRef<any>();
-  const trRef = useRef<any>();
-
-  useEffect(() => {
-    if (isSelected) {
-      trRef.current?.nodes([shapeRef.current]);
-      trRef.current?.getLayer()?.batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <>
-      <Rect
-        {...shapeProps}
-        ref={shapeRef}
-        draggable
-        stroke="lime"
-        strokeWidth={2}
-        onClick={onSelect}
-        onDragEnd={(e) =>
-          onChange({ ...shapeProps, x: e.target.x(), y: e.target.y() })
-        }
-        onTransformEnd={(e) => {
-          const node = shapeRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          node.scaleX(1);
-          node.scaleY(1);
-          onChange({
-            ...shapeProps,
-            x: node.x(),
-            y: node.y(),
-            rotation: node.rotation(),
-            width: node.width() * scaleX,
-            height: node.height() * scaleY,
-          });
-        }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          keepRatio={false}
-          rotateEnabled
-          enabledAnchors={[
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
-          ]}
-        />
-      )}
-    </>
-  );
-};
+/* ---------- conversion between array format and cx/cy format ------------- */
+const arr2bbox = ([x, y, w, h, a]: BoxArr): BBox => ({
+  cx: x + w / 2,
+  cy: y + h / 2,
+  w, h, angle: a,
+});
+const bbox2arr = (b: BBox): BoxArr => [
+  b.cx - b.w / 2,
+  b.cy - b.h / 2,
+  b.w,
+  b.h,
+  b.angle,
+];
 
 /* -------------------------------------------------------------------------- */
-/*                         Main ImageAnnotator component                      */
+/*                               component                                    */
 /* -------------------------------------------------------------------------- */
-
-interface Props {
-  imageId: string;
-  api: string; // e.g. http://localhost:8000/api
-}
-
 const ImageAnnotator: React.FC<Props> = ({ imageId, api }) => {
-  /* ------------------------------ state hooks ----------------------------- */
-  const [image] = useImage(`${api}/image/${imageId}/rgb`);
-  const [bbox, setBBox] = useState<any | null>(null);
-  const [selected, setSelected] = useState(false);
-  const [label, setLabel] = useState("");
-  const [options, setOptions] = useState<string[]>([]); // dropdown values
-  const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  /* ------------------------------ state -------------------------------- */
+  const [image] = useImage(`${api}/image/${imageId}/rgb?ts=${imageId}`);
+  const [boxes, setBoxes] = useState<Anno[]>([]);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [candidates, setCandidates] = useState<string[]>([]);
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  /* -------------------- fetch dropdown options on image change ------------ */
+  /* --------------------------- fetch initial --------------------------- */
   useEffect(() => {
-    axios
-      .get(`${api}/image/${imageId}/objects`)
-      .then((res) => setOptions(res.data))
-      .catch(() => setOptions([]));
+    axios.get(`${api}/image/${imageId}/annotations`).then(res => {
+      const list = (res.data as any[]).map(obj => ({
+        bbox : arr2bbox(obj.bbox as BoxArr),
+        label: obj.name,
+        conf : obj.conf,
+      }));
+      setBoxes(list);
+    });
+    axios.get(`${api}/image/${imageId}/objects`)
+         .then(res => setCandidates(res.data));
   }, [imageId, api]);
 
-  /* -------------------------- viewport scaling ---------------------------- */
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-
+  /* ------------------------------- scale ------------------------------- */
   useEffect(() => {
     if (!image) return;
-  
-    const reserve = 160;                // px reserved for header + controls
-    const compute = () => {
-      const vw = window.innerWidth;     // viewport width
-      const vh = window.innerHeight - reserve;
-      setScale(Math.min(vw / image.width, vh / image.height, 1));
-    };
-  
-    compute();                          // run once
-    window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
+    const reserve = 170;
+    const upd = () => setScale(Math.min(
+      window.innerWidth  / image.width,
+      (window.innerHeight - reserve) / image.height,
+      1
+    ));
+    upd(); window.addEventListener("resize", upd);
+    return () => window.removeEventListener("resize", upd);
   }, [image]);
 
-  /* -------------------------- confirm handler ----------------------------- */
-  const confirm = () => {
-    if (!bbox || !label.trim()) {
-      return alert("Draw a box and choose / type a label.");
-    }
-    axios
-      .post(`${api}/annotate`, {
-        image_id: imageId,
-        label: label.trim(),
-        bbox: {
-          cx: bbox.x + bbox.width / 2,
-          cy: bbox.y + bbox.height / 2,
-          w: bbox.width,
-          h: bbox.height,
-          angle: bbox.rotation,
-        },
-      })
-      .then(() => {
-        // alert("Saved!");
-        setBBox(null);
-        setLabel("");
-        setSelected(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Failed to save annotation.");
-      });
+  /* ------------------------------ helpers ------------------------------ */
+  const toRect = (b: BBox) => ({
+    x: b.cx - b.w / 2,
+    y: b.cy - b.h / 2,
+    width: b.w,
+    height: b.h,
+    rotation: b.angle,
+  });
+
+  /* ------------------------- BBox component --------------------------- */
+  const BBoxShape: React.FC<{ idx: number; anno: Anno }> = ({ idx, anno }) => {
+    const rectRef = useRef<any>(), trRef = useRef<any>();
+    const isSel   = idx === selectedIdx;
+
+    /* keep Transformer attached */
+    useEffect(() => {
+      if (isSel && rectRef.current) {
+        trRef.current?.nodes([rectRef.current]);
+        trRef.current?.getLayer()?.batchDraw();
+      }
+    }, [isSel]);
+
+    /* update helpers */
+    const commit = (node: any) => {
+      // const r   = node.getClientRect();
+      const rot = node.rotation();
+      const w   = node.width()  * node.scaleX();
+      const h   = node.height() * node.scaleY();
+      const cx  = node.x() + w / 2;
+      const cy  = node.y() + h / 2;
+      node.scaleX(1); node.scaleY(1);      // reset for next edit
+      setBoxes(bs =>
+        bs.map((b, i) =>
+          i === idx ? { ...b, bbox: { cx, cy, w, h, angle: rot } } : b
+        )
+      );
+    };
+
+    const { x, y, width, height, rotation } = toRect(anno.bbox);
+
+    return (
+      <>
+        <Group>
+          <Rect
+            ref={rectRef}
+            x={x} y={y} width={width} height={height} rotation={rotation}
+            stroke="lime" strokeWidth={2} draggable
+            onClick={() => setSelectedIdx(idx)}
+            onDragEnd={e => commit(e.target)}
+            onTransformEnd={e => commit(e.target)}
+          />
+          {anno.label && (
+            <Text
+              text={anno.label}
+              x={x} y={y - 18}
+              fontSize={18}
+              fill="white" stroke="white" strokeWidth={1}
+            />
+          )}
+        </Group>
+        {isSel && (
+          <Transformer
+            ref={trRef} keepRatio={false} rotateEnabled
+            enabledAnchors={[
+              "top-left","top-right","bottom-left","bottom-right",
+              "middle-left","middle-right","middle-top","middle-bottom",
+            ]}
+          />
+        )}
+      </>
+    );
   };
 
-  /* ----------------------------------------------------------------------- */
-  /*                                render                                   */
-  /* ----------------------------------------------------------------------- */
+  /* ---------------------------- handlers ------------------------------ */
+  const addBox = () => {
+    setBoxes([...boxes, {
+      bbox: { cx: 100, cy: 100, w: 120, h: 80, angle: 0 },
+      label: "",
+    }]);
+    setSelectedIdx(boxes.length);
+  };
 
-return (
-    <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden p-2">
-      {/* ─────────────── TOP CONTROL BAR ─────────────── */}
-      <div className="flex items-center space-x-2 mb-2">
-        {/* Draw-box (always visible when no active bbox) */}
-        {!bbox && image && (
-          <button
-            className="border px-3 py-1"
-            onClick={() => {
-              setBBox({ x: 50, y: 50, width: 150, height: 100, rotation: 0 });
-              setSelected(true);
-            }}
-          >
-            Draw box
-          </button>
-        )}
+  const saveAll = () => {
+    const annos = boxes.map(b => ({
+      bbox: b.bbox,                // {cx,cy,w,h,angle}
+      category: b.label || "",     // backend field alias => "label"
+      conf: b.conf ?? undefined,
+    }));
   
-        {/* Label input + Confirm / Undo (visible during editing) */}
-        {bbox && (
+    axios
+      .post(`${api}/annotate`, { image_id: imageId, annos })
+      .then(() => alert("Saved!"))
+      .catch(err => console.error(err));
+  };
+
+  /* ------------------------------ render ------------------------------ */
+  return (
+    <div ref={containerRef} className="flex-1 flex flex-col p-2 space-y-2 overflow-hidden">
+      {/* ---------------- top bar ---------------- */}
+      <div className="flex items-center space-x-2">
+        <button className="border px-3 py-1" onClick={addBox}>Add box</button>
+        <button className="border px-3 py-1" onClick={saveAll}>Confirm / Save</button>
+
+        {selectedIdx !== null && boxes[selectedIdx] && (
           <>
             <input
-              list="objlist"
-              className="border px-2 flex-1"
+              list="objectList" className="border px-2 flex-1"
               placeholder="object name"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
+              value={boxes[selectedIdx].label}
+              onChange={e => {
+                const v = e.target.value;
+                setBoxes(bs => bs.map((b,i)=>
+                  i===selectedIdx? {...b,label:v}: b));
+              }}
               autoFocus
             />
-            <datalist id="objlist">
-              {options.map((o) => (
-                <option key={o} value={o} />
-              ))}
+            <datalist id="objectList">
+              {candidates.map(c => <option key={c} value={c} />)}
             </datalist>
-  
-            <button onClick={confirm} className="border px-3">
-              Confirm
-            </button>
             <button
-              onClick={() => {
-                setBBox(null);
-                setLabel("");
-                setSelected(false);
+              className="border px-2"
+              onClick={()=>{
+                setBoxes(bs=>bs.filter((_,i)=>i!==selectedIdx));
+                setSelectedIdx(null);
               }}
-              className="border px-3"
-            >
-              Undo
-            </button>
+            >Delete</button>
           </>
         )}
       </div>
-  
-      {/* ─────────────── IMAGE AREA (auto-scaled) ─────────────── */}
+
+      {/* ---------------- canvas ---------------- */}
       <div
         style={{
           transform: `scale(${scale})`,
@@ -213,26 +212,17 @@ return (
         <Stage
           width={image?.width ?? 800}
           height={image?.height ?? 600}
-          onMouseDown={(e) =>
-            e.target === e.target.getStage() && setSelected(false)
-          }
+          onMouseDown={e =>
+            e.target === e.target.getStage() && setSelectedIdx(null)}
         >
           <Layer>
             {image && <KonvaImage image={image} />}
-            {bbox && (
-              <BBox
-                shapeProps={bbox}
-                isSelected={selected}
-                onSelect={() => setSelected(true)}
-                onChange={setBBox}
-              />
-            )}
+            {boxes.map((a,i)=> <BBoxShape key={i} idx={i} anno={a} />)}
           </Layer>
         </Stage>
       </div>
     </div>
   );
-  
 };
 
 export default ImageAnnotator;

@@ -46,3 +46,16 @@ pip install -r requirements.txt
 ```shell
 uvicorn main:app --reload --port 8000
 ```
+
+
+## Bbox Annotaion using OwlViT
+
+Install GPU compatible Pytorch first, then
+
+```shell
+pip install transformers
+```
+
+```shell
+python inference.py --img_dir /your_dataset_path
+```

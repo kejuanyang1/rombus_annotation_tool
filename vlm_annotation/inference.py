@@ -39,7 +39,7 @@ def load_queries_from_metadata(meta_root: Path) -> dict:
 
     image_query_dict = {}
 
-    for i in range(1, 2):  # scene_01 to scene_80
+    for i in range(80, 81):  # scene_01 to scene_80
         for j in range(3):  # 0, 1, 2
             scene_id = f"scene_{i:02d}_{j}"
             meta_path = meta_root / f"{scene_id}_metadata.json"

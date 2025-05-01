@@ -25,8 +25,7 @@ project/
 
 ```shell
 cd frontend
-npm create vite@latest  . -- --template react-ts
-npm i react-konva konva axios use-image
+npm install
 ```
 
 ```shell

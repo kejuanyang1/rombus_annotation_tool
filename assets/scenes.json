@@ -1,0 +1,3957 @@
+[
+    {
+        "scene_id": "scene_01",
+        "obj_ids": [
+            "kitchen_07",
+            "kitchen_09",
+            "kitchen_11",
+            "kitchen_19",
+            "kitchen_23",
+            "container_02",
+            "container_13",
+            "lid_03"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_07",
+                "name": "mango",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_13",
+                "name": "green bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_03",
+                "name": "green lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_02",
+        "obj_ids": [
+            "kitchen_02",
+            "kitchen_02",
+            "kitchen_13",
+            "kitchen_16",
+            "kitchen_18",
+            "kitchen_20"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_13",
+                "name": "garlic",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_16",
+                "name": "white radish",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_18",
+                "name": "green chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_20",
+                "name": "purple eggplant",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_03",
+        "obj_ids": [
+            "kitchen_01",
+            "kitchen_01",
+            "kitchen_11",
+            "kitchen_13",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_13",
+                "name": "garlic",
+                "category": "item"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_04",
+        "obj_ids": [
+            "kitchen_12",
+            "kitchen_18",
+            "kitchen_22",
+            "kitchen_22",
+            "kitchen_25",
+            "kitchen_28",
+            "kitchen_32"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_12",
+                "name": "carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_18",
+                "name": "green chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_22",
+                "name": "green lime",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_22",
+                "name": "green lime",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_25",
+                "name": "purple jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_28",
+                "name": "can of Pringles chip",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_32",
+                "name": "steel knife",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_05",
+        "obj_ids": [
+            "kitchen_14",
+            "kitchen_15",
+            "kitchen_20",
+            "kitchen_21",
+            "kitchen_30",
+            "container_01"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_14",
+                "name": "tomato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_15",
+                "name": "red onion",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_20",
+                "name": "purple eggplant",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_21",
+                "name": "small orange carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_06",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_09",
+            "kitchen_11",
+            "kitchen_15",
+            "kitchen_17",
+            "kitchen_21"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_15",
+                "name": "red onion",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_17",
+                "name": "red chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_21",
+                "name": "small orange carrot",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_07",
+        "obj_ids": [
+            "kitchen_01",
+            "kitchen_04",
+            "kitchen_08",
+            "kitchen_10",
+            "container_06",
+            "container_14",
+            "lid_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_04",
+                "name": "bunch of red grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_08",
+                "name": "green apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            },
+            {
+                "id": "container_14",
+                "name": "pink bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_04",
+                "name": "pink lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_08",
+        "obj_ids": [
+            "kitchen_02",
+            "kitchen_02",
+            "kitchen_05",
+            "kitchen_29",
+            "kitchen_30",
+            "kitchen_31",
+            "kitchen_33"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_05",
+                "name": "orange",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_29",
+                "name": "yellow corn can",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_31",
+                "name": "plastic knife",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_33",
+                "name": "black spoon",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_09",
+        "obj_ids": [
+            "kitchen_04",
+            "kitchen_14",
+            "kitchen_22",
+            "kitchen_22",
+            "kitchen_32",
+            "container_12",
+            "lid_02"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_04",
+                "name": "bunch of red grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_14",
+                "name": "tomato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_22",
+                "name": "green lime",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_22",
+                "name": "green lime",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_32",
+                "name": "steel knife",
+                "category": "item"
+            },
+            {
+                "id": "container_12",
+                "name": "orange bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_02",
+                "name": "orange lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_10",
+        "obj_ids": [
+            "kitchen_19",
+            "kitchen_20",
+            "kitchen_30",
+            "kitchen_31"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_20",
+                "name": "purple eggplant",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_31",
+                "name": "plastic knife",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_11",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_08",
+            "kitchen_15",
+            "kitchen_21",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_08",
+                "name": "green apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_15",
+                "name": "red onion",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_21",
+                "name": "small orange carrot",
+                "category": "item"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_12",
+        "obj_ids": [
+            "kitchen_06",
+            "kitchen_15",
+            "kitchen_26",
+            "kitchen_30"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_06",
+                "name": "bunch of green grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_15",
+                "name": "red onion",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_26",
+                "name": "yellow jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_13",
+        "obj_ids": [
+            "kitchen_10",
+            "kitchen_10",
+            "kitchen_17",
+            "kitchen_19",
+            "kitchen_27",
+            "container_11",
+            "container_12",
+            "lid_01",
+            "lid_02"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_17",
+                "name": "red chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "container_11",
+                "name": "blue bowl",
+                "category": "container"
+            },
+            {
+                "id": "container_12",
+                "name": "orange bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_01",
+                "name": "blue lid",
+                "category": "lid"
+            },
+            {
+                "id": "lid_02",
+                "name": "orange lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 9
+    },
+    {
+        "scene_id": "scene_14",
+        "obj_ids": [
+            "kitchen_04",
+            "kitchen_10",
+            "kitchen_26",
+            "kitchen_27",
+            "kitchen_28"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_04",
+                "name": "bunch of red grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_26",
+                "name": "yellow jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_28",
+                "name": "can of Pringles chip",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_15",
+        "obj_ids": [
+            "kitchen_05",
+            "kitchen_14",
+            "kitchen_25",
+            "kitchen_31",
+            "container_10"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_05",
+                "name": "orange",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_14",
+                "name": "tomato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_25",
+                "name": "purple jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_31",
+                "name": "plastic knife",
+                "category": "item"
+            },
+            {
+                "id": "container_10",
+                "name": "blue plate",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_16",
+        "obj_ids": [
+            "kitchen_02",
+            "kitchen_02",
+            "kitchen_07",
+            "kitchen_11",
+            "kitchen_23",
+            "kitchen_29",
+            "kitchen_32"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_07",
+                "name": "mango",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_29",
+                "name": "yellow corn can",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_32",
+                "name": "steel knife",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_17",
+        "obj_ids": [
+            "kitchen_06",
+            "kitchen_09",
+            "kitchen_12",
+            "kitchen_27",
+            "kitchen_33",
+            "container_11",
+            "lid_01"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_06",
+                "name": "bunch of green grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_12",
+                "name": "carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_33",
+                "name": "black spoon",
+                "category": "item"
+            },
+            {
+                "id": "container_11",
+                "name": "blue bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_01",
+                "name": "blue lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_18",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_09",
+            "kitchen_16",
+            "kitchen_18",
+            "kitchen_20",
+            "kitchen_23"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_16",
+                "name": "white radish",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_18",
+                "name": "green chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_20",
+                "name": "purple eggplant",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_19",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_05",
+            "kitchen_07",
+            "kitchen_17",
+            "kitchen_25",
+            "container_11",
+            "container_14",
+            "lid_01",
+            "lid_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_05",
+                "name": "orange",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_07",
+                "name": "mango",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_17",
+                "name": "red chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_25",
+                "name": "purple jello box",
+                "category": "item"
+            },
+            {
+                "id": "container_11",
+                "name": "blue bowl",
+                "category": "container"
+            },
+            {
+                "id": "container_14",
+                "name": "pink bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_01",
+                "name": "blue lid",
+                "category": "lid"
+            },
+            {
+                "id": "lid_04",
+                "name": "pink lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 9
+    },
+    {
+        "scene_id": "scene_20",
+        "obj_ids": [
+            "kitchen_06",
+            "kitchen_12",
+            "kitchen_19",
+            "kitchen_23",
+            "kitchen_27",
+            "kitchen_29"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_06",
+                "name": "bunch of green grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_12",
+                "name": "carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_29",
+                "name": "yellow corn can",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_21",
+        "obj_ids": [
+            "kitchen_01",
+            "kitchen_10",
+            "kitchen_10",
+            "kitchen_19",
+            "kitchen_26",
+            "kitchen_29",
+            "container_09",
+            "container_12",
+            "lid_02"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_26",
+                "name": "yellow jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_29",
+                "name": "yellow corn can",
+                "category": "item"
+            },
+            {
+                "id": "container_09",
+                "name": "yellow plate",
+                "category": "container"
+            },
+            {
+                "id": "container_12",
+                "name": "orange bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_02",
+                "name": "orange lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 9
+    },
+    {
+        "scene_id": "scene_22",
+        "obj_ids": [
+            "kitchen_01",
+            "kitchen_01",
+            "kitchen_12",
+            "kitchen_13",
+            "kitchen_23"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_12",
+                "name": "carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_13",
+                "name": "garlic",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_23",
+        "obj_ids": [
+            "kitchen_09",
+            "kitchen_17",
+            "kitchen_27",
+            "kitchen_28",
+            "kitchen_30",
+            "container_01",
+            "container_14",
+            "lid_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_17",
+                "name": "red chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_28",
+                "name": "can of Pringles chip",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_14",
+                "name": "pink bowl",
+                "category": "container"
+            },
+            {
+                "id": "lid_04",
+                "name": "pink lid",
+                "category": "lid"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_24",
+        "obj_ids": [
+            "kitchen_11",
+            "kitchen_13",
+            "kitchen_16",
+            "kitchen_28",
+            "kitchen_33"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_13",
+                "name": "garlic",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_16",
+                "name": "white radish",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_28",
+                "name": "can of Pringles chip",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_33",
+                "name": "black spoon",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_25",
+        "obj_ids": [
+            "office_02",
+            "office_05",
+            "office_08",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_26",
+        "obj_ids": [
+            "office_04",
+            "office_07",
+            "office_09",
+            "office_10"
+        ],
+        "objects": [
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "office_09",
+                "name": "USB drive",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_27",
+        "obj_ids": [
+            "office_01",
+            "office_03",
+            "office_04",
+            "office_08",
+            "office_10",
+            "container_03"
+        ],
+        "objects": [
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_03",
+                "name": "pencil",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_28",
+        "obj_ids": [
+            "office_01",
+            "office_03",
+            "office_05",
+            "office_07",
+            "office_08",
+            "office_09"
+        ],
+        "objects": [
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_03",
+                "name": "pencil",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "office_09",
+                "name": "USB drive",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_29",
+        "obj_ids": [
+            "office_02",
+            "office_07",
+            "container_05",
+            "container_06"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_30",
+        "obj_ids": [
+            "office_01",
+            "office_03",
+            "office_06",
+            "office_08",
+            "office_10"
+        ],
+        "objects": [
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_03",
+                "name": "pencil",
+                "category": "item"
+            },
+            {
+                "id": "office_06",
+                "name": "glue stick",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_31",
+        "obj_ids": [
+            "office_02",
+            "office_04",
+            "office_05",
+            "office_10",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_32",
+        "obj_ids": [
+            "other_01",
+            "other_02",
+            "other_03",
+            "other_04"
+        ],
+        "objects": [
+            {
+                "id": "other_01",
+                "name": "ping pong ball",
+                "category": "item"
+            },
+            {
+                "id": "other_02",
+                "name": "apple-shaped candle",
+                "category": "item"
+            },
+            {
+                "id": "other_03",
+                "name": "duracell battery",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "other"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_33",
+        "obj_ids": [
+            "other_01",
+            "other_02",
+            "other_03",
+            "other_04",
+            "container_03",
+            "container_06"
+        ],
+        "objects": [
+            {
+                "id": "other_01",
+                "name": "ping pong ball",
+                "category": "item"
+            },
+            {
+                "id": "other_02",
+                "name": "apple-shaped candle",
+                "category": "item"
+            },
+            {
+                "id": "other_03",
+                "name": "duracell battery",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "other"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_34",
+        "obj_ids": [
+            "other_01",
+            "other_02",
+            "other_03",
+            "other_04",
+            "container_02"
+        ],
+        "objects": [
+            {
+                "id": "other_01",
+                "name": "ping pong ball",
+                "category": "item"
+            },
+            {
+                "id": "other_02",
+                "name": "apple-shaped candle",
+                "category": "item"
+            },
+            {
+                "id": "other_03",
+                "name": "duracell battery",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "other"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_35",
+        "obj_ids": [
+            "shape_11",
+            "shape_15",
+            "shape_15",
+            "shape_21",
+            "shape_28",
+            "shape_28",
+            "container_02"
+        ],
+        "objects": [
+            {
+                "id": "shape_11",
+                "name": "large yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_28",
+                "name": "green half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_28",
+                "name": "green half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_36",
+        "obj_ids": [
+            "shape_06",
+            "shape_07",
+            "shape_08",
+            "shape_08",
+            "shape_17",
+            "shape_21",
+            "shape_26",
+            "shape_27"
+        ],
+        "objects": [
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_07",
+                "name": "red half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_08",
+                "name": "small yellow cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_08",
+                "name": "small yellow cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_26",
+                "name": "small green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_27",
+                "name": "green cylinder",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_37",
+        "obj_ids": [
+            "shape_04",
+            "shape_05",
+            "shape_05",
+            "shape_25",
+            "shape_25",
+            "shape_26",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "shape_04",
+                "name": "large red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_26",
+                "name": "small green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_38",
+        "obj_ids": [
+            "shape_03",
+            "shape_07",
+            "shape_10",
+            "shape_11",
+            "shape_12",
+            "shape_14",
+            "shape_20"
+        ],
+        "objects": [
+            {
+                "id": "shape_03",
+                "name": "flat red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_07",
+                "name": "red half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_10",
+                "name": "flat yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_11",
+                "name": "large yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_39",
+        "obj_ids": [
+            "shape_05",
+            "shape_05",
+            "shape_06",
+            "shape_12",
+            "shape_16",
+            "shape_16",
+            "shape_23",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_16",
+                "name": "long blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_16",
+                "name": "long blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_23",
+                "name": "long green block",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_40",
+        "obj_ids": [
+            "shape_01",
+            "shape_01",
+            "shape_02",
+            "shape_08",
+            "shape_08",
+            "shape_13",
+            "shape_14",
+            "shape_17",
+            "shape_22",
+            "shape_22"
+        ],
+        "objects": [
+            {
+                "id": "shape_01",
+                "name": "small red cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_01",
+                "name": "small red cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_08",
+                "name": "small yellow cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_08",
+                "name": "small yellow cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_13",
+                "name": "yellow cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_22",
+                "name": "small green cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_22",
+                "name": "small green cube",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 10
+    },
+    {
+        "scene_id": "scene_41",
+        "obj_ids": [
+            "shape_01",
+            "shape_05",
+            "shape_05",
+            "shape_10",
+            "shape_10",
+            "shape_19",
+            "shape_19",
+            "shape_23",
+            "shape_24",
+            "shape_24",
+            "container_02",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "shape_01",
+                "name": "small red cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_05",
+                "name": "small red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_10",
+                "name": "flat yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_10",
+                "name": "flat yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_23",
+                "name": "long green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 12
+    },
+    {
+        "scene_id": "scene_42",
+        "obj_ids": [
+            "shape_03",
+            "shape_03",
+            "shape_04",
+            "shape_09",
+            "shape_20",
+            "shape_24",
+            "shape_24"
+        ],
+        "objects": [
+            {
+                "id": "shape_03",
+                "name": "flat red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_03",
+                "name": "flat red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_04",
+                "name": "large red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_43",
+        "obj_ids": [
+            "shape_07",
+            "shape_17",
+            "shape_18",
+            "shape_18",
+            "shape_21",
+            "shape_22",
+            "shape_27",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "shape_07",
+                "name": "red half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_18",
+                "name": "large blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_18",
+                "name": "large blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_22",
+                "name": "small green cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_27",
+                "name": "green cylinder",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_44",
+        "obj_ids": [
+            "shape_02",
+            "shape_02",
+            "shape_17",
+            "shape_18",
+            "shape_18",
+            "shape_22",
+            "shape_25",
+            "shape_26"
+        ],
+        "objects": [
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_18",
+                "name": "large blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_18",
+                "name": "large blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_22",
+                "name": "small green cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_26",
+                "name": "small green triangular prism",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_45",
+        "obj_ids": [
+            "shape_01",
+            "shape_01",
+            "shape_09",
+            "shape_09",
+            "shape_14",
+            "shape_16",
+            "shape_20",
+            "container_01",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "shape_01",
+                "name": "small red cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_01",
+                "name": "small red cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_16",
+                "name": "long blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 9
+    },
+    {
+        "scene_id": "scene_46",
+        "obj_ids": [
+            "shape_02",
+            "shape_02",
+            "shape_06",
+            "shape_13",
+            "shape_19",
+            "shape_20",
+            "shape_20",
+            "shape_22",
+            "shape_23",
+            "shape_25"
+        ],
+        "objects": [
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_13",
+                "name": "yellow cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_22",
+                "name": "small green cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_23",
+                "name": "long green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 10
+    },
+    {
+        "scene_id": "scene_47",
+        "obj_ids": [
+            "shape_03",
+            "shape_03",
+            "shape_04",
+            "shape_09",
+            "shape_15",
+            "shape_15",
+            "shape_16",
+            "shape_27",
+            "container_02",
+            "container_06"
+        ],
+        "objects": [
+            {
+                "id": "shape_03",
+                "name": "flat red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_03",
+                "name": "flat red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_04",
+                "name": "large red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_16",
+                "name": "long blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_27",
+                "name": "green cylinder",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 10
+    },
+    {
+        "scene_id": "scene_48",
+        "obj_ids": [
+            "shape_04",
+            "shape_13",
+            "shape_13",
+            "shape_14",
+            "shape_15",
+            "shape_21",
+            "shape_21",
+            "shape_25",
+            "shape_25",
+            "shape_26"
+        ],
+        "objects": [
+            {
+                "id": "shape_04",
+                "name": "large red triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_13",
+                "name": "yellow cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_13",
+                "name": "yellow cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_26",
+                "name": "small green triangular prism",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 10
+    },
+    {
+        "scene_id": "scene_49",
+        "obj_ids": [
+            "shape_02",
+            "shape_02",
+            "shape_12",
+            "shape_23",
+            "shape_24",
+            "shape_24",
+            "container_06"
+        ],
+        "objects": [
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_02",
+                "name": "long red block",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_23",
+                "name": "long green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_24",
+                "name": "flat green block",
+                "category": "item"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_50",
+        "obj_ids": [
+            "shape_06",
+            "shape_11",
+            "shape_12",
+            "shape_12",
+            "shape_20",
+            "shape_21"
+        ],
+        "objects": [
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_11",
+                "name": "large yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_20",
+                "name": "blue cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_21",
+                "name": "blue half cylinder",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_51",
+        "obj_ids": [
+            "shape_08",
+            "shape_10",
+            "shape_13",
+            "shape_14",
+            "shape_19",
+            "container_02",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "shape_08",
+                "name": "small yellow cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_10",
+                "name": "flat yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_13",
+                "name": "yellow cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_52",
+        "obj_ids": [
+            "shape_06",
+            "shape_07",
+            "shape_11",
+            "shape_23",
+            "shape_27",
+            "shape_28"
+        ],
+        "objects": [
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_07",
+                "name": "red half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_11",
+                "name": "large yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_23",
+                "name": "long green block",
+                "category": "item"
+            },
+            {
+                "id": "shape_27",
+                "name": "green cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_28",
+                "name": "green half cylinder",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_53",
+        "obj_ids": [
+            "shape_12",
+            "shape_12",
+            "shape_14",
+            "shape_16",
+            "shape_19",
+            "shape_19",
+            "shape_25",
+            "shape_25",
+            "container_01",
+            "container_06"
+        ],
+        "objects": [
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_12",
+                "name": "small yellow triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_14",
+                "name": "yellow half cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_16",
+                "name": "long blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_19",
+                "name": "small blue triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "shape_25",
+                "name": "large green triangular prism",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_06",
+                "name": "green basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 10
+    },
+    {
+        "scene_id": "scene_54",
+        "obj_ids": [
+            "shape_06",
+            "shape_09",
+            "shape_09",
+            "shape_15",
+            "shape_17",
+            "shape_17",
+            "shape_27"
+        ],
+        "objects": [
+            {
+                "id": "shape_06",
+                "name": "red cylinder",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_09",
+                "name": "long yellow block",
+                "category": "item"
+            },
+            {
+                "id": "shape_15",
+                "name": "small blue cube",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_17",
+                "name": "flat blue block",
+                "category": "item"
+            },
+            {
+                "id": "shape_27",
+                "name": "green cylinder",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "shape"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_55",
+        "obj_ids": [
+            "tool_01",
+            "tool_03",
+            "tool_06",
+            "tool_07",
+            "tool_08"
+        ],
+        "objects": [
+            {
+                "id": "tool_01",
+                "name": "scissors",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "tool_07",
+                "name": "wrench",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_56",
+        "obj_ids": [
+            "tool_01",
+            "tool_02",
+            "tool_03",
+            "tool_04",
+            "tool_05"
+        ],
+        "objects": [
+            {
+                "id": "tool_01",
+                "name": "scissors",
+                "category": "item"
+            },
+            {
+                "id": "tool_02",
+                "name": "screwdriver",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_57",
+        "obj_ids": [
+            "tool_04",
+            "tool_06",
+            "tool_07",
+            "tool_08",
+            "tool_09",
+            "container_04",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "tool_07",
+                "name": "wrench",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            },
+            {
+                "id": "tool_09",
+                "name": "pointed chisel",
+                "category": "item"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_58",
+        "obj_ids": [
+            "tool_01",
+            "tool_04",
+            "tool_05",
+            "tool_07",
+            "tool_08"
+        ],
+        "objects": [
+            {
+                "id": "tool_01",
+                "name": "scissors",
+                "category": "item"
+            },
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_07",
+                "name": "wrench",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_59",
+        "obj_ids": [
+            "tool_02",
+            "tool_03",
+            "tool_08",
+            "tool_09",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "tool_02",
+                "name": "screwdriver",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            },
+            {
+                "id": "tool_09",
+                "name": "pointed chisel",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_60",
+        "obj_ids": [
+            "tool_04",
+            "tool_05",
+            "tool_06",
+            "tool_07",
+            "tool_09"
+        ],
+        "objects": [
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "tool_07",
+                "name": "wrench",
+                "category": "item"
+            },
+            {
+                "id": "tool_09",
+                "name": "pointed chisel",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_61",
+        "obj_ids": [
+            "office_01",
+            "office_02",
+            "other_04",
+            "tool_05",
+            "tool_09",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_09",
+                "name": "pointed chisel",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office",
+            "other",
+            "tool"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_62",
+        "obj_ids": [
+            "office_04",
+            "office_05",
+            "office_07",
+            "tool_05",
+            "tool_08"
+        ],
+        "objects": [
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office",
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_63",
+        "obj_ids": [
+            "office_02",
+            "office_04",
+            "tool_01",
+            "tool_03",
+            "container_03",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "tool_01",
+                "name": "scissors",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office",
+            "tool"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_64",
+        "obj_ids": [
+            "tool_01",
+            "tool_03",
+            "tool_04",
+            "tool_06"
+        ],
+        "objects": [
+            {
+                "id": "tool_01",
+                "name": "scissors",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "tool"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_65",
+        "obj_ids": [
+            "office_02",
+            "office_04",
+            "office_09",
+            "tool_02",
+            "tool_06",
+            "tool_09",
+            "container_03"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_09",
+                "name": "USB drive",
+                "category": "item"
+            },
+            {
+                "id": "tool_02",
+                "name": "screwdriver",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "tool_09",
+                "name": "pointed chisel",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office",
+            "tool"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_66",
+        "obj_ids": [
+            "office_02",
+            "office_05",
+            "office_08",
+            "tool_02"
+        ],
+        "objects": [
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "tool_02",
+                "name": "screwdriver",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office",
+            "tool"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_67",
+        "obj_ids": [
+            "office_01",
+            "office_04",
+            "office_06",
+            "office_07",
+            "office_08",
+            "tool_08",
+            "container_01",
+            "container_02"
+        ],
+        "objects": [
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            },
+            {
+                "id": "office_06",
+                "name": "glue stick",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office",
+            "tool"
+        ],
+        "quantity": 8
+    },
+    {
+        "scene_id": "scene_68",
+        "obj_ids": [
+            "office_10",
+            "other_02",
+            "other_03",
+            "other_04",
+            "tool_07",
+            "tool_08"
+        ],
+        "objects": [
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            },
+            {
+                "id": "tool_07",
+                "name": "wrench",
+                "category": "item"
+            },
+            {
+                "id": "tool_08",
+                "name": "tweezers",
+                "category": "item"
+            },
+            {
+                "id": "other_02",
+                "name": "apple-shaped candle",
+                "category": "item"
+            },
+            {
+                "id": "other_03",
+                "name": "duracell battery",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office",
+            "other",
+            "tool"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_69",
+        "obj_ids": [
+            "office_06",
+            "other_04",
+            "tool_02",
+            "tool_04",
+            "tool_06",
+            "container_03",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "office_06",
+                "name": "glue stick",
+                "category": "item"
+            },
+            {
+                "id": "tool_02",
+                "name": "screwdriver",
+                "category": "item"
+            },
+            {
+                "id": "tool_04",
+                "name": "blue stripper",
+                "category": "item"
+            },
+            {
+                "id": "tool_06",
+                "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "other_04",
+                "name": "small allmax battery",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "office",
+            "other",
+            "tool"
+        ],
+        "quantity": 7
+    },
+    {
+        "scene_id": "scene_70",
+        "obj_ids": [
+            "office_07",
+            "office_08",
+            "other_02",
+            "tool_03",
+            "tool_05"
+        ],
+        "objects": [
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            },
+            {
+                "id": "tool_03",
+                "name": "scrapper",
+                "category": "item"
+            },
+            {
+                "id": "tool_05",
+                "name": "orange stripper",
+                "category": "item"
+            },
+            {
+                "id": "other_02",
+                "name": "apple-shaped candle",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "office",
+            "other",
+            "tool"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_71",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_15",
+            "kitchen_26",
+            "office_07",
+            "office_10",
+            "container_03"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_15",
+                "name": "red onion",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_26",
+                "name": "yellow jello box",
+                "category": "item"
+            },
+            {
+                "id": "office_07",
+                "name": "blue marker",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_72",
+        "obj_ids": [
+            "kitchen_01",
+            "kitchen_05",
+            "kitchen_07",
+            "kitchen_10",
+            "office_01",
+            "office_02"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_01",
+                "name": "banana",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_05",
+                "name": "orange",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_07",
+                "name": "mango",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "office_01",
+                "name": "black tape",
+                "category": "item"
+            },
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_73",
+        "obj_ids": [
+            "kitchen_09",
+            "kitchen_21",
+            "kitchen_27",
+            "kitchen_28",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_21",
+                "name": "small orange carrot",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_27",
+                "name": "carton of coconut water",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_28",
+                "name": "can of Pringles chip",
+                "category": "item"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_74",
+        "obj_ids": [
+            "kitchen_07",
+            "kitchen_10",
+            "kitchen_14",
+            "kitchen_31",
+            "office_05"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_07",
+                "name": "mango",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_14",
+                "name": "tomato",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_31",
+                "name": "plastic knife",
+                "category": "item"
+            },
+            {
+                "id": "office_05",
+                "name": "paper clip",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_75",
+        "obj_ids": [
+            "kitchen_23",
+            "kitchen_29",
+            "kitchen_32",
+            "office_03",
+            "container_03",
+            "container_05"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_29",
+                "name": "yellow corn can",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_32",
+                "name": "steel knife",
+                "category": "item"
+            },
+            {
+                "id": "office_03",
+                "name": "pencil",
+                "category": "item"
+            },
+            {
+                "id": "container_03",
+                "name": "pink basket",
+                "category": "container"
+            },
+            {
+                "id": "container_05",
+                "name": "yellow basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_76",
+        "obj_ids": [
+            "kitchen_02",
+            "kitchen_16",
+            "kitchen_30",
+            "kitchen_31",
+            "office_08"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_02",
+                "name": "strawberry",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_16",
+                "name": "white radish",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_30",
+                "name": "water bottle",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_31",
+                "name": "plastic knife",
+                "category": "item"
+            },
+            {
+                "id": "office_08",
+                "name": "green marker",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 5
+    },
+    {
+        "scene_id": "scene_77",
+        "obj_ids": [
+            "kitchen_06",
+            "kitchen_09",
+            "kitchen_11",
+            "office_06",
+            "container_02",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_06",
+                "name": "bunch of green grapes",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_09",
+                "name": "green pear",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_11",
+                "name": "potato",
+                "category": "item"
+            },
+            {
+                "id": "office_06",
+                "name": "glue stick",
+                "category": "item"
+            },
+            {
+                "id": "container_02",
+                "name": "big green shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_78",
+        "obj_ids": [
+            "kitchen_10",
+            "kitchen_18",
+            "kitchen_20",
+            "office_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_10",
+                "name": "yellow lemon",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_18",
+                "name": "green chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_20",
+                "name": "purple eggplant",
+                "category": "item"
+            },
+            {
+                "id": "office_04",
+                "name": "black pen",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 4
+    },
+    {
+        "scene_id": "scene_79",
+        "obj_ids": [
+            "kitchen_17",
+            "kitchen_25",
+            "kitchen_26",
+            "office_02",
+            "container_01",
+            "container_04"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_17",
+                "name": "red chili pepper",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_25",
+                "name": "purple jello box",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_26",
+                "name": "yellow jello box",
+                "category": "item"
+            },
+            {
+                "id": "office_02",
+                "name": "white tape",
+                "category": "item"
+            },
+            {
+                "id": "container_01",
+                "name": "big yellow shopping basket",
+                "category": "container"
+            },
+            {
+                "id": "container_04",
+                "name": "blue basket",
+                "category": "container"
+            }
+        ],
+        "category": [
+            "kitchen",
+            "office"
+        ],
+        "quantity": 6
+    },
+    {
+        "scene_id": "scene_80",
+        "obj_ids": [
+            "kitchen_03",
+            "kitchen_19",
+            "kitchen_22",
+            "kitchen_23"
+        ],
+        "objects": [
+            {
+                "id": "kitchen_03",
+                "name": "apple",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_19",
+                "name": "green romaine lettuce",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_22",
+                "name": "green lime",
+                "category": "item"
+            },
+            {
+                "id": "kitchen_23",
+                "name": "big corn",
+                "category": "item"
+            }
+        ],
+        "category": [
+            "kitchen"
+        ],
+        "quantity": 4
+    }
+]

@@ -4,7 +4,7 @@ import os
 import re
 
 
-scenes_json_path = "/Users/ykj/Desktop/github/ROMBUS/assets/scenes.json"
+scenes_json_path = "assets/scenes.json"
 
 def load_json(json_path):
     with open(json_path) as f:
@@ -40,7 +40,7 @@ def clean_and_round(raw_data):
         cleaned.append(new_item)
     return cleaned
 
-root_path = "/Users/ykj/Desktop/github/rombus_annotation_tool/output"
+root_path = "output"
 for fpath in sorted(os.listdir(root_path)):
     if '_3d.json' not in fpath:
         continue
@@ -55,7 +55,12 @@ for fpath in sorted(os.listdir(root_path)):
     try:
         assert sorted(extracted_obj_names) == sorted(scene_obj_names)
     except:
-        print(f"\nScene {scene_id}_{layout} Wrong match:\nPose file: {sorted(extracted_obj_names)}\nRecorded: {sorted(scene_obj_names)}")
+        if len(extracted_obj_names) == len(scene_obj_names):
+            print(f"\nScene {scene_id}_{layout} Wrong match:\nPose file: {sorted(scene_obj_names)}\nRecorded: {sorted(extracted_obj_names)}")
+            print('wrong name of object')
+        else:
+            print(f"\nScene {scene_id}_{layout} Wrong match:\nPose file: {sorted(scene_obj_names)}\nRecorded: {sorted(extracted_obj_names)}")
+            print('failure to record all objects')
 
     # assert sorted(extracted_obj_names) == sorted(scene_obj_names), f"\nScene {scene_id}_{layout} Wrong match:\nPose file: {sorted(extracted_obj_names)}\nRecorded: {sorted(scene_obj_names)}"
     

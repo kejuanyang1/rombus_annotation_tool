@@ -53,5 +53,16 @@
     },
     "category": "a big yellow shopping basket",
     "conf": null
+  },
+  {
+    "bbox": {
+      "cx": 411.46759706748435,
+      "cy": 597.6109215017062,
+      "w": 167.13254936708466,
+      "h": 144.57717176061854,
+      "angle": 0.0
+    },
+    "category": "a white tape",
+    "conf": null
   }
 ]

@@ -7,7 +7,8 @@
       "h": 151.22410997569102,
       "angle": 11.581300363842542
     },
-    "category": "a small allmax battery"
+    "category": "a small allmax battery",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 153.4031982421875,
       "angle": 0.0
     },
-    "category": "a white tape"
+    "category": "a white tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 94.96798706054688,
       "angle": 0.0
     },
-    "category": "a black tape"
+    "category": "a black tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 168.46104062868218,
       "angle": 2.836584350169792
     },
-    "category": "an orange stripper"
+    "category": "an orange stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 406.85488536819423,
       "angle": 4.721551272878205
     },
-    "category": "a pointed chisel"
+    "category": "a pointed chisel",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,6 +62,7 @@
       "h": 328.31950770375636,
       "angle": -5.862988175355645
     },
-    "category": "a blue basket"
+    "category": "a blue basket",
+    "conf": null
   }
 ]

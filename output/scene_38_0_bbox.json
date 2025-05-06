@@ -12,17 +12,6 @@
   },
   {
     "bbox": {
-      "cx": 1155.35168113122,
-      "cy": 319.26749388566986,
-      "w": 232.9548563633442,
-      "h": 92.10803386220817,
-      "angle": 8.968659056749237
-    },
-    "category": "a flat red block",
-    "conf": 0.19470757246017456
-  },
-  {
-    "bbox": {
       "cx": 681.6998291015625,
       "cy": 382.5318298339844,
       "w": 112.555419921875,
@@ -40,7 +29,7 @@
       "h": 84.60112857194433,
       "angle": -11.430643578859009
     },
-    "category": "a yellow half circle cylinder",
+    "category": "a yellow half cylinder",
     "conf": null
   },
   {
@@ -74,6 +63,17 @@
       "angle": 18.796212038885304
     },
     "category": "a large yellow triangular prism",
+    "conf": null
+  },
+  {
+    "bbox": {
+      "cx": 1160.477917798698,
+      "cy": 319.4255427342006,
+      "w": 233.8628639089626,
+      "h": 79.38001407620004,
+      "angle": 11.227685650706503
+    },
+    "category": "a flat red block",
     "conf": null
   }
 ]

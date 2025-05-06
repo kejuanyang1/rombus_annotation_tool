@@ -40,7 +40,7 @@
       "h": 79.99999999999994,
       "angle": -17.88264439756801
     },
-    "category": "a green half circle cylinder",
+    "category": "a green half cylinder",
     "conf": null
   },
   {
@@ -62,7 +62,7 @@
       "h": 80.0,
       "angle": 0.0
     },
-    "category": "a green half circle cylinder",
+    "category": "a green half cylinder",
     "conf": null
   },
   {
@@ -73,7 +73,7 @@
       "h": 112.20790000360728,
       "angle": 0.0
     },
-    "category": "a blue half circle cylinder",
+    "category": "a blue half cylinder",
     "conf": null
   }
 ]

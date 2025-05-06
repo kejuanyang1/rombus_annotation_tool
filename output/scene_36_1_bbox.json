@@ -51,7 +51,7 @@
       "h": 119.87644762351421,
       "angle": 0.0
     },
-    "category": "a blue half circle cylinder",
+    "category": "a blue half cylinder",
     "conf": null
   },
   {
@@ -74,6 +74,17 @@
       "angle": 26.130276581890985
     },
     "category": "a red half cylinder",
+    "conf": null
+  },
+  {
+    "bbox": {
+      "cx": 1224.0460922284385,
+      "cy": 161.57817909245742,
+      "w": 81.77440009860014,
+      "h": 156.9253310608267,
+      "angle": 13.927132930523584
+    },
+    "category": "a green cylinder",
     "conf": null
   }
 ]

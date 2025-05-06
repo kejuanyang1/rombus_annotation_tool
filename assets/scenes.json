@@ -717,7 +717,6 @@
             "kitchen_02",
             "kitchen_07",
             "kitchen_11",
-            "kitchen_23",
             "kitchen_29",
             "kitchen_32"
         ],
@@ -740,11 +739,6 @@
             {
                 "id": "kitchen_11",
                 "name": "potato",
-                "category": "item"
-            },
-            {
-                "id": "kitchen_23",
-                "name": "big corn",
                 "category": "item"
             },
             {
@@ -2259,8 +2253,8 @@
             "shape_02",
             "shape_06",
             "shape_13",
+            "shape_13",
             "shape_19",
-            "shape_20",
             "shape_20",
             "shape_22",
             "shape_23",
@@ -2288,13 +2282,13 @@
                 "category": "item"
             },
             {
-                "id": "shape_19",
-                "name": "small blue triangular prism",
+                "id": "shape_13",
+                "name": "yellow cylinder",
                 "category": "item"
             },
             {
-                "id": "shape_20",
-                "name": "blue cylinder",
+                "id": "shape_19",
+                "name": "small blue triangular prism",
                 "category": "item"
             },
             {
@@ -3189,17 +3183,12 @@
     {
         "scene_id": "scene_64",
         "obj_ids": [
-            "tool_01",
             "tool_03",
             "tool_04",
-            "tool_06"
+            "tool_06",
+            "office_10"
         ],
         "objects": [
-            {
-                "id": "tool_01",
-                "name": "scissors",
-                "category": "item"
-            },
             {
                 "id": "tool_03",
                 "name": "scrapper",
@@ -3213,6 +3202,11 @@
             {
                 "id": "tool_06",
                 "name": "big screw",
+                "category": "item"
+            },
+            {
+                "id": "office_10",
+                "name": "stapler",
                 "category": "item"
             }
         ],

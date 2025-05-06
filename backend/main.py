@@ -13,6 +13,10 @@ from pydantic import BaseModel, Field
 from typing import List
 import open3d as o3d
 import quaternion
+import numpy as np
+from scipy.spatial.transform import Rotation as R
+
+
 
 # -------------------------------------------------------------- paths -----
 ROOT          = Path(__file__).parent.parent
@@ -132,6 +136,9 @@ def pixel_to_cam(K, u, v, depth_m):
 def cam_to_base(pt_cam, trans, q_cam2base):
     # rotate then translate
     pt_base = q_cam2base * np.quaternion(0,*pt_cam) * q_cam2base.conjugate()
+    print(pt_base)
+    print(pt_base.x, pt_base.y, pt_base.z)
+    print(np.array([pt_base.x, pt_base.y, pt_base.z]) + trans)
     return np.array([pt_base.x, pt_base.y, pt_base.z]) + trans
 
 def yaw_to_quat(yaw_deg):
@@ -141,12 +148,43 @@ def yaw_to_quat(yaw_deg):
     )
     return [q.x, q.y, q.z, q.w]
 
+def get_rotation_quaternion(degree_tilt: float):
+    """
+    Constructs a quaternion for a camera looking slightly down at a table:
+    - Z axis points up from the table (camera looking down).
+    - X axis points toward the bottom of the image (table's front).
+    - Y axis points toward the right side of the image (table's right).
+    - Camera is tilted by `degree_tilt` degrees around the Y axis (image right).
+
+    Args:
+        degree_tilt (float): Tilt angle in degrees between the camera's Z axis and the table normal.
+
+    Returns:
+        tuple: Quaternion (w, x, y, z)
+    """
+    tilt_theta = np.radians(-degree_tilt)
+    rot_tilt = R.from_rotvec(np.array([0, 1, 0]) * tilt_theta)
+
+    # Step 2: Rotate world around camera's Z axis by +90 deg (counter-clockwise)
+    rot_z90 = R.from_euler('z', 90, degrees=True)
+
+    # Step 3: Invert Y axis: rotate around X by 180 deg
+    rot_invert_y = R.from_euler('z', 180, degrees=True)
+    rot_invert_x = R.from_euler('y', 180, degrees=True)
+
+    # Compose: apply in order (tilt -> rotate around Z -> invert Y)
+    final_rotation = rot_invert_x * rot_invert_y * rot_z90 * rot_tilt
+
+    quat_xyzw = final_rotation.as_quat()
+    return np.quaternion(quat_xyzw[3], quat_xyzw[0], -quat_xyzw[1], quat_xyzw[2])
+
+
 # ---- Robust depth sampler ----------------------------------------------------
 def filtered_depth(
         depth_m: np.ndarray,          # depth in *metres*, H×W
         x: int,
         y: int,
-        window_size: int = 5,
+        window_size: int = 10,
         max_diff: float = 0.02        # metres
     ) -> float | None:
     """
@@ -365,6 +403,7 @@ def annotate_list(payload: AnnotationList):
     K, trans, q_cam2base, height, width = load_metadata(img_id)
     fx, fy = K[0, 0], K[1, 1]
     cx, cy = K[0, 2], K[1, 2]
+    q_cam2base = get_rotation_quaternion(15)
 
 
     # ---------- build 3-D records ----------
@@ -388,22 +427,30 @@ def annotate_list(payload: AnnotationList):
     print(annos2d)
     for a in annos2d:
         bb = a["bbox"]
-        cx, cy = int(bb["cx"]), int(bb["cy"])
-        depth_c = filtered_depth(depth_m, cx, cy)
-        if depth_c is None: continue
+        center_x, center_y = int(bb["cx"]), int(bb["cy"])
+        depth_c = None
+        window = 5
+        while depth_c is None:
+            depth_c = filtered_depth(depth_m, center_x, center_y, window_size=window)
+            window += 5
+        # depth_c = filtered_depth(depth_m, cx, cy)
+        # if depth_c is None: continue
 
         # position
-        pt_cam  = pixel_to_cam(K, cx, cy, depth_c)
+        print(a['bbox'])
+        pt_cam  = pixel_to_cam(K, center_x, center_y, depth_c)
+        print(pt_cam)
         pt_base = cam_to_base(pt_cam, trans, q_cam2base)
+        print(pt_base)
 
         # size (w, h, height)
         rect = ((bb["cx"], bb["cy"]), (bb["w"], bb["h"]), -bb["angle"])
         w_m, h_m, hZ = metric_size_and_height(K, depth_m, rect, depth_c)
-        print(a)
+        # print(a)
         rec3d.append({
             "name": a["category"],
             "position": pt_base.tolist(),
-            "orientation": yaw_to_quat(bb["angle"]),
+            "orientation": bb["angle"],
             "size": [w_m, h_m, hZ]
         })
 

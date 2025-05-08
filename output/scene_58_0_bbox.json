@@ -7,7 +7,8 @@
       "h": 344.43161002345903,
       "angle": -70.87149057360995
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 558.4871192634217,
       "angle": -51.47217184095578
     },
-    "category": "an orange stripper"
+    "category": "an orange stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 540.7032084422783,
       "angle": 4.77186732804289
     },
-    "category": "a scissors"
+    "category": "a scissors",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 361.76553506076556,
       "angle": -16.240403712867636
     },
-    "category": "a blue stripper"
+    "category": "a blue stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,6 +51,7 @@
       "h": 363.57037132376485,
       "angle": 8.064704964499814
     },
-    "category": "a wrench"
+    "category": "a wrench",
+    "conf": null
   }
 ]

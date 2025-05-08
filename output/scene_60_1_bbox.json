@@ -7,7 +7,8 @@
       "h": 305.3988494873047,
       "angle": 0.0
     },
-    "category": "a pointed chisel"
+    "category": "a pointed chisel",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 318.9649047851561,
       "angle": -20.371824223762374
     },
-    "category": "a wrench"
+    "category": "a wrench",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 200.31835494588736,
       "angle": -20.684239768529185
     },
-    "category": "an orange stripper"
+    "category": "an orange stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 241.0814887278965,
       "angle": 0.0
     },
-    "category": "a big screw"
+    "category": "a big screw",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,6 +51,7 @@
       "h": 177.30355878756694,
       "angle": 10.450158606200066
     },
-    "category": "a blue stripper"
+    "category": "a blue stripper",
+    "conf": null
   }
 ]

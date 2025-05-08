@@ -7,7 +7,8 @@
       "h": 43.42942905721095,
       "angle": 11.476384912726127
     },
-    "category": "a pointed chisel"
+    "category": "a pointed chisel",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 159.75811767578125,
       "angle": 0.0
     },
-    "category": "a white tape"
+    "category": "a white tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 70.06746283552347,
       "angle": -32.96633290046985
     },
-    "category": "a black pen"
+    "category": "a black pen",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 72.82178386141057,
       "angle": 0.0
     },
-    "category": "a screwdriver"
+    "category": "a screwdriver",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 112.62457155148954,
       "angle": 0.0
     },
-    "category": "an USB drive"
+    "category": "an USB drive",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,7 +62,8 @@
       "h": 60.10292062928374,
       "angle": -22.28909223493006
     },
-    "category": "a big screw"
+    "category": "a big screw",
+    "conf": null
   },
   {
     "bbox": {
@@ -67,6 +73,7 @@
       "h": 406.6619473582591,
       "angle": 0.0
     },
-    "category": "a pink basket"
+    "category": "a pink basket",
+    "conf": null
   }
 ]

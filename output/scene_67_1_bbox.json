@@ -7,7 +7,8 @@
       "h": 478.0670166015625,
       "angle": 0.0
     },
-    "category": "a big yellow shopping basket"
+    "category": "a big yellow shopping basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 444.1892393056028,
       "angle": -5.116964227327994
     },
-    "category": "a big green shopping basket"
+    "category": "a big green shopping basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 78.96588134765616,
       "angle": 5.05674824857306
     },
-    "category": "a black pen"
+    "category": "a black pen",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 358.03174512560565,
       "angle": -13.044473499113465
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 69.77038332627232,
       "angle": -8.607323797794628
     },
-    "category": "a blue marker"
+    "category": "a blue marker",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,7 +62,8 @@
       "h": 81.38343056738222,
       "angle": 0.0
     },
-    "category": "a black tape"
+    "category": "a black tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -67,7 +73,8 @@
       "h": 76.63712144895293,
       "angle": -39.170796530351026
     },
-    "category": "a glue stick"
+    "category": "a glue stick",
+    "conf": null
   },
   {
     "bbox": {
@@ -77,6 +84,7 @@
       "h": 63.08240200501318,
       "angle": 18.73424198583204
     },
-    "category": "a green marker"
+    "category": "a green marker",
+    "conf": null
   }
 ]

@@ -7,7 +7,8 @@
       "h": 72.38785540532616,
       "angle": 15.499705047724111
     },
-    "category": "a black pen"
+    "category": "a black pen",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 124.6199951171875,
       "angle": 0.0
     },
-    "category": "a paper clip"
+    "category": "a paper clip",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 44.3636474609375,
       "angle": 0.0
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 323.927366258851,
       "angle": 44.2923308052318
     },
-    "category": "a blue marker"
+    "category": "a blue marker",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,6 +51,7 @@
       "h": 188.07214604204128,
       "angle": 39.18922707996495
     },
-    "category": "an orange stripper"
+    "category": "an orange stripper",
+    "conf": null
   }
 ]

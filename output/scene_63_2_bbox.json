@@ -7,7 +7,8 @@
       "h": 334.39266042884503,
       "angle": 49.86869388829737
     },
-    "category": "a black pen"
+    "category": "a black pen",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 147.4556884765625,
       "angle": 0.0
     },
-    "category": "a white tape"
+    "category": "a white tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 204.08002011948062,
       "angle": 16.656542736319366
     },
-    "category": "a scissors"
+    "category": "a scissors",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 448.1832233805416,
       "angle": -5.118798940606338
     },
-    "category": "a pink basket"
+    "category": "a pink basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 510.9157603449392,
       "angle": 0.0
     },
-    "category": "a scrapper"
+    "category": "a scrapper",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,6 +62,7 @@
       "h": 488.02625665286837,
       "angle": 0.0
     },
-    "category": "a blue basket"
+    "category": "a blue basket",
+    "conf": null
   }
 ]

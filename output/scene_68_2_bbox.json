@@ -7,7 +7,8 @@
       "h": 145.30124494602273,
       "angle": 32.38267037187271
     },
-    "category": "a stapler"
+    "category": "a stapler",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 166.8311767578125,
       "angle": 0.0
     },
-    "category": "an apple-shaped candle"
+    "category": "an apple-shaped candle",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 326.734130859375,
       "angle": 0.0
     },
-    "category": "a wrench"
+    "category": "a wrench",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 169.5584716796875,
       "angle": 0.0
     },
-    "category": "a duracell battery"
+    "category": "a duracell battery",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 106.64512634277344,
       "angle": 0.0
     },
-    "category": "a small allmax battery"
+    "category": "a small allmax battery",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,6 +62,7 @@
       "h": 388.7715321106081,
       "angle": -21.81910000672066
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   }
 ]

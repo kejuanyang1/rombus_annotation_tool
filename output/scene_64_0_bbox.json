@@ -7,7 +7,8 @@
       "h": 154.37481627608335,
       "angle": -27.855491980591747
     },
-    "category": "a blue stripper"
+    "category": "a blue stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 530.622398016667,
       "angle": 0.0
     },
-    "category": "a scrapper"
+    "category": "a scrapper",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 164.54896607513987,
       "angle": -20.24794974785257
     },
-    "category": "a stapler"
+    "category": "a stapler",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,6 +40,7 @@
       "h": 242.85586743959232,
       "angle": -21.297730985912693
     },
-    "category": "a big screw"
+    "category": "a big screw",
+    "conf": null
   }
 ]

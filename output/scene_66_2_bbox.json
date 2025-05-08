@@ -7,7 +7,8 @@
       "h": 466.00603005204084,
       "angle": -19.073177509959933
     },
-    "category": "a screwdriver"
+    "category": "a screwdriver",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 148.57421875,
       "angle": 0.0
     },
-    "category": "a white tape"
+    "category": "a white tape",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 83.603271484375,
       "angle": 0.0
     },
-    "category": "a paper clip"
+    "category": "a paper clip",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,6 +40,7 @@
       "h": 71.77876421354965,
       "angle": -22.475775879160544
     },
-    "category": "a green marker"
+    "category": "a green marker",
+    "conf": null
   }
 ]

@@ -7,7 +7,8 @@
       "h": 450.08278831886844,
       "angle": 17.149815537642173
     },
-    "category": "a screwdriver"
+    "category": "a screwdriver",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 56.842605346014004,
       "angle": 0.0
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 380.273917413643,
       "angle": -22.81433799846611
     },
-    "category": "a pointed chisel"
+    "category": "a pointed chisel",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 488.2523776631936,
       "angle": -48.91775193134658
     },
-    "category": "a scrapper"
+    "category": "a scrapper",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,6 +51,7 @@
       "h": 497.50345752336403,
       "angle": -6.171562920535121
     },
-    "category": "a yellow basket"
+    "category": "a yellow basket",
+    "conf": null
   }
 ]

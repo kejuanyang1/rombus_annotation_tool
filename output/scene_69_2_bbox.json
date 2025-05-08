@@ -7,7 +7,8 @@
       "h": 374.880069632595,
       "angle": -17.03145932402071
     },
-    "category": "a screwdriver"
+    "category": "a screwdriver",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 132.28228759765625,
       "angle": 0.0
     },
-    "category": "a small allmax battery"
+    "category": "a small allmax battery",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 67.70106213486369,
       "angle": 11.332352675372373
     },
-    "category": "a glue stick"
+    "category": "a glue stick",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 420.768576470056,
       "angle": -1.6933177160565847
     },
-    "category": "a pink basket"
+    "category": "a pink basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 80.00000000000016,
       "angle": -23.507258787776884
     },
-    "category": "a big screw"
+    "category": "a big screw",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,7 +62,8 @@
       "h": 111.971169315915,
       "angle": 0.0
     },
-    "category": "a blue stripper"
+    "category": "a blue stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -67,6 +73,7 @@
       "h": 325.51821383773824,
       "angle": 4.058322162825381
     },
-    "category": "a yellow basket"
+    "category": "a yellow basket",
+    "conf": null
   }
 ]

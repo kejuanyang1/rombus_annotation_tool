@@ -7,7 +7,8 @@
       "h": 324.11319251811847,
       "angle": 5.918032010976335
     },
-    "category": "a yellow basket"
+    "category": "a yellow basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -17,7 +18,8 @@
       "h": 114.82782559655992,
       "angle": -20.904641895959518
     },
-    "category": "a wrench"
+    "category": "a wrench",
+    "conf": null
   },
   {
     "bbox": {
@@ -27,7 +29,8 @@
       "h": 85.79165079635317,
       "angle": -29.2444420562676
     },
-    "category": "a tweezers"
+    "category": "a tweezers",
+    "conf": null
   },
   {
     "bbox": {
@@ -37,7 +40,8 @@
       "h": 344.34554300958064,
       "angle": 0.0
     },
-    "category": "a pointed chisel"
+    "category": "a pointed chisel",
+    "conf": null
   },
   {
     "bbox": {
@@ -47,7 +51,8 @@
       "h": 348.2798120857203,
       "angle": -18.433311801176668
     },
-    "category": "a blue stripper"
+    "category": "a blue stripper",
+    "conf": null
   },
   {
     "bbox": {
@@ -57,7 +62,8 @@
       "h": 364.183973994882,
       "angle": -11.397778828743384
     },
-    "category": "a blue basket"
+    "category": "a blue basket",
+    "conf": null
   },
   {
     "bbox": {
@@ -67,6 +73,7 @@
       "h": 60.15083494353182,
       "angle": -22.254795071624113
     },
-    "category": "a big screw"
+    "category": "a big screw",
+    "conf": null
   }
 ]

@@ -1,3 +1,7 @@
 Matt: scene 01_0 to scene 27_2
 Kendra: scene 28_0 to scene 55_2
 Lak: scene 56_0 to scene 80_2
+
+PDDL validation:
+Kendra: scene 01_0 to scene 40_2
+Matt: scene 41_0 to scene 80_2

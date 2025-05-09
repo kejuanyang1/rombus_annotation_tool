@@ -1,0 +1,20 @@
+(define (problem scene1)
+  (:domain manip)
+  (:objects
+    banana_1 banana_2 carrot garlic big corn - item
+  )
+  (:init
+    (ontable banana_1)
+    (ontable banana_2)
+    (ontable carrot)
+    (ontable garlic)
+    (ontable big corn)
+    (clear banana_1)
+    (clear banana_2)
+    (clear carrot)
+    (clear garlic)
+    (clear big corn)
+    (handempty)
+  )
+  (:goal (and ))
+)

@@ -1,0 +1,21 @@
+(define (problem scene1)
+  (:domain manip)
+  (:objects
+    long red block_1 long red block_2 flat blue block large blue triangular prism_1 large blue triangular prism_2 small green cube large green triangular prism small green triangular prism - obj
+  )
+  (:init
+    (ontable long red block_1)
+    (on long red block_2 long red block_1)
+    (ontable flat blue block)
+    (ontable large blue triangular prism_1)
+    (on large blue triangular prism_2 large blue triangular prism_1)
+    (ontable small green cube)
+    (on large green triangular prism long red block_2)
+    (ontable small green triangular prism)
+    (clear flat blue block)
+    (clear small green cube)
+    (clear small green triangular prism)
+    (handempty)
+  )
+  (:goal (and ))
+)

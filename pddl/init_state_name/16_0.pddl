@@ -1,0 +1,22 @@
+(define (problem scene1)
+  (:domain manip)
+  (:objects
+    strawberry_1 strawberry_2 mango potato yellow corn can steel knife - item
+  )
+  (:init
+    (ontable strawberry_1)
+    (ontable strawberry_2)
+    (ontable mango)
+    (ontable potato)
+    (ontable yellow corn can)
+    (ontable steel knife)
+    (clear strawberry_1)
+    (clear strawberry_2)
+    (clear mango)
+    (clear potato)
+    (clear yellow corn can)
+    (clear steel knife)
+    (handempty)
+  )
+  (:goal (and ))
+)

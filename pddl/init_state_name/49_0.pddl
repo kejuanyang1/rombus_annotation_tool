@@ -1,0 +1,25 @@
+(define (problem scene1)
+  (:domain manip)
+  (:objects
+    long red block_1 long red block_2 small yellow triangular prism long green block flat green block_1 flat green block_2 - pickable
+    green basket - container
+  )
+  (:init
+    (ontable long red block_1)
+    (ontable long red block_2)
+    (ontable small yellow triangular prism)
+    (ontable long green block)
+    (ontable flat green block_1)
+    (ontable flat green block_2)
+    (ontable green basket)
+    (clear long red block_1)
+    (clear long red block_2)
+    (clear small yellow triangular prism)
+    (clear long green block)
+    (clear flat green block_1)
+    (clear flat green block_2)
+    (clear green basket)
+    (handempty)
+  )
+  (:goal (and ))
+)

@@ -1,0 +1,283 @@
+(define (domain manip)
+  (:requirements :strips :typing :adl)
+
+  (:types
+    obj                 - object
+    pickable container  - obj
+    item  support  lid         - pickable
+  )
+
+  (:predicates
+    (clear    ?x   - obj)
+    (ontable  ?x   - obj)
+    (handempty)
+    (holding  ?x   - pickable)
+    (closed   ?c   - container)
+    (on       ?x   - pickable  ?y - obj)
+    (in       ?x   - pickable  ?c - container)
+    (left   ?x   - obj       ?y - obj)  ;;; x on left of y
+    (front  ?x   - obj       ?y - obj)  ;;; x on front of y
+  )
+
+  ;;; PICK-TYPE ACTIONS
+  (:action pick-up
+    :parameters (?it - pickable)
+    :precondition (and (clear ?it) (ontable ?it) (handempty))
+    :effect
+      (and
+        (holding ?it)
+        (forall (?refer - obj)
+          (when (left ?it ?refer)
+            (not (left ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (left ?refer ?it)
+            (not (left ?refer ?it))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?it ?refer)
+            (not (front ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?refer ?it)
+            (not (front ?refer ?it))
+          )
+        )
+        (not (clear ?it))
+        (not (ontable ?it))
+        (not (handempty))
+      )
+  )
+
+  (:action unstack
+    :parameters (?it - pickable ?under - support)
+    :precondition (and (on ?it ?under) (clear ?it) (handempty))
+    :effect
+      (and
+        (holding ?it)
+        (forall (?refer - obj)
+          (when (left ?it ?refer)
+            (not (left ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (left ?refer ?it)
+            (not (left ?refer ?it))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?it ?refer)
+            (not (front ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?refer ?it)
+            (not (front ?refer ?it))
+          )
+        )
+        (clear ?under)
+        (not (on ?it ?under))
+        (not (clear ?it))
+        (not (handempty))
+      )
+  )
+
+  (:action take-out
+    :parameters (?it - pickable ?c - container)
+    :precondition (and (in ?it ?c) (not (closed ?c)) (handempty))
+    :effect
+      (and
+        (holding ?it)
+        (forall (?refer - obj)
+          (when (left ?it ?refer)
+            (not (left ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (left ?refer ?it)
+            (not (left ?refer ?it))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?it ?refer)
+            (not (front ?it ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?refer ?it)
+            (not (front ?refer ?it))
+          )
+        )
+        (not (in ?it ?c))
+        (not (handempty))
+      )
+  )
+
+  (:action pick-lid
+    :parameters (?ld - lid ?c - container)
+    :precondition (and (closed ?c) (clear ?ld) (handempty))
+    :effect
+      (and
+        (holding ?ld)
+        (clear ?c)
+        (forall (?refer - obj)
+          (when (left ?ld ?refer)
+            (not (left ?ld ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (left ?refer ?ld)
+            (not (left ?refer ?ld))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?ld ?refer)
+            (not (front ?ld ?refer))
+          )
+        )
+        (forall (?refer - obj)
+          (when (front ?refer ?ld)
+            (not (front ?refer ?ld))
+          )
+        )
+        (not (closed ?c))
+        (not (clear ?ld))
+        (not (handempty))
+      )
+  )
+
+  ;;; PLACE-TYPE ACTIONS
+  (:action put-left
+    :parameters (?it    - pickable ?refer - obj)
+    :precondition (holding ?it)
+    :effect
+      (and
+        (ontable ?it)
+        (left  ?it ?refer)
+        (clear    ?it)
+        (handempty)
+        (not (holding ?it))
+      )
+  )
+
+  (:action put-right
+    :parameters (?it    - pickable ?refer - obj)
+    :precondition (holding ?it)
+    :effect
+      (and
+        (ontable ?it)
+        (left  ?refer ?it)
+        (clear    ?it)
+        (handempty)
+        (not (holding ?it))
+      )
+  )
+
+  (:action put-front
+    :parameters (?it    - pickable ?refer - obj)
+    :precondition (holding ?it)
+    :effect
+      (and
+        (ontable ?it)
+        (front  ?it ?refer)
+        (clear    ?it)
+        (handempty)
+        (not (holding ?it))
+      )
+  )
+
+  (:action put-behind
+    :parameters (?it    - pickable ?refer - obj)
+    :precondition (holding ?it)
+    :effect
+      (and
+        (ontable ?it)
+        (front  ?refer ?it)
+        (clear    ?it)
+        (handempty)
+        (not (holding ?it))
+      )
+  )
+
+  (:action put-in
+    :parameters (?it - pickable ?c - container)
+    :precondition (and (holding ?it) (not (closed ?c)))
+    :effect
+      (and
+        (in       ?it ?c)
+        (clear    ?it)
+        (handempty)
+        (not (holding ?it))
+      )
+  )
+
+  (:action stack
+    :parameters (?it    - pickable ?under - support)
+    :precondition (and (holding ?it) (clear ?under))
+    :effect
+      (and
+        (on       ?it ?under)
+        (clear    ?it)
+        (not (clear ?under))
+        (handempty)
+        (not (holding ?it))
+        (forall (?x - obj)
+          (when (left ?under ?x)
+            (left ?it ?x)
+          )
+        )
+        (forall (?x - obj)
+          (when (left ?x ?under)
+            (left ?x ?it)
+          )
+        )
+        (forall (?x - obj)
+          (when (front ?under ?x)
+            (front ?it ?x)
+          )
+        )
+        (forall (?x - obj)
+          (when (front ?x ?under)
+            (front ?x ?it)
+          )
+        )
+      )
+  )
+
+  (:action place-lid
+    :parameters (?ld - lid ?c - container)
+    :precondition (and (holding ?ld) (clear ?c) (not (closed ?c)))
+    :effect
+      (and
+        (on       ?ld ?c)
+        (closed   ?c)
+        (clear    ?ld)
+        (not (clear ?c))
+        (handempty)
+        (not (holding ?ld))
+        (forall (?x - obj)
+          (when (left ?c ?x)
+            (left ?ld ?x)
+          )
+        )
+        (forall (?x - obj)
+          (when (left ?x ?c)
+            (left ?x ?ld)
+          )
+        )
+        (forall (?x - obj)
+          (when (front ?c ?x)
+            (front ?ld ?x)
+          )
+        )
+        (forall (?x - obj)
+          (when (front ?x ?c)
+            (front ?x ?ld)
+          )
+        )        
+      )
+  )
+)

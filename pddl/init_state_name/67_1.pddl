@@ -17,8 +17,6 @@
     (in black tape big yellow shopping basket)
     (in glue stick big yellow shopping basket)
     (in blue marker big green shopping basket)
-    (closed big yellow shopping basket)
-    (closed big green shopping basket)
     (handempty)
     (clear green marker)
     (clear tweezers)

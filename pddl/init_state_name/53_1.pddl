@@ -12,7 +12,7 @@
     (in small blue triangular prism_1 big yellow shopping basket)
     (ontable small blue triangular prism_2)
     (ontable large green triangular prism_1)
-    (in large green triangular prism_2 green basket)
+    (ontable large green triangular prism_2)
     (clear small yellow triangular prism_2)
     (clear small blue triangular prism_2)
     (clear large green triangular prism_1)

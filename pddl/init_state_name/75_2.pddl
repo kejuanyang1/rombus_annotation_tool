@@ -15,7 +15,6 @@
     (ontable pink basket)
     (ontable yellow basket)
     (in steel knife yellow basket)
-    (closed yellow basket)
     (clear big corn)
     (clear yellow corn can)
     (clear pencil)

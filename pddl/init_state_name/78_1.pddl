@@ -10,7 +10,7 @@
     (ontable yellow lemon)
     (ontable green chili pepper)
     (ontable purple eggplant)
-    (ontable black pen)
+    (on black pen green chili pepper)
     (clear yellow lemon)
     (clear green chili pepper)
     (clear purple eggplant)

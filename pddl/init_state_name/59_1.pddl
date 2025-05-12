@@ -12,7 +12,7 @@
     (ontable tweezers)
     (ontable pointed chisel)
     (in scrapper yellow basket)
-    (closed yellow basket)
+    (ontable yellow basket)
     (handempty)
     (clear screwdriver)
     (clear tweezers)

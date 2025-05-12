@@ -13,8 +13,6 @@
     (ontable blue stripper)
     (ontable tweezers)
     (ontable pointed chisel)
-    (in wrench blue basket)
-    (in big screw yellow basket)
     (closed blue basket)
     (closed yellow basket)
     (clear blue stripper)

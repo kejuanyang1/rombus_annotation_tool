@@ -14,7 +14,7 @@
     (ontable pointed chisel)
     (in black tape blue basket)
     (in small allmax battery blue basket)
-    (closed blue basket)
+    (ontable blue basket)
     (handempty)
     (clear white tape)
     (clear orange stripper)

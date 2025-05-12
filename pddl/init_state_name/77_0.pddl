@@ -13,8 +13,6 @@
     (in bunch of green grapes blue basket)
     (ontable green pear)
     (ontable glue stick)
-    (closed big green shopping basket)
-    (closed blue basket)
     (clear green pear)
     (clear glue stick)
     (handempty)

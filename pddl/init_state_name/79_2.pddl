@@ -13,8 +13,6 @@
     (ontable white tape)
     (in purple jello box big yellow shopping basket)
     (in yellow jello box blue basket)
-    (closed big yellow shopping basket)
-    (closed blue basket)
     (handempty)
     (clear red chili pepper)
     (clear white tape)

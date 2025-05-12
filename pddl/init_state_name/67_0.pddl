@@ -23,8 +23,6 @@
     (clear blue marker)
     (clear tweezers)
     (clear green marker)
-    (clear big yellow shopping basket)
-    (clear big green shopping basket)
     (handempty)
   )
   (:goal (and ))

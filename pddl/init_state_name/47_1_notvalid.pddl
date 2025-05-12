@@ -13,6 +13,7 @@
     (ontable small blue cube_2)
     (ontable long blue block)
     (ontable green cylinder)
+    (ontable small green triangular prism)
     (ontable big green shopping basket)
     (ontable green basket)
     (clear flat red block_1)

@@ -15,8 +15,6 @@
     (ontable blue stripper)
     (in big screw yellow basket)
     (in small allmax battery pink basket)
-    (closed pink basket)
-    (closed yellow basket)
     (handempty)
     (clear glue stick)
     (clear screwdriver)

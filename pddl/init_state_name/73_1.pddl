@@ -12,7 +12,6 @@
     (ontable carton of coconut water)
     (ontable can of Pringles chip)
     (in small orange carrot yellow basket)
-    (closed yellow basket)
     (handempty)
     (clear green pear)
     (clear carton of coconut water)

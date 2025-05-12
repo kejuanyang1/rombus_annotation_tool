@@ -16,8 +16,6 @@
     (ontable yellow half cylinder)
     (ontable long blue block)
     (ontable blue cylinder)
-    (not (closed big yellow shopping basket))
-    (not (closed blue basket))
     (clear long yellow block_2)
     (clear yellow half cylinder)
     (clear long blue block)

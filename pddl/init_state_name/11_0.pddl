@@ -12,7 +12,6 @@
     (ontable green apple)
     (ontable red onion)
     (in small orange carrot blue basket)
-    (closed blue basket)
     (handempty)
     (clear apple)
     (clear green apple)

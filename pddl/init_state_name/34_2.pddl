@@ -12,7 +12,6 @@
     (in apple-shaped candle big green shopping basket)
     (in duracell battery big green shopping basket)
     (in small allmax battery big green shopping basket)
-    (closed big green shopping basket)
     (handempty)
     (clear ping pong ball)
   )

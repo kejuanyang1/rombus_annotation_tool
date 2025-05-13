@@ -22,7 +22,6 @@
     (clear can of Pringles chip)
     (clear water bottle)
     (clear pink lid)
-    (not (closed pink bowl))
   )
   (:goal (and ))
 )

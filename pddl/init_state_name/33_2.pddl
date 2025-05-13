@@ -13,8 +13,6 @@
     (ontable apple-shaped candle)
     (in duracell battery green basket)
     (in small allmax battery pink basket)
-    (closed pink basket)
-    (closed green basket)
     (handempty)
     (clear ping pong ball)
     (clear apple-shaped candle)

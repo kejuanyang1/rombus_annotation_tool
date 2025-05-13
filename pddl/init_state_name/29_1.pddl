@@ -11,8 +11,6 @@
     (ontable blue marker)
     (ontable yellow basket)
     (ontable green basket)
-    (closed yellow basket)
-    (closed green basket)
     (clear blue marker)
     (handempty)
   )

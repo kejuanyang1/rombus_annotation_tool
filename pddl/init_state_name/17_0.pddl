@@ -17,7 +17,6 @@
     (ontable black spoon)
     (ontable blue lid)
     (ontable blue bowl)
-    (closed blue bowl)
     (handempty)
     (clear bunch of green grapes)
     (clear green pear)

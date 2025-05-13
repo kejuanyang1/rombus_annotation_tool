@@ -14,7 +14,6 @@
     (ontable purple eggplant)
     (ontable small orange carrot)
     (in water bottle big yellow shopping basket)
-    (closed big yellow shopping basket)
     (clear tomato)
     (clear red onion)
     (clear purple eggplant)

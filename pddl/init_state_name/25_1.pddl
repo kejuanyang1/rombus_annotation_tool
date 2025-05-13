@@ -10,7 +10,6 @@
     (in white tape yellow basket)
     (ontable paper clip)
     (ontable green marker)
-    (closed yellow basket)
     (clear paper clip)
     (clear green marker)
     (handempty)

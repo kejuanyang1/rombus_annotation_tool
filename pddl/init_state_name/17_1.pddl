@@ -21,7 +21,6 @@
     (clear carton of coconut water)
     (clear black spoon)
     (clear blue lid)
-    (not (closed blue bowl))
     (handempty)
   )
   (:goal (and ))

@@ -19,7 +19,6 @@
     (clear yellow jello box)
     (clear white tape)
     (clear blue basket)
-    (closed big yellow shopping basket)
     (handempty)
   )
   (:goal (and ))

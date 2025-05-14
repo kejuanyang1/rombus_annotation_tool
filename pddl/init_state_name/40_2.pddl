@@ -1,8 +1,12 @@
 (define (problem scene1)
   (:domain manip)
   (:objects
-    small red cube_1 small red cube_2 long red block small yellow cube_1 small yellow cube_2
-    yellow cylinder yellow half cylinder flat blue block small green cube_1 small green cube_2 - obj
+    small red cube_1 small red cube_2 - support
+    long red block - support
+    small yellow cube_1 small yellow cube_2 - support
+    yellow cylinder yellow half cylinder - item
+    flat blue block - support
+    small green cube_1 small green cube_2 - support
   )
   (:init
     (ontable long red block)

@@ -15,8 +15,6 @@
     (ontable small blue triangular prism)
     (in small yellow cube blue basket)
     (in yellow cylinder blue basket)
-    (closed big green shopping basket)
-    (closed blue basket)
     (handempty)
     (clear flat yellow block)
     (clear yellow half cylinder)

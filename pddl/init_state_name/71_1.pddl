@@ -14,7 +14,6 @@
     (ontable blue marker)
     (in apple pink basket)
     (on red onion yellow jello box)
-    (closed pink basket)
     (clear red onion)
     (clear stapler)
     (clear blue marker)

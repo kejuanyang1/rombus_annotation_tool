@@ -1,7 +1,8 @@
 (define (problem scene1)
   (:domain manip)
   (:objects
-    strawberry_1 strawberry_2 orange yellow corn can water bottle plastic knife black spoon - item
+    strawberry_1 strawberry_2 orange yellow corn can water bottle plastic knife - item
+    black spoon - support
   )
   (:init
     (ontable strawberry_1)

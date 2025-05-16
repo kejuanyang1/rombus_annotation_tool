@@ -14,7 +14,6 @@
     (ontable green marker)
     (ontable stapler)
     (in black tape pink basket)
-    (closed pink basket)
     (clear pencil)
     (clear black pen)
     (clear green marker)

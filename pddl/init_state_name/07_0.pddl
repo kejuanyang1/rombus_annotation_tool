@@ -17,7 +17,6 @@
     (ontable green basket)
     (ontable pink bowl)
     (ontable pink lid)
-    (closed pink bowl)
     (handempty)
     (clear banana)
     (clear bunch of red grapes)

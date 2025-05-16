@@ -17,7 +17,6 @@
     (ontable purple jello box)
     (ontable can of Pringles chip)
     (ontable steel knife)
-    (closed can of Pringles chip)
     (clear carrot)
     (clear green chili pepper)
     (clear green lime_1)

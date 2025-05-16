@@ -8,12 +8,11 @@
   )
   (:init
     (ontable white tape)
-    (in blue marker yellow basket)
+    (ontable blue marker)
     (ontable yellow basket)
     (ontable green basket)
     (clear white tape)
     (clear green basket)
-    (not (closed yellow basket))
     (handempty)
   )
   (:goal (and ))

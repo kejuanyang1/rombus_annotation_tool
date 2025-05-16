@@ -389,6 +389,20 @@ def get_object_candidates(image_id: str):
 def get_init_annotations(image_id: str):
     return get_common_boxes(image_id)
 
+def true_center(bbox: dict) -> tuple[float, float]:
+    """
+    将前端回传的 (cx, cy, w, h, angle) 修正为真正几何中心
+    假设 angle 顺时针为正，单位 ° ，旋转中心在左上角
+    """
+    cx0, cy0 = bbox["cx"], bbox["cy"]
+    w, h, angle = bbox["w"], bbox["h"], bbox["angle"]
+    theta = math.radians(angle)
+
+    dx, dy = w / 2.0, h / 2.0
+    cx = cx0 + (math.cos(theta) - 1) * dx - math.sin(theta) * dy
+    cy = cy0 + math.sin(theta) * dx + (math.cos(theta) - 1) * dy
+    return cx, cy
+
 @app.post("/api/annotate")
 def annotate_list(payload: AnnotationList):
     """
@@ -397,6 +411,13 @@ def annotate_list(payload: AnnotationList):
     """
     annos2d = [a.dict(by_alias=True) for a in payload.annos]
     save_boxes(payload.image_id, annos2d)
+
+    annos2d = []
+    for anno in payload.annos:
+        a = anno.dict(by_alias=True)              # 👉 转成普通 dict
+        bbox = a["bbox"]
+        bbox["cx"], bbox["cy"] = true_center(bbox)  # 🚩 修正中心
+        annos2d.append(a)
 
     img_id = payload.image_id
 

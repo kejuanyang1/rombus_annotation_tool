@@ -14,6 +14,7 @@
     (ontable blue bowl)
     (ontable orange bowl)
     (ontable orange lid)
+    (on blue lid blue bowl)
     (closed blue bowl)
     (clear yellow lemon_1)
     (clear yellow lemon_2)

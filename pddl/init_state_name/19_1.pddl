@@ -19,6 +19,7 @@
     (ontable blue lid)
     (ontable pink bowl)
     (in orange blue bowl)
+    (on pink lid pink bowl)
     (closed pink bowl)
     (handempty)
     (clear apple)

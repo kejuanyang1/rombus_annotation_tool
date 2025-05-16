@@ -23,7 +23,6 @@
     (clear big screw)
     (clear pointed chisel)
     (clear pink basket)
-    (not (closed pink basket))
     (handempty)
   )
   (:goal (and ))

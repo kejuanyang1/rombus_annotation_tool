@@ -12,7 +12,7 @@
     (ontable carton of coconut water)
     (ontable blue lid)
     (in yellow lemon_1 orange bowl)
-    (closed orange bowl)
+    (ontable orange bowl)
     (handempty)
     (clear yellow lemon_2)
     (clear red chili pepper)

@@ -13,8 +13,6 @@
     (ontable small allmax battery)
     (in apple-shaped candle pink basket)
     (in duracell battery green basket)
-    (closed pink basket)
-    (closed green basket)
     (clear ping pong ball)
     (clear small allmax battery)
     (handempty)

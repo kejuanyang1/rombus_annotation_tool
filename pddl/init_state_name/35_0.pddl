@@ -24,7 +24,6 @@
     (clear green half cylinder_1)
     (clear green half cylinder_2)
     (clear big green shopping basket)
-    (not (closed big green shopping basket))
     (handempty)
   )
   (:goal (and))

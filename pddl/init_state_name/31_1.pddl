@@ -12,7 +12,6 @@
     (ontable stapler)
     (ontable paper clip)
     (in white tape yellow basket)
-    (closed yellow basket)
     (clear black pen)
     (clear stapler)
     (clear paper clip)

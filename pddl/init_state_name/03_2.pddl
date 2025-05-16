@@ -10,7 +10,6 @@
     (ontable potato)
     (ontable garlic)
     (ontable blue basket)
-    (closed blue basket)
     (clear banana_1)
     (clear banana_2)
     (clear potato)

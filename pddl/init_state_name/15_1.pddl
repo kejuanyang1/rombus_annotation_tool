@@ -12,7 +12,6 @@
     (ontable purple jello box)
     (ontable plastic knife)
     (on tomato blue plate)
-    (closed blue plate)
     (handempty)
     (clear orange)
     (clear purple jello box)

@@ -11,8 +11,6 @@
     (ontable red chili pepper)
     (ontable green romaine lettuce)
     (ontable carton of coconut water)
-    (ontable blue lid)
-    (ontable orange lid)
     (closed blue bowl)
     (closed orange bowl)
     (on blue lid blue bowl)

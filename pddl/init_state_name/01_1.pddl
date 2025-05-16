@@ -19,7 +19,6 @@
     (in potato big green shopping basket)
     (ontable big green shopping basket)
     (ontable green bowl)
-    (closed green bowl)
     (handempty)
     (clear mango)
     (clear green pear)

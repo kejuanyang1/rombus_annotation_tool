@@ -1,7 +1,7 @@
 (define (problem scene1)
   (:domain manip)
   (:objects
-    flat red block_1 flat red block_2 large red triangular prism long yellow block small blue cube_1 small blue cube_2 long blue block green cylinder - pickable
+    flat red block_1 flat red block_2 large red triangular prism long yellow block small blue cube_1 small blue cube_2 long blue block green cylinder small green triangular prism - pickable
     big green shopping basket green basket - container
   )
   (:init

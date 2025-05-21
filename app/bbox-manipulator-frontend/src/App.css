@@ -1,0 +1,331 @@
+/* General App Styles */
+.App {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  padding: 20px;
+  color: #333;
+  max-width: 100vw;
+  /* overflow-x: hidden; /* Be careful with this, can hide useful scrollbars if content legitimately overflows */
+}
+
+.App h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+.App h2 {
+  color: #34495e;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 10px;
+  margin-top: 30px;
+}
+
+.error {
+  color: #e74c3c;
+  background-color: #fbeaea;
+  border: 1px solid #e74c3c;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 15px 0;
+}
+
+/* Scene Selector */
+.scene-selector-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.scene-id-input {
+  padding: 8px 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 1em;
+  flex-grow: 1;
+  max-width: 300px;
+}
+
+/* Main Layout for Image, Plot, and Controls */
+.app-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens or if content is too wide */
+  gap: 25px;
+  margin-top: 20px;
+  align-items: flex-start;
+}
+
+.original-image-container {
+  flex: 1 1 450px; /* Allow to grow and shrink, base size ~450px */
+  min-width: 300px;
+  /* max-width: 50%; */ /* Optional: if you want to cap it relative to parent */
+}
+
+.original-image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f0f0f0; /* BG for while image loads or if transparent */
+  object-fit: contain; /* Important for aspect ratio within fixed max-height */
+}
+.placeholder-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    color: #999;
+    font-style: italic;
+    background-color: #f9f9f9;
+}
+
+
+.js-plot-container {
+  flex-shrink: 0; /* Plot SVG should not shrink below its defined size */
+  /* SVG within JSPlotter will define its own width/height */
+}
+
+.controls-panel-container {
+  flex: 1 1 320px; /* Allow to grow and shrink, base size 320px */
+  min-width: 300px; /* Ensure it's usable */
+}
+
+.controls-panel {
+  border: 1px solid #dde;
+  padding: 20px;
+  border-radius: 6px;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.controls-panel h4, .controls-panel h5 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  color: #2980b9;
+}
+.controls-panel h4:first-child {
+    margin-top: 0;
+}
+.controls-panel p {
+  margin: 8px 0;
+  font-size: 0.95em;
+}
+.selected-id {
+    font-weight: bold;
+    color: #2980b9;
+    background-color: #ecf0f1;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+.instruction {
+    font-style: italic;
+    color: #555;
+    font-size: 0.9em;
+    margin-top: 12px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border-left: 3px solid #7f8c8d;
+}
+
+.control-button {
+  background-color: #ecf0f1;
+  border: 1px solid #bdc3c7;
+  padding: 9px 14px;
+  margin: 5px 5px 5px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9em;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.control-button:hover {
+  background-color: #dfe6e9;
+  border-color: #95a5a6;
+}
+.control-button.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+}
+.control-button:disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+  border-color: #ddd;
+}
+
+.operation-details {
+  border: 1px solid #ecf0f1;
+  padding: 15px;
+  margin-top: 15px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+.operation-details h5 {
+    margin-top: 0;
+    color: #3498db;
+}
+
+.direction-controls, .distance-control {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.direction-controls span {
+    margin-right: 5px;
+    font-weight: 500;
+}
+.direction-button {
+    min-width: 60px;
+}
+
+.distance-input {
+  padding: 7px 9px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  width: 80px;
+  margin-left: 5px;
+}
+.distance-control label {
+    font-weight: 500;
+}
+
+.action-button {
+    background-color: #2ecc71; /* Green */
+    color: white;
+    border-color: #27ae60;
+}
+.action-button:hover {
+    background-color: #27ae60;
+}
+.action-button:disabled {
+    background-color: #95a5a6;
+    border-color: #7f8c8d;
+}
+
+
+.save-button {
+    margin-top: 25px;
+    padding: 12px 18px;
+    font-size: 1em;
+    background-color: #34495e;
+    color: white;
+    border: none;
+}
+.save-button:hover {
+    background-color: #2c3e50;
+}
+
+
+
+.interaction-history-box {
+  background-color: #fdfdfd;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.85em;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1.4;
+}
+
+/* --- Styles for new layout within Controls Panel --- */
+.controls-panel hr.controls-separator { /* Style for the hr tag */
+  border: none;
+  border-top: 1px dashed #ccc;
+  margin: 20px 0;
+}
+
+.controls-top-row {
+display: flex;
+flex-direction: row;
+flex-wrap: wrap; /* Allow wrapping if panel is extremely narrow */
+gap: 20px;       /* Space between selection status and trajectory history */
+margin-bottom: 10px; /* Space before the next HR or operations */
+}
+
+.selection-status-block {
+flex: 1; /* Allows it to take available space */
+min-width: 200px; /* Prevent it from getting too squished */
+/* Add any specific padding or border if needed */
+}
+
+.trajectory-section-block { /* This replaces the old .trajectory-section for styling when inside controls */
+flex: 1.5; /* Allows it to take a bit more space than selection, adjust as needed */
+min-width: 250px; /* Prevent it from getting too squished */
+/* border-left: 1px solid #eee; /* Optional separator */
+/* padding-left: 20px; /* Optional padding if there's a border */
+}
+
+.trajectory-section-block h3 {
+margin-top: 0; /* Align with "Selection Status" heading if desired */
+margin-bottom: 10px;
+font-size: 1.1em;
+color: #34495e;
+}
+
+.trajectory-section-block .interaction-history-box {
+/* Max height can be adjusted to fit better in the side-by-side layout */
+max-height: 120px; /* Reduced max-height */
+margin-bottom: 10px; /* Space before save button */
+/* Existing styles for font, padding, border are likely fine */
+}
+
+.trajectory-section-block .save-button {
+margin-top: 0; /* Removed top margin as history box has bottom margin */
+width: 100%;   /* Make save button take full width of this block */
+box-sizing: border-box;
+}
+
+/* Error instruction styling */
+.instruction.error-instruction {
+  color: #c0392b;
+  border-left-color: #c0392b;
+  background-color: #fadbd8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1300px) { /* Adjust breakpoint for when controls stack */
+  .app-layout {
+    flex-direction: column;
+    align-items: stretch; /* Make items take full width when stacked */
+  }
+  .original-image-container,
+  .js-plot-container,
+  .controls-panel-container {
+    flex-basis: auto;
+    width: 100%; /* Take full width when stacked */
+    max-width: none; /* Remove max-width constraint when stacked */
+    margin-bottom: 20px; /* Add space between stacked items */
+  }
+  .js-plot-container {
+    display: flex; /* Center SVG if it's smaller than 100% width */
+    justify-content: center;
+  }
+  .original-image-container img {
+    max-height: 500px; /* Adjust image height */
+  }
+}
+
+@media (max-width: 768px) { /* Further adjustments for smaller screens */
+    .original-image-container img {
+        max-height: 350px;
+    }
+    .control-button, .action-button, .save-button {
+        padding: 8px 10px;
+        font-size: 0.85em;
+    }
+    .direction-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .direction-button {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}

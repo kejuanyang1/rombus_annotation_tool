@@ -29,12 +29,26 @@
 }
 
 /* Scene Selector */
-.scene-selector-form {
+
+
+.scene-navigation-controls {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
   align-items: center;
+  gap: 10px; /* Space between prev, selector, and next buttons */
+  margin-bottom: 20px; /* Same as existing scene-selector-form */
 }
+
+.scene-selector-form {
+  margin-bottom: 0; /* Remove bottom margin if it's part of scene-navigation-controls */
+  /* flex-grow: 1; /* Optionally allow the form itself to grow if needed */
+}
+
+.nav-button {
+  padding: 8px 12px; /* Match styling of other control buttons if desired */
+}
+
+
+
 .scene-id-input {
   padding: 8px 10px;
   border: 1px solid #bdc3c7;

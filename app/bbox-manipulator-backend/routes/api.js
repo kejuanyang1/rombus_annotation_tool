@@ -8,6 +8,7 @@ const POSES_FILE_PATH = path.join(__dirname, '..', 'assets', 'poses.json');
 // Path to where trajectories will be saved
 const TRAJECTORIES_DIR = path.join(__dirname, '..', 'trajectories');
 
+
 // Ensure trajectories directory exists
 (async () => {
     try {

@@ -41,6 +41,17 @@ const TABLE_LIMITS = {
     sceneY_max: 0.2
 };
 
+const toDegrees = (radians) => radians * (180 / Math.PI);
+
+const calculateRefDotFromVertices = (verts) => {
+    if (!verts || verts.length < 4) {
+        return [0, 0]; 
+    }
+    const ref_dot_scene_y = (verts[0][0] + verts[3][0]) / 2;
+    const ref_dot_scene_x = (verts[0][1] + verts[3][1]) / 2;
+    return [ref_dot_scene_y, ref_dot_scene_x];
+};
+
 function App() {
     const [currentTaskId, setCurrentTaskId] = useState('01_0');
     const [sceneData, setSceneData] = useState(null);
@@ -52,14 +63,20 @@ function App() {
     const [referenceSelectedObjectId, setReferenceSelectedObjectId] = useState(null);
 
     const [dragContext, setDragContext] = useState(null);
-    const [previewObjectPosition, setPreviewObjectPosition] = useState(null);
+    const [rotationContext, setRotationContext] = useState(null);
+    const [previewObjectState, setPreviewObjectState] = useState(null);
+
+    const clearInteractions = useCallback(() => {
+        setDragContext(null);
+        setRotationContext(null);
+        setPreviewObjectState(null);
+    }, []);
 
     const clearSelections = useCallback(() => {
         setPrimarySelectedObjectId(null);
         setReferenceSelectedObjectId(null);
-        setDragContext(null);
-        setPreviewObjectPosition(null);
-    }, []);
+        clearInteractions();
+    }, [clearInteractions]);
 
     const fetchScene = useCallback(async (taskIdToFetch) => {
         if (!taskIdToFetch) { console.warn("fetchScene called with no taskIdToFetch"); return; }
@@ -73,11 +90,18 @@ function App() {
             console.log("Backend Response Data:", response.data);
             setSceneData(response.data);
             if (response.data && response.data.objects) {
-                const initialObjects = response.data.objects.map(obj => ({
-                    ...obj,
-                    verts: obj.initial_verts || calculateVertices(obj.scene_x, obj.scene_y, obj.size_sx, obj.size_sy, obj.orientation),
-                    color: OBJECT_COLORS[obj.name.toLowerCase().split(" ").find(word => OBJECT_COLORS[word])] || OBJECT_COLORS[obj.name.toLowerCase().split(" ")[0]] || OBJECT_COLORS.default,
-                }));
+                const initialObjects = response.data.objects.map(obj => {
+                    const orientationDegrees = obj.orientation || 0;
+                    const verts = obj.initial_verts || calculateVertices(obj.scene_x, obj.scene_y, obj.size_sx, obj.size_sy, orientationDegrees);
+                    const ref_dot = calculateRefDotFromVertices(verts);
+                    return {
+                        ...obj,
+                        orientation: orientationDegrees,
+                        verts: verts,
+                        color: OBJECT_COLORS[obj.name.toLowerCase().split(" ").find(word => OBJECT_COLORS[word])] || OBJECT_COLORS[obj.name.toLowerCase().split(" ")[0]] || OBJECT_COLORS.default,
+                        ref_dot: ref_dot,
+                    };
+                });
                 setObjects(initialObjects);
             } else { setObjects([]); }
             setInteractionHistory([]);
@@ -92,11 +116,24 @@ function App() {
     }, [currentTaskId, fetchScene]);
 
     const handleObjectUpdate = (updatedObj) => {
-        setObjects(prevObjects => prevObjects.map(obj => obj.id === updatedObj.id ? updatedObj : obj));
+        const orientationDegrees = parseFloat(updatedObj.orientation || 0);
+        const verts = calculateVertices(updatedObj.scene_x, updatedObj.scene_y, updatedObj.size_sx, updatedObj.size_sy, orientationDegrees);
+        const ref_dot = calculateRefDotFromVertices(verts);
+        const finalObj = {
+            ...updatedObj,
+            orientation: orientationDegrees,
+            verts: verts,
+            ref_dot: ref_dot,
+        };
+        setObjects(prevObjects => prevObjects.map(obj => obj.id === finalObj.id ? finalObj : obj));
+        return finalObj;
     };
+
     const recordAction = (action) => {
+        console.log("Recording action:", action);
         setInteractionHistory(prev => [...prev, action]);
     };
+    
     const handleSaveTrajectory = async () => {
         if (!sceneData || !sceneData.taskId || interactionHistory.length === 0) { alert("No interactions to save or no scene loaded."); return; }
         try {
@@ -104,212 +141,290 @@ function App() {
             alert(`Trajectory for scene ${sceneData.taskId} saved!`);
         } catch (err) { alert('Failed to save trajectory.'); console.error("Save Trajectory Error:", err); }
     };
-    
+
     const handleObjectClickForSelection = (objectId) => {
-        if (dragContext) return; 
+        if (dragContext || rotationContext) return; 
         const isPlotActive = sceneData?.plotMetadata?.plot_target_width !== undefined;
         if (isPlotActive) {
-            if (!primarySelectedObjectId || primarySelectedObjectId === objectId) {
-                setPrimarySelectedObjectId(prev => (prev === objectId ? null : objectId));
+            if (primarySelectedObjectId === objectId) {
+                setPrimarySelectedObjectId(null); 
                 setReferenceSelectedObjectId(null);
-            } else if (!referenceSelectedObjectId || referenceSelectedObjectId === objectId) {
-                setReferenceSelectedObjectId(prev => (prev === objectId ? null : objectId));
+            } else if (referenceSelectedObjectId === objectId) {
+                setReferenceSelectedObjectId(null);
+            } else if (!primarySelectedObjectId) {
+                setPrimarySelectedObjectId(objectId);
+                setReferenceSelectedObjectId(null);
+            } else { 
+                setReferenceSelectedObjectId(objectId);
             }
         } else { console.warn("Plot area metadata not fully loaded, selection disabled.");}
     };
+
+    const initiateImplicitRotation = (objectId) => {
+        const objectToRotate = objects.find(o => o.id === objectId);
+        if (objectToRotate && !dragContext) { 
+            console.log(`Implicitly initiating rotation for ${objectId}`);
+            setPrimarySelectedObjectId(objectToRotate.id); 
+            setReferenceSelectedObjectId(null); 
+            setRotationContext({
+                objectId: objectToRotate.id,
+                originalOrientationDegrees: objectToRotate.orientation,
+                scene_x: objectToRotate.scene_x,
+                scene_y: objectToRotate.scene_y,
+                size_sx: objectToRotate.size_sx,
+                size_sy: objectToRotate.size_sy,
+                color: objectToRotate.color,
+                label: objectToRotate.label || objectToRotate.name,
+            });
+            const verts = calculateVertices(objectToRotate.scene_x, objectToRotate.scene_y, objectToRotate.size_sx, objectToRotate.size_sy, objectToRotate.orientation);
+            setPreviewObjectState({
+                id: `${objectToRotate.id}-preview-rotate`,
+                scene_x: objectToRotate.scene_x,
+                scene_y: objectToRotate.scene_y,
+                size_sx: objectToRotate.size_sx,
+                size_sy: objectToRotate.size_sy,
+                orientation: objectToRotate.orientation,
+                verts: verts,
+                ref_dot: calculateRefDotFromVertices(verts),
+                color: objectToRotate.color ? objectToRotate.color.replace('0.5', '0.2') : 'rgba(120,120,255,0.2)',
+                label: `${objectToRotate.label || objectToRotate.name} (rotating ${objectToRotate.orientation.toFixed(0)}°)`,
+            });
+        }
+    };
+
     const handleCategoricalAction = (actionType) => {
         if (!primarySelectedObjectId || !referenceSelectedObjectId) { alert("Please select a primary and a reference object."); return; }
         const primaryObj = objects.find(o => o.id === primarySelectedObjectId);
         const referenceObj = objects.find(o => o.id === referenceSelectedObjectId);
         if (!primaryObj || !referenceObj) { alert("Selected objects not found."); return; }
-        let actionDetails = {};
+
         let updatedObjectState = { ...primaryObj };
+        let newOrientationDegrees = primaryObj.orientation;
+        let actionDetailsBase = { objectId: primaryObj.id, original_orientation: primaryObj.orientation };
         const primaryName = primaryObj.name.toLowerCase();
         const referenceName = referenceObj.name.toLowerCase();
+
         switch (actionType) {
             case 'CLOSE_LID':
                 if (!primaryName.includes('lid') || !referenceName.includes('bowl')) { alert("For 'Close Lid', primary must be 'lid' and reference 'bowl'."); return; }
-                updatedObjectState.scene_x = referenceObj.scene_x; updatedObjectState.scene_y = referenceObj.scene_y;
-                actionDetails = { type: 'CLOSE_LID', lidId: primaryObj.id, bowlId: referenceObj.id, new_pos: [updatedObjectState.scene_x, updatedObjectState.scene_y] };
+                updatedObjectState.scene_x = referenceObj.scene_x; 
+                updatedObjectState.scene_y = referenceObj.scene_y;
+                actionDetailsBase = { ...actionDetailsBase, type: 'CLOSE_LID', lidId: primaryObj.id, bowlId: referenceObj.id };
                 break;
             case 'OPEN_LID':
                 if (!primaryName.includes('lid') || !referenceName.includes('bowl')) { alert("For 'Open Lid', primary must be 'lid' and reference 'bowl'."); return; }
-                updatedObjectState.scene_x = referenceObj.scene_x - (referenceObj.size_sy * 0.7); updatedObjectState.scene_y = referenceObj.scene_y - (referenceObj.size_sx * 0.3);
-                actionDetails = { type: 'OPEN_LID', lidId: primaryObj.id, bowlId: referenceObj.id, new_pos: [updatedObjectState.scene_x, updatedObjectState.scene_y] };
+                updatedObjectState.scene_x = referenceObj.scene_x - (referenceObj.size_sy * 0.7); 
+                updatedObjectState.scene_y = referenceObj.scene_y - (referenceObj.size_sx * 0.3);
+                actionDetailsBase = { ...actionDetailsBase, type: 'OPEN_LID', lidId: primaryObj.id, bowlId: referenceObj.id };
                 break;
             case 'IN_BASKET':
                 if (!referenceName.includes('basket')) { alert("Reference must be a 'basket' for 'Put In Basket'."); return; }
-                updatedObjectState.scene_x = referenceObj.scene_x; updatedObjectState.scene_y = referenceObj.scene_y;
-                actionDetails = { type: 'IN_BASKET', objectId: primaryObj.id, basketId: referenceObj.id, new_pos: [updatedObjectState.scene_x, updatedObjectState.scene_y] };
+                updatedObjectState.scene_x = referenceObj.scene_x; 
+                updatedObjectState.scene_y = referenceObj.scene_y;
+                actionDetailsBase = { ...actionDetailsBase, type: 'IN_BASKET', basketId: referenceObj.id};
                 break;
             case 'ON_SUPPORT':
                 if (!referenceName.includes('support')) { alert("Reference must be a 'support' for 'Place On Support'."); return; }
-                updatedObjectState.scene_x = referenceObj.scene_x; updatedObjectState.scene_y = referenceObj.scene_y;
-                actionDetails = { type: 'ON_SUPPORT', objectId: primaryObj.id, supportId: referenceObj.id, new_pos: [updatedObjectState.scene_x, updatedObjectState.scene_y] };
+                updatedObjectState.scene_x = referenceObj.scene_x; 
+                updatedObjectState.scene_y = referenceObj.scene_y;
+                actionDetailsBase = { ...actionDetailsBase, type: 'ON_SUPPORT', supportId: referenceObj.id};
                 break;
-            default: return;
+            default: 
+                console.warn("Unknown categorical action:", actionType);
+                return;
         }
-        updatedObjectState.verts = calculateVertices(updatedObjectState.scene_x, updatedObjectState.scene_y, updatedObjectState.size_sx, updatedObjectState.size_sy, updatedObjectState.orientation);
-        handleObjectUpdate(updatedObjectState);
-        recordAction(actionDetails);
+        
+        updatedObjectState.orientation = newOrientationDegrees;
+        const finalUpdatedObj = handleObjectUpdate(updatedObjectState);
+
+        recordAction({
+            ...actionDetailsBase,
+            new_pos: [finalUpdatedObj.scene_x, finalUpdatedObj.scene_y],
+            new_orientation: finalUpdatedObj.orientation,
+        });
+        clearInteractions(); 
+        initiateImplicitRotation(finalUpdatedObj.id);
     };
 
     const initiateTranslationalDrag = (direction) => {
         if (!primarySelectedObjectId || !referenceSelectedObjectId) { alert("Please select a primary object to move AND a reference object to define the axis."); return; }
+        if (rotationContext) { clearInteractions(); }
         const objectToMove = objects.find(o => o.id === primarySelectedObjectId);
         const refObject = objects.find(o => o.id === referenceSelectedObjectId);
         if (!objectToMove || !refObject) { alert("Selected object(s) not found."); return; }
+
         let axisToDrag; let fixedCoordinateValue;
         switch (direction) {
             case 'UP': case 'DOWN': axisToDrag = 'scene_x'; fixedCoordinateValue = refObject.scene_y; break;
             case 'LEFT': case 'RIGHT': axisToDrag = 'scene_y'; fixedCoordinateValue = refObject.scene_x; break;
             default: return;
         }
-        setDragContext({ objectId: objectToMove.id, originalSceneX: objectToMove.scene_x, originalSceneY: objectToMove.scene_y, sizeSx: objectToMove.size_sx, sizeSy: objectToMove.size_sy, orientation: objectToMove.orientation, color: objectToMove.color, label: objectToMove.label, axisToDrag: axisToDrag, fixedCoordinateValue: fixedCoordinateValue, });
+        const currentOrientationDegrees = objectToMove.orientation || 0;
+        setDragContext({
+            objectId: objectToMove.id,
+            originalSceneX: objectToMove.scene_x, originalSceneY: objectToMove.scene_y,
+            sizeSx: objectToMove.size_sx, sizeSy: objectToMove.size_sy,
+            orientation: currentOrientationDegrees, 
+            color: objectToMove.color, label: objectToMove.label || objectToMove.name,
+            axisToDrag: axisToDrag, fixedCoordinateValue: fixedCoordinateValue,
+        });
         let initialPreviewX = objectToMove.scene_x; let initialPreviewY = objectToMove.scene_y;
         if (axisToDrag === 'scene_x') { initialPreviewY = fixedCoordinateValue; } else { initialPreviewX = fixedCoordinateValue; }
-        setPreviewObjectPosition({ scene_x: initialPreviewX, scene_y: initialPreviewY });
-    };
-
-    // MODIFIED: handlePlotMouseMoveForDrag to clamp center position
-    const handlePlotMouseMoveForDrag = (mousePlotXData_sceneY, mousePlotYData_sceneX) => {
-        if (!dragContext) return; // dragContext includes fixedCoordinateValue from reference object
         
-        let newPreviewSceneX;
-        let newPreviewSceneY;
-
-        // Determine the new potential center based on mouse and constrained axis
-        if (dragContext.axisToDrag === 'scene_x') { // Dragging along plot's Y-axis (scene_x data changes)
-            newPreviewSceneX = mousePlotYData_sceneX;    // mousePlotYData_sceneX is the SCENE X value from mouse
-            newPreviewSceneY = dragContext.fixedCoordinateValue; // SCENE Y of primary is fixed
-        } else { // axisToDrag === 'scene_y', dragging along plot's X-axis (scene_y data changes)
-            newPreviewSceneY = mousePlotXData_sceneY;    // mousePlotXData_sceneY is the SCENE Y value from mouse
-            newPreviewSceneX = dragContext.fixedCoordinateValue; // SCENE X of primary is fixed
+        const verts = calculateVertices(initialPreviewX, initialPreviewY, objectToMove.size_sx, objectToMove.size_sy, currentOrientationDegrees);
+        setPreviewObjectState({ 
+            id: `${objectToMove.id}-preview-drag`,
+            scene_x: initialPreviewX, scene_y: initialPreviewY,
+            size_sx: objectToMove.size_sx, size_sy: objectToMove.size_sy,
+            orientation: currentOrientationDegrees,
+            verts: verts,
+            ref_dot: calculateRefDotFromVertices(verts),
+            color: objectToMove.color ? objectToMove.color.replace('0.5', '0.25') : 'rgba(100,100,255,0.25)',
+            label: `${objectToMove.label || objectToMove.name} (dragging)`,
+        });
+    };
+    
+    const handlePlotMouseMoveForDrag = (mousePlotXData_sceneY, mousePlotYData_sceneX) => {
+        if (!dragContext) return;
+        let newPreviewSceneX; let newPreviewSceneY;
+        if (dragContext.axisToDrag === 'scene_x') {
+            newPreviewSceneX = mousePlotYData_sceneX; newPreviewSceneY = dragContext.fixedCoordinateValue;
+        } else {
+            newPreviewSceneY = mousePlotXData_sceneY; newPreviewSceneX = dragContext.fixedCoordinateValue;
         }
-
-        // --- Directly clamp the CENTER position ---
         const clampedSceneX = Math.max(TABLE_LIMITS.sceneX_min, Math.min(newPreviewSceneX, TABLE_LIMITS.sceneX_max));
         const clampedSceneY = Math.max(TABLE_LIMITS.sceneY_min, Math.min(newPreviewSceneY, TABLE_LIMITS.sceneY_max));
         
-        setPreviewObjectPosition({ scene_x: clampedSceneX, scene_y: clampedSceneY });
+        const verts = calculateVertices(clampedSceneX, clampedSceneY, dragContext.sizeSx, dragContext.sizeSy, dragContext.orientation);
+        setPreviewObjectState({
+            id: `${dragContext.objectId}-preview-drag`,
+            scene_x: clampedSceneX, scene_y: clampedSceneY,
+            size_sx: dragContext.sizeSx, size_sy: dragContext.sizeSy,
+            orientation: dragContext.orientation,
+            verts: verts,
+            ref_dot: calculateRefDotFromVertices(verts),
+            color: dragContext.color ? dragContext.color.replace('0.5', '0.25') : 'rgba(100,100,255,0.25)',
+            label: `${dragContext.label} (dragging)`,
+        });
     };
 
     const handlePlotClickToFinalizeMove = () => {
-        if (!dragContext || !previewObjectPosition) return;
+        if (!dragContext || !previewObjectState) return;
         const objectToUpdate = objects.find(o => o.id === dragContext.objectId);
-        if (!objectToUpdate) { console.error("Original object not found."); setDragContext(null); setPreviewObjectPosition(null); return; }
-        // The previewObjectPosition already holds the clamped center coordinates
-        const finalUpdatedObject = { 
-            ...objectToUpdate, 
-            scene_x: previewObjectPosition.scene_x, 
-            scene_y: previewObjectPosition.scene_y, 
-            verts: calculateVertices(previewObjectPosition.scene_x, previewObjectPosition.scene_y, objectToUpdate.size_sx, objectToUpdate.size_sy, objectToUpdate.orientation), 
+        if (!objectToUpdate) { clearInteractions(); return; }
+
+        const finalObjectState = {
+            ...objectToUpdate,
+            scene_x: previewObjectState.scene_x,
+            scene_y: previewObjectState.scene_y,
+            orientation: dragContext.orientation,
         };
-        handleObjectUpdate(finalUpdatedObject);
-        recordAction({ type: 'MOVE_OBJECT_TO', objectId: dragContext.objectId, new_pos: [previewObjectPosition.scene_x, previewObjectPosition.scene_y], });
-        setDragContext(null); setPreviewObjectPosition(null);
+        const finalUpdatedObj = handleObjectUpdate(finalObjectState);
+
+        recordAction({
+            type: 'MOVE_OBJECT_TO',
+            objectId: dragContext.objectId,
+            new_pos: [finalUpdatedObj.scene_x, finalUpdatedObj.scene_y],
+            new_orientation: finalUpdatedObj.orientation,
+        });
+        setDragContext(null); 
+        initiateImplicitRotation(finalUpdatedObj.id);
     };
 
-    let currentPreviewObjectForPlotter = null;
-    if (dragContext && previewObjectPosition) {
-        currentPreviewObjectForPlotter = { 
-            id: `${dragContext.objectId}-preview`, 
-            scene_x: previewObjectPosition.scene_x, // This is the clamped center
-            scene_y: previewObjectPosition.scene_y, // This is the clamped center
-            size_sx: dragContext.sizeSx, 
-            size_sy: dragContext.sizeSy, 
-            orientation: dragContext.orientation, 
-            verts: calculateVertices(previewObjectPosition.scene_x, previewObjectPosition.scene_y, dragContext.sizeSx, dragContext.sizeSy, dragContext.orientation), 
-            color: dragContext.color ? dragContext.color.replace('0.5', '0.25') : 'rgba(100,100,255,0.25)', 
-            label: `${dragContext.label} (preview)`, 
-        };
-    }
+    const initiateExplicitRotation = () => {
+        if (!primarySelectedObjectId) { alert("Please select an object to rotate first."); return; }
+        if (dragContext || rotationContext) { return; }
+        initiateImplicitRotation(primarySelectedObjectId);
+    };
+    
+    const handlePlotMouseMoveForRotation = (mousePlotXData_sceneY, mousePlotYData_sceneX) => {
+        if (!rotationContext) return;
+        const { objectId, scene_x, scene_y, size_sx, size_sy, color, label } = rotationContext;
 
+        const delta_scene_x_comp = mousePlotYData_sceneX - scene_x;
+        const delta_scene_y_comp = mousePlotXData_sceneY - scene_y;
+        const newOrientationRadians = Math.atan2(delta_scene_x_comp, delta_scene_y_comp);
+        let newOrientationDegrees = toDegrees(newOrientationRadians);
+        
+        const verts = calculateVertices(scene_x, scene_y, size_sx, size_sy, newOrientationDegrees);
+        setPreviewObjectState({
+            id: `${objectId}-preview-rotate`,
+            scene_x: scene_x, scene_y: scene_y,
+            size_sx: size_sx, size_sy: size_sy,
+            orientation: newOrientationDegrees,
+            verts: verts,
+            ref_dot: calculateRefDotFromVertices(verts),
+            color: color ? color.replace('0.5', '0.2') : 'rgba(120,120,255,0.2)',
+            label: `${label} (rotating ${newOrientationDegrees.toFixed(0)}°)`,
+        });
+    };
+
+    const handlePlotClickToFinalizeRotation = () => {
+        if (!rotationContext || !previewObjectState) return;
+        const objectToUpdate = objects.find(o => o.id === rotationContext.objectId);
+        if (!objectToUpdate) { clearInteractions(); return; }
+
+        const finalObjectState = {
+            ...objectToUpdate,
+            orientation: previewObjectState.orientation,
+        };
+        const finalUpdatedObj = handleObjectUpdate(finalObjectState);
+        recordAction({
+            type: 'ROTATE_OBJECT',
+            objectId: rotationContext.objectId,
+            original_orientation: rotationContext.originalOrientationDegrees,
+            new_orientation: finalUpdatedObj.orientation,
+        });
+        clearInteractions();
+    };
+    
     const handlePreviousScene = () => {
         const parsed = parseTaskId(currentTaskId);
-        if (!parsed) {
-            console.error("Cannot navigate: currentTaskId is invalid or unparseable.", currentTaskId);
-            return;
-        }
-
+        if (!parsed) { console.error("Cannot navigate: currentTaskId is invalid or unparseable.", currentTaskId); return; }
         let { main, sub } = parsed;
-
-        if (main === MIN_MAIN_ID && sub === MIN_SUB_ID) {
-            // Already at the very first scene
-            return;
-        }
-
-        if (sub > MIN_SUB_ID) {
-            sub--;
-        } else {
-            // Reached sub ID 0, go to previous main ID and max sub ID
-            sub = MAX_SUB_ID;
-            main--;
-            // Ensure main doesn't go below MIN_MAIN_ID (though the initial check should cover this)
-            if (main < MIN_MAIN_ID) {
-                // This case should ideally not be reached if the first check is correct
-                main = MIN_MAIN_ID; 
-                sub = MIN_SUB_ID;
-            }
-        }
+        if (main === MIN_MAIN_ID && sub === MIN_SUB_ID) { return; }
+        if (sub > MIN_SUB_ID) { sub--; } 
+        else { sub = MAX_SUB_ID; main--; if (main < MIN_MAIN_ID) { main = MIN_MAIN_ID; sub = MIN_SUB_ID;}}
         const newTaskId = formatTaskId(main, sub);
-        setCurrentTaskId(newTaskId); // This will trigger the useEffect to fetch the scene
+        setCurrentTaskId(newTaskId);
     };
 
     const handleNextScene = () => {
         const parsed = parseTaskId(currentTaskId);
-        if (!parsed) {
-            console.error("Cannot navigate: currentTaskId is invalid or unparseable.", currentTaskId);
-            return;
-        }
-
+        if (!parsed) { console.error("Cannot navigate: currentTaskId is invalid or unparseable.", currentTaskId); return; }
         let { main, sub } = parsed;
-
-        if (main === MAX_MAIN_ID && sub === MAX_SUB_ID) {
-            // Already at the very last scene
-            return;
-        }
-
-        if (sub < MAX_SUB_ID) {
-            sub++;
-        } else {
-            // Reached max sub ID, go to next main ID and min sub ID
-            sub = MIN_SUB_ID;
-            main++;
-            // Ensure main doesn't go above MAX_MAIN_ID (though the initial check should cover this)
-            if (main > MAX_MAIN_ID) {
-                // This case should ideally not be reached
-                main = MAX_MAIN_ID;
-                sub = MAX_SUB_ID;
-            }
-        }
+        if (main === MAX_MAIN_ID && sub === MAX_SUB_ID) { return; }
+        if (sub < MAX_SUB_ID) { sub++;} 
+        else { sub = MIN_SUB_ID; main++; if (main > MAX_MAIN_ID) { main = MAX_MAIN_ID; sub = MAX_SUB_ID;}}
         const newTaskId = formatTaskId(main, sub);
-        setCurrentTaskId(newTaskId); // This will trigger the useEffect to fetch the scene
+        setCurrentTaskId(newTaskId);
     };
 
     const isAtFirstScene = () => {
         const parsed = parseTaskId(currentTaskId);
-        return parsed ? (parsed.main === MIN_MAIN_ID && parsed.sub === MIN_SUB_ID) : true; // Disable if currentTaskId is invalid
+        return parsed ? (parsed.main === MIN_MAIN_ID && parsed.sub === MIN_SUB_ID) : true;
     };
 
     const isAtLastScene = () => {
         const parsed = parseTaskId(currentTaskId);
-        return parsed ? (parsed.main === MAX_MAIN_ID && parsed.sub === MAX_SUB_ID) : true; // Disable if currentTaskId is invalid
+        return parsed ? (parsed.main === MAX_MAIN_ID && parsed.sub === MAX_SUB_ID) : true;
     };
 
     const getObjectDisplayLabel = (objectId) => {
         if (!objectId) return 'None';
         const selectedObject = objects.find(obj => obj.id === objectId);
-        return selectedObject ? selectedObject.label : `ID: ${objectId} (Not found)`;
+        return selectedObject ? (selectedObject.label || selectedObject.name || `ID: ${selectedObject.id}`) : `ID: ${objectId} (Not found)`;
     };
 
-
+    let currentPreviewObjectForPlotter = null;
+    if ((dragContext || rotationContext) && previewObjectState) {
+        currentPreviewObjectForPlotter = previewObjectState;
+    }
 
     return (
         <div className="App">
             <h1>Bounding Box Manipulator</h1>
             <div className="scene-navigation-controls">
-                {/* ... Nav buttons and SceneSelector ... */}
                 <button onClick={handlePreviousScene} disabled={isAtFirstScene()} className="control-button nav-button"> &lt; Prev </button>
                 <SceneSelector currentTaskId={currentTaskId} onSetCurrentTaskId={setCurrentTaskId} />
                 <button onClick={handleNextScene} disabled={isAtLastScene()} className="control-button nav-button"> Next &gt; </button>
@@ -322,8 +437,7 @@ function App() {
                     <h2>Scene: {sceneData.taskId}</h2>
                     <div className="app-layout">
                         <div className="main-visuals-stack">
-                            {/* ... Original Image and JSPlotter rendering ... */}
-                            <div className="original-image-container">
+                             <div className="original-image-container">
                                 {sceneData.originalImageSrc ? ( <img src={`http://localhost:3001${sceneData.originalImageSrc}`} alt={`Original Scene ${sceneData.taskId}`} style={{maxWidth: '100%', maxHeight: sceneData.plotMetadata?.plot_target_height ? `${sceneData.plotMetadata.plot_target_height}px` : '600px', height: 'auto', border: '1px solid #ccc', objectFit: 'contain', display: 'block', margin: '0 auto' }} />) : 
                                 (<div className="placeholder-box" style={{width: sceneData.plotMetadata?.plot_target_width ? `${sceneData.plotMetadata.plot_target_width}px` : '600px', height: '400px'}}>Original Image Area (Not Available)</div>
                                 )}
@@ -336,8 +450,9 @@ function App() {
                                         selectedObjectIds={{ primary: primarySelectedObjectId, reference: referenceSelectedObjectId }}
                                         onObjectClick={handleObjectClickForSelection}
                                         isDraggingActive={!!dragContext}
-                                        onPlotMouseMove={dragContext ? handlePlotMouseMoveForDrag : null}
-                                        onPlotClick={dragContext ? handlePlotClickToFinalizeMove : null}
+                                        isRotatingActive={!!rotationContext}
+                                        onPlotMouseMove={dragContext ? handlePlotMouseMoveForDrag : (rotationContext ? handlePlotMouseMoveForRotation : null)}
+                                        onPlotClick={dragContext ? handlePlotClickToFinalizeMove : (rotationContext ? handlePlotClickToFinalizeRotation : null)}
                                         previewObject={currentPreviewObjectForPlotter}
                                     />
                                 ) : ( <div className="placeholder-box" style={{width: '600px', height: '600px'}}> Plot Area (Waiting for Plot Metadata) </div> )}
@@ -345,7 +460,6 @@ function App() {
                         </div>
                         <div className="controls-panel-container">
                              <div className="controls-panel">
-                                {/* ... Controls Panel JSX (Selection, Trajectory, Operations) ... */}
                                 <div className="controls-top-row">
                                    <div className="selection-status-block">
                                         <h4>Selection Status:</h4>
@@ -361,45 +475,69 @@ function App() {
                                 </div>
                                 <hr className="controls-separator" />
 
-                                {primarySelectedObjectId && referenceSelectedObjectId && (
-                                    <>
-                                        <h4>Available Operations:</h4>
-                                        <div className="actions-main-container">
-                                            <div className="operation-section categorical-ops">
-                                                  <h5>Categorical Actions:</h5>
-                                                  <p className="instruction-small">Primary = object to act. Reference = target.</p>
-                                                  <button className="control-button action-button" onClick={() => handleCategoricalAction('OPEN_LID')}>Open Lid</button>
-                                                  <button className="control-button action-button" onClick={() => handleCategoricalAction('CLOSE_LID')}>Close Lid</button>
-                                                  <button className="control-button action-button" onClick={() => handleCategoricalAction('IN_BASKET')}>Put In Basket</button>
-                                                  <button className="control-button action-button" onClick={() => handleCategoricalAction('ON_SUPPORT')}>Place On Support</button>
-                                            </div>
-                                            <div className="operation-section translational-ops-setup">
-                                                <h5>Translational Movement (Primary Object):</h5>
-                                                {dragContext ? (
-                                                    <>
-                                                        <p className="instruction-small drag-active-text">Drag '{dragContext.label}' along axis defined by Reference. Click plot to place.</p>
-                                                        <button onClick={() => { setDragContext(null); setPreviewObjectPosition(null); }} className="control-button cancel-drag-button">Cancel Move</button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                      <p className="instruction-small">Select direction to move Primary along Reference's axis.</p>
-                                                      <div className="direction-controls">
-                                                          <button onClick={() => initiateTranslationalDrag('UP')} className="control-button direction-button">Up</button>
-                                                          <button onClick={() => initiateTranslationalDrag('DOWN')} className="control-button direction-button">Down</button>
-                                                          <button onClick={() => initiateTranslationalDrag('LEFT')} className="control-button direction-button">Left</button>
-                                                          <button onClick={() => initiateTranslationalDrag('RIGHT')} className="control-button direction-button">Right</button>
-                                                      </div>
-                                                    </>
-                                                )}
+                                { (primarySelectedObjectId || dragContext || rotationContext) && <h4>Available Operations:</h4> }
+                                <div className="actions-main-container">
+                                    {primarySelectedObjectId && referenceSelectedObjectId && !dragContext && !rotationContext && (
+                                        <div className="operation-section categorical-ops">
+                                            <h5>Categorical Actions:</h5>
+                                            <p className="instruction-small">Primary = object to act. Reference = target.</p>
+                                            <button className="control-button action-button" onClick={() => handleCategoricalAction('OPEN_LID')}>Open Lid</button>
+                                            <button className="control-button action-button" onClick={() => handleCategoricalAction('CLOSE_LID')}>Close Lid</button>
+                                            <button className="control-button action-button" onClick={() => handleCategoricalAction('IN_BASKET')}>Put In Basket</button>
+                                            <button className="control-button action-button" onClick={() => handleCategoricalAction('ON_SUPPORT')}>Place On Support</button>
+                                        </div>
+                                    )}
+                                    {primarySelectedObjectId && referenceSelectedObjectId && !dragContext && !rotationContext && (
+                                        <div className="operation-section translational-ops-setup">
+                                            <h5>Translational Movement (Primary Object):</h5>
+                                            <p className="instruction-small">Select direction to move Primary along Reference's axis.</p>
+                                            <div className="direction-controls">
+                                                <button onClick={() => initiateTranslationalDrag('UP')} className="control-button direction-button">Up</button>
+                                                <button onClick={() => initiateTranslationalDrag('DOWN')} className="control-button direction-button">Down</button>
+                                                <button onClick={() => initiateTranslationalDrag('LEFT')} className="control-button direction-button">Left</button>
+                                                <button onClick={() => initiateTranslationalDrag('RIGHT')} className="control-button direction-button">Right</button>
                                             </div>
                                         </div>
-                                        <hr className="controls-separator" />
-                                    </>
+                                    )}
+                                    {dragContext && (
+                                         <div className="operation-section translational-ops-active">
+                                            <h5>Translational Movement (Active):</h5>
+                                            <p className="instruction-small drag-active-text">Drag '{dragContext.label}' along axis. Click plot to place.</p>
+                                            <button onClick={() => { clearInteractions(); }} className="control-button cancel-drag-button">Cancel Move</button>
+                                        </div>
+                                    )}
+
+                                    {primarySelectedObjectId && !dragContext && (
+                                        <div className="operation-section rotational-ops">
+                                            <h5>Rotational Movement</h5>
+                                            {rotationContext ? (
+                                                <>
+                                                    <p className="instruction-small drag-active-text">Move mouse to rotate '{rotationContext.label}'. Click plot to finalize.</p>
+                                                    <button onClick={() => { clearInteractions(); }} className="control-button cancel-drag-button">Cancel Rotate</button>
+                                                </>
+                                            ) : (
+                                                <button onClick={initiateExplicitRotation} className="control-button action-button">Rotate Selected Explicitly</button>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                 {(primarySelectedObjectId || dragContext || rotationContext) && <hr className="controls-separator" /> }
+                                
+                                {!dragContext && !rotationContext && !primarySelectedObjectId && (
+                                    <p className="instruction">1. Select a primary object from the plot.</p>
                                 )}
-                                {/* Instructional Text */}
-                                {!primarySelectedObjectId && <p className="instruction">1. Select a primary object from the plot.</p>}
-                                {primarySelectedObjectId && !referenceSelectedObjectId && !dragContext && <p className="instruction">2. Select a reference object for operations.</p>}
-                                {primarySelectedObjectId && referenceSelectedObjectId && !dragContext && <p className="instruction">3. Choose an operation above.</p>}
+                                {!dragContext && !rotationContext && primarySelectedObjectId && !referenceSelectedObjectId && (
+                                    <p className="instruction">2. Select a reference object (for Translate/Categorical ops) OR click 'Rotate Selected Explicitly'. (Rotation will also auto-activate after moves/placements).</p>
+                                )}
+                                {!dragContext && !rotationContext && primarySelectedObjectId && referenceSelectedObjectId && (
+                                     <p className="instruction">3. Choose a Translational or Categorical operation above.</p>
+                                )}
+                                {rotationContext && (
+                                    <p className="instruction">Rotate the object by moving the mouse. Click on the plot to finalize the orientation.</p>
+                                )}
+                                {dragContext && (
+                                    <p className="instruction">Drag the object to the desired position. Click on the plot to finalize the move.</p>
+                                )}
                             </div>
                         </div>
                     </div>

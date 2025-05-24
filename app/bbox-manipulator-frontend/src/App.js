@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SceneSelector from './components/SceneSelector';
-import JSPlotter from './components/JSPlotter';
+// import JSPlotter from './components/JSPlotter'; // Original plotter
+import CombinedPlotterSceneViewer from './components/CombinedPlotterSceneViewer'; // Combined component
 import { getSceneData, saveTrajectory } from './services/api';
 import { calculateVertices } from './utils/geometry';
 import './App.css';
 
+// Object colors remain the same
 const OBJECT_COLORS = {
     lid: 'rgba(255, 107, 107, 0.5)',
     bowl: 'rgba(78, 205, 196, 0.5)',
@@ -14,11 +16,13 @@ const OBJECT_COLORS = {
     default: 'rgba(150, 150, 150, 0.5)',
 };
 
+// Scene ID constants remain the same
 const MIN_MAIN_ID = 1;
 const MAX_MAIN_ID = 80;
 const MIN_SUB_ID = 0;
 const MAX_SUB_ID = 2;
 
+// Helper functions (parseTaskId, formatTaskId, toDegrees, calculateRefDotFromVertices) remain the same
 const parseTaskId = (taskId) => {
     if (!taskId || typeof taskId !== 'string' || !taskId.includes('_')) return null;
     const parts = taskId.split('_');
@@ -34,13 +38,6 @@ const formatTaskId = (main, sub) => {
     return `${mainStr}_${sub}`;
 };
 
-const TABLE_LIMITS = {
-    sceneX_min: 0,
-    sceneX_max: 0.5,
-    sceneY_min: -0.5,
-    sceneY_max: 0.2
-};
-
 const toDegrees = (radians) => radians * (180 / Math.PI);
 
 const calculateRefDotFromVertices = (verts) => {
@@ -52,9 +49,35 @@ const calculateRefDotFromVertices = (verts) => {
     return [ref_dot_scene_y, ref_dot_scene_x];
 };
 
+// Table limits constant, now the primary source for these boundaries
+const TABLE_LIMITS = {
+    sceneX_min: 0.0,  // Corresponds to plot's vertical axis min
+    sceneX_max: 0.5,  // Corresponds to plot's vertical axis max
+    sceneY_min: -0.6, // Corresponds to plot's horizontal axis min
+    sceneY_max: 0.2   // Corresponds to plot's horizontal axis max
+};
+
+// --- Manually Defined Plot Configuration ---
+// const MANUAL_PLOT_CONFIG = {
+//     plot_target_width: 650,    // Width of the SVG plot area
+//     plot_target_height: 375,   // Height of the SVG plot area
+//     xlim: [TABLE_LIMITS.sceneY_min, TABLE_LIMITS.sceneY_max], 
+//     ylim: [TABLE_LIMITS.sceneX_min, TABLE_LIMITS.sceneX_max], 
+
+// };
+
+const MANUAL_PLOT_CONFIG = {
+    plot_target_width: 650,    // Width of the SVG plot area
+    plot_target_height: 375,   // Height of the SVG plot area
+    xlim: [TABLE_LIMITS.sceneY_min, TABLE_LIMITS.sceneY_max], 
+    ylim: [TABLE_LIMITS.sceneX_min, TABLE_LIMITS.sceneX_max], 
+
+};
+
+
 function App() {
     const [currentTaskId, setCurrentTaskId] = useState('01_0');
-    const [sceneData, setSceneData] = useState(null);
+    const [sceneData, setSceneData] = useState(null); // Will no longer store plotMetadata here
     const [objects, setObjects] = useState([]);
     const [interactionHistory, setInteractionHistory] = useState([]);
     const [error, setError] = useState('');
@@ -88,7 +111,11 @@ function App() {
             setError(''); clearSelections();
             const response = await getSceneData(taskIdToFetch);
             console.log("Backend Response Data:", response.data);
-            setSceneData(response.data);
+            
+            // Set sceneData, but plotMetadata will come from MANUAL_PLOT_CONFIG
+            const { plotMetadata, ...restOfSceneData } = response.data; 
+            setSceneData(restOfSceneData); 
+
             if (response.data && response.data.objects) {
                 const initialObjects = response.data.objects.map(obj => {
                     const orientationDegrees = obj.orientation || 0;
@@ -108,6 +135,8 @@ function App() {
         } catch (err) {
             setError(`Failed to load scene data for ${taskIdToFetch}. Ensure backend is running. Check console.`);
             console.error("Fetch Scene Error for " + taskIdToFetch + ":", err);
+            setSceneData(null); 
+            setObjects([]);
         }
     }, [clearSelections]);
 
@@ -135,16 +164,19 @@ function App() {
     };
     
     const handleSaveTrajectory = async () => {
-        if (!sceneData || !sceneData.taskId || interactionHistory.length === 0) { alert("No interactions to save or no scene loaded."); return; }
+        if (!currentTaskId || interactionHistory.length === 0) { 
+            alert("No interactions to save or no scene loaded properly."); 
+            return; 
+        }
         try {
-            await saveTrajectory(sceneData.taskId, { scene_id: sceneData.taskId, actions: interactionHistory });
-            alert(`Trajectory for scene ${sceneData.taskId} saved!`);
+            await saveTrajectory(currentTaskId, { scene_id: currentTaskId, actions: interactionHistory });
+            alert(`Trajectory for scene ${currentTaskId} saved!`);
         } catch (err) { alert('Failed to save trajectory.'); console.error("Save Trajectory Error:", err); }
     };
 
     const handleObjectClickForSelection = (objectId) => {
         if (dragContext || rotationContext) return; 
-        const isPlotActive = sceneData?.plotMetadata?.plot_target_width !== undefined;
+        const isPlotActive = MANUAL_PLOT_CONFIG.plot_target_width !== undefined; 
         if (isPlotActive) {
             if (primarySelectedObjectId === objectId) {
                 setPrimarySelectedObjectId(null); 
@@ -157,7 +189,7 @@ function App() {
             } else { 
                 setReferenceSelectedObjectId(objectId);
             }
-        } else { console.warn("Plot area metadata not fully loaded, selection disabled.");}
+        } else { console.warn("Plot area configuration not fully loaded, selection disabled.");}
     };
 
     const initiateImplicitRotation = (objectId) => {
@@ -434,28 +466,43 @@ function App() {
 
             {sceneData && (
                 <div>
-                    <h2>Scene: {sceneData.taskId}</h2>
+                    <h2>Scene: {sceneData.taskId || currentTaskId}</h2>
                     <div className="app-layout">
                         <div className="main-visuals-stack">
                              <div className="original-image-container">
-                                {sceneData.originalImageSrc ? ( <img src={`http://localhost:3001${sceneData.originalImageSrc}`} alt={`Original Scene ${sceneData.taskId}`} style={{maxWidth: '100%', maxHeight: sceneData.plotMetadata?.plot_target_height ? `${sceneData.plotMetadata.plot_target_height}px` : '600px', height: 'auto', border: '1px solid #ccc', objectFit: 'contain', display: 'block', margin: '0 auto' }} />) : 
-                                (<div className="placeholder-box" style={{width: sceneData.plotMetadata?.plot_target_width ? `${sceneData.plotMetadata.plot_target_width}px` : '600px', height: '400px'}}>Original Image Area (Not Available)</div>
+                                {sceneData.originalImageSrc ? ( 
+                                    <img 
+                                        src={`http://localhost:3001${sceneData.originalImageSrc}`} 
+                                        alt={`Original Scene ${sceneData.taskId || currentTaskId}`} 
+                                        style={{
+                                            maxWidth: '100%', 
+                                            maxHeight: `${MANUAL_PLOT_CONFIG.plot_target_height}px`, 
+                                            height: 'auto', 
+                                            border: '1px solid #ccc', 
+                                            objectFit: 'contain', 
+                                            display: 'block', 
+                                            margin: '0 auto' 
+                                        }} 
+                                    />
+                                ) : (
+                                    <div className="placeholder-box" style={{width: `${MANUAL_PLOT_CONFIG.plot_target_width}px`, height: '400px'}}> 
+                                        Original Image Area (Not Available)
+                                    </div>
                                 )}
                             </div>
                             <div className="js-plot-container">
-                                {sceneData.plotMetadata ? (
-                                    <JSPlotter
-                                        objects={objects}
-                                        plotMetadata={sceneData.plotMetadata}
-                                        selectedObjectIds={{ primary: primarySelectedObjectId, reference: referenceSelectedObjectId }}
-                                        onObjectClick={handleObjectClickForSelection}
-                                        isDraggingActive={!!dragContext}
-                                        isRotatingActive={!!rotationContext}
-                                        onPlotMouseMove={dragContext ? handlePlotMouseMoveForDrag : (rotationContext ? handlePlotMouseMoveForRotation : null)}
-                                        onPlotClick={dragContext ? handlePlotClickToFinalizeMove : (rotationContext ? handlePlotClickToFinalizeRotation : null)}
-                                        previewObject={currentPreviewObjectForPlotter}
-                                    />
-                                ) : ( <div className="placeholder-box" style={{width: '600px', height: '600px'}}> Plot Area (Waiting for Plot Metadata) </div> )}
+                                <CombinedPlotterSceneViewer
+                                    objects={objects}
+                                    plotMetadata={MANUAL_PLOT_CONFIG} 
+                                    tableLimitsData={TABLE_LIMITS} // Pass TABLE_LIMITS directly
+                                    selectedObjectIds={{ primary: primarySelectedObjectId, reference: referenceSelectedObjectId }}
+                                    onObjectClick={handleObjectClickForSelection}
+                                    isDraggingActive={!!dragContext}
+                                    isRotatingActive={!!rotationContext}
+                                    onPlotMouseMove={dragContext ? handlePlotMouseMoveForDrag : (rotationContext ? handlePlotMouseMoveForRotation : null)}
+                                    onPlotClick={dragContext ? handlePlotClickToFinalizeMove : (rotationContext ? handlePlotClickToFinalizeRotation : null)}
+                                    previewObject={currentPreviewObjectForPlotter}
+                                />
                             </div>
                         </div>
                         <div className="controls-panel-container">

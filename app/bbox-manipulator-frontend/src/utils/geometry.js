@@ -1,6 +1,5 @@
 // src/utils/geometry.js
 
-// Helper for Math.radians if not available globally
 if (!Math.radians) {
     Math.radians = function(degrees) {
       return degrees * Math.PI / 180;
@@ -17,23 +16,11 @@ export function calculateVertices(scene_center_x, scene_center_y, size_sx, size_
     const cs = Math.cos(-rad);
     const sn = Math.sin(-rad);
 
-    // Python's dx_x, dx_y were components from sy/2 (half object height)
-    // Python's dy_x, dy_y were components from sx/2 (half object width)
-    // dx_x = sy/2 * sn  (projection of half-height onto scene Y-axis)
-    // dx_y = sy/2 * cs  (projection of half-height onto scene X-axis)
-    // dy_x = -sx/2 * cs (projection of half-width onto scene Y-axis)
-    // dy_y = sx/2 * sn  (projection of half-width onto scene X-axis)
-
     const half_obj_height_proj_on_scene_Y = (size_sy / 2) * sn;
     const half_obj_height_proj_on_scene_X = (size_sy / 2) * cs;
 
     const half_obj_width_proj_on_scene_Y = (-size_sx / 2) * cs;
     const half_obj_width_proj_on_scene_X = (size_sx / 2) * sn;
-
-    // Python's verts were: (scene_y_coord, scene_x_coord)
-    // v0_py = (scene_center_y - dx_x - dy_x, scene_center_x - dx_y - dy_y)
-    // ...
-    // We want to return verts as [scene_y_coord, scene_x_coord]
 
     const verts = [
         [ // Vertex 0: [scene_y_coord, scene_x_coord]

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SceneSelector from './components/SceneSelector';
-// import JSPlotter from './components/JSPlotter'; // Original plotter
 import CombinedPlotterSceneViewer from './components/CombinedPlotterSceneViewer'; // Combined component
 import { getSceneData, saveTrajectory } from './services/api';
 import { calculateVertices } from './utils/geometry';
@@ -58,13 +57,6 @@ const TABLE_LIMITS = {
 };
 
 // --- Manually Defined Plot Configuration ---
-// const MANUAL_PLOT_CONFIG = {
-//     plot_target_width: 650,    // Width of the SVG plot area
-//     plot_target_height: 375,   // Height of the SVG plot area
-//     xlim: [TABLE_LIMITS.sceneY_min, TABLE_LIMITS.sceneY_max], 
-//     ylim: [TABLE_LIMITS.sceneX_min, TABLE_LIMITS.sceneX_max], 
-
-// };
 
 const MANUAL_PLOT_CONFIG = {
     plot_target_width: 650,    // Width of the SVG plot area

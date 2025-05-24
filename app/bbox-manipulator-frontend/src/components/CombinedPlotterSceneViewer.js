@@ -14,25 +14,21 @@ function CombinedPlotterSceneViewer({
     sceneImage, // From SceneViewer
     objects, // Common prop
     plotMetadata, // Common prop (though structure might differ, may need merging/checking)
-    selectedObjectIds, // From JSPlotter (structure might be {primary, reference})
+    selectedObjectIds, // (structure might be {primary, reference})
     onObjectClick, // Common prop
-    isDraggingActive, // From JSPlotter
-    isRotatingActive, // From JSPlotter
-    onPlotMouseMove, // From JSPlotter
-    onPlotClick, // From JSPlotter
-    previewObject, // From JSPlotter
-    // Note: selectedObjectIds in SceneViewer was an array, in JSPlotter it's an object.
-    // We'll assume the JSPlotter's structure for selectedObjectIds for now, or it needs to be reconciled.
+    isDraggingActive,
+    isRotatingActive,
+    onPlotMouseMove,
+    onPlotClick, 
+    previewObject, 
 }) {
     // --- State and Refs ---
     const [currentDataForPlotXaxis, setCurrentDataForPlotXaxis] = useState(null);
     const [currentDataForPlotYaxis, setCurrentDataForPlotYaxis] = useState(null);
     const svgRef = useRef(null); // For JSPlotter part
-    const containerRef = useRef(null); // For SceneViewer part
-    const [imageLoaded, setImageLoaded] = useState(false); // For SceneViewer part
 
     // --- Memos ---
-    // From JSPlotter: Calculates pixel dimensions of the plot area
+    // Calculates pixel dimensions of the plot area
     const { plotAreaPixelWidth, plotAreaPixelHeight } = useMemo(() => {
         const width = plotMetadata?.plot_target_width; // Used by JSPlotter for its own SVG
         const height = plotMetadata?.plot_target_height; // Used by JSPlotter for its own SVG
@@ -49,7 +45,7 @@ function CombinedPlotterSceneViewer({
 
 
 
-    // From JSPlotter: Calculate data range for axes based on plotMetadata and aspect ratio
+    // Calculate data range for axes based on plotMetadata and aspect ratio
     useEffect(() => {
 
         let targetMinPlotXData = plotMetadata.xlim_plot?.min ?? FIXED_SCENE_Y_DATA_MIN;
@@ -88,7 +84,6 @@ function CombinedPlotterSceneViewer({
     }, [plotMetadata, plotAreaPixelWidth, plotAreaPixelHeight, sceneImage]);
 
     // --- Transformations ---
-    // From JSPlotter: Transforms data coordinates to pixel coordinates for the standalone plot
     const plotAreaXStart = AXIS_PADDING;
     const plotAreaYStart = AXIS_PADDING;
 
@@ -111,7 +106,7 @@ function CombinedPlotterSceneViewer({
         };
     };
 
-    // From JSPlotter: Transforms pixel coordinates to data coordinates for the standalone plot
+    // Transforms pixel coordinates to data coordinates for the standalone plot
     const transformPixelToDataJSPlotter = (svgX, svgY) => {
         if (!currentDataForPlotXaxis || !currentDataForPlotYaxis || plotAreaPixelWidth <= 0 || plotAreaPixelHeight <= 0) {
             return { data_scene_y: (FIXED_SCENE_Y_DATA_MIN + FIXED_SCENE_Y_DATA_MAX) / 2, data_scene_x: (FIXED_SCENE_X_DATA_MIN + FIXED_SCENE_X_DATA_MAX) / 2 };
@@ -147,13 +142,8 @@ function CombinedPlotterSceneViewer({
         if ((isDraggingActive || isRotatingActive) && onPlotClick) {
             onPlotClick(); // This likely signals the end of a drag/rotate action
         }
-        // Note: SceneViewer doesn't have a generic SVG click, only on BoundingBox components
     };
     
-    const handleImageLoad = () => {
-        setImageLoaded(true);
-    };
-
 
     // --- Render Helpers (from JSPlotter) ---
     const renderGrid = () => {

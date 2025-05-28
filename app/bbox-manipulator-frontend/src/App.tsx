@@ -220,7 +220,7 @@ const App: React.FC = () => {
             await fetch(`http://localhost:8000/save_trajectory/${sceneData.task_id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(trajectory),
+                body: JSON.stringify({ trajectory, pddl: pddlRelations }),
             });
             alert('Trajectory saved!');
         } catch (error) {

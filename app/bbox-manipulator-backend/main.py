@@ -26,7 +26,7 @@ app.add_middleware(
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 POSES_FILE = os.path.join(ASSETS_DIR, "poses.json")
-PDDL_DIR = "/Users/ykj/Desktop/github/ROMBUS/planner/instances/init_state_id/"
+PDDL_DIR = "/Users/ykj/Desktop/github/ROMBUS/planner/instances/init_state_id_verified/"
 
 FIXED_BOWL_TO_LID_MAP = {
     "container_07": "lid_01",  # blue bowl -> blue lid
@@ -128,6 +128,37 @@ def transform_pddl_for_frontend(raw_pddl_relations: Dict, bowl_to_lid_map: Dict)
 
     return frontend_pddl
 
+
+def generate_pddl_string(scene_id: str, pddl_relations: Dict, objects: List[Dict]):
+    """Generates a PDDL string from the PDDL relations and objects."""
+    pddl_string = f"(define (problem {scene_id}-goal)\n"  # Changed problem name
+    pddl_string += "  (:domain gripper-strips)\n"
+    pddl_string += "  (:objects\n"
+
+    object_lines = []
+    for obj in objects:
+        object_lines.append(f"    {obj['id']} - {obj['category']}")
+    pddl_string += "\n".join(object_lines)
+    pddl_string += "\n  )\n"
+    pddl_string += "  (:init\n"
+
+    for relation in pddl_relations.get("on", []):
+        pddl_string += f"    (on {relation['obj1']} {relation['obj2']})\n"
+    for relation in pddl_relations.get("in", []):
+        pddl_string += f"    (in {relation['obj1']} {relation['obj2']})\n"
+    for relation in pddl_relations.get("closed", []):
+        pddl_string += f"    (closed {relation['obj1']})\n"
+
+    pddl_string += "  )\n"
+    pddl_string += "  (:goal\n"
+    pddl_string += "    (and\n"
+    pddl_string += "      ;; Add goal conditions here\n"
+    pddl_string += "    )\n"
+    pddl_string += "  )\n"
+    pddl_string += ")\n"
+    return pddl_string
+
+
 # --- API Endpoints ---
 @app.get("/scenes")
 async def get_scenes_list():
@@ -143,18 +174,24 @@ async def get_scene(scene_id: str):
     frontend_pddl = transform_pddl_for_frontend(pddl_relations, FIXED_BOWL_TO_LID_MAP)
     return {"scene": scene_data, "pddl": frontend_pddl, "bowl_to_lid_map": FIXED_BOWL_TO_LID_MAP}
 
+
+class TrajectoryData(BaseModel):
+    trajectory: list
+    pddl: Dict
+
 @app.post("/save_trajectory/{scene_id}")
-async def save_trajectory(scene_id: str, trajectory: list = Body(...)):
+async def save_trajectory(scene_id: str, data: TrajectoryData = Body(...)):
     """Endpoint to save the interaction trajectory."""
     filename = f"trajectories/{scene_id}.json"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
-        json.dump(trajectory, f, indent=4)
+        json.dump(data.trajectory, f, indent=4)
+
+    # Save PDDL
+    scene_data = load_scene_data(scene_id)
+    pddl_string = generate_pddl_string(scene_id, data.pddl, scene_data["objects"])
+    pddl_filename = f"pddl/{scene_id}.pddl"
+    with open(pddl_filename, "w") as f:
+        f.write(pddl_string)
+
     return {"message": "Trajectory saved successfully"}
-
-# --- PDDL Data (Example - you'll need to create these files) ---
-# Create a directory named 'pddl_data' and add PDDL files like this:
-# pddl_data/01_0.pddl (content as in your example)
-
-# --- Trajectories Directory ---
-# Create a directory named 'trajectories' to store saved trajectories.

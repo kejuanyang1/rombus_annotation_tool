@@ -11,13 +11,13 @@
         "new_orientation": 0
     },
     {
-        "type": "CLOSE",
-        "objectId": "lid_03",
-        "refObjectId": "container_09",
+        "type": "PUT_IN",
+        "objectId": "kitchen_09",
+        "refObjectId": "container_02",
         "new_pos": [
-            0.135,
-            -0.063,
-            0.023
+            0.176,
+            -0.3,
+            0.017999999999999995
         ],
         "new_orientation": 0
     }

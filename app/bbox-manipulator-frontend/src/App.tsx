@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Stage, Layer, Rect, Transformer, Text, Group } from 'react-konva';
+import { Stage, Layer, Rect, Transformer, Text, Group, Line } from 'react-konva';
 import Konva from 'konva';
 import './App.css'; // Import the CSS file
 
@@ -22,8 +22,8 @@ interface SceneData {
   quantity?: number;
 }
 
-type ActionType = 'SELECT' | 'PUT_NEAR' | 'PUT_IN' | 'PUT_ON' | 'OPEN_CLOSE' | null;
-type PutNearState = 'SELECT_TARGET' | 'SELECT_REFERENCE' | 'MANIPULATE';
+type ActionType = 'SELECT' | 'PUT_NEAR' | 'PUT_IN' | 'PUT_ON' | 'OPEN' | 'CLOSE' | null;
+type ActionState = 'SELECT_TARGET' | 'SELECT_REFERENCE' | 'MANIPULATE';
 
 // --- World Coordinate Display Range ---
 const WORLD_X_MIN = 0;    // Vertical world axis (obj.position[0]) - min value
@@ -43,7 +43,7 @@ const App: React.FC = () => {
     const [currentAction, setCurrentAction] = useState<ActionType>('SELECT');
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [referenceId, setReferenceId] = useState<string | null>(null);
-    const [putNearState, setPutNearState] = useState<PutNearState>('SELECT_TARGET');
+    const [actionState, setActionState] = useState<ActionState>('SELECT_TARGET');
     const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
     const [stageSize, setStageSize] = useState({ width: 800, height: 400 });
 
@@ -104,7 +104,7 @@ const App: React.FC = () => {
             setSelectedId(null);
             setReferenceId(null);
             setCurrentAction('SELECT');
-            setPutNearState('SELECT_TARGET');
+            setActionState('SELECT_TARGET');
         } catch (error) {
             console.error("Error loading scene:", error);
             alert(`Error loading scene: ${error instanceof Error ? error.message : String(error)}`);
@@ -144,25 +144,40 @@ const App: React.FC = () => {
     };
 
    // --- Update Scene and Trajectory ---
-   const updateObjectState = (objectId: string, newPos: [number, number, number], newOrientation: number) => {
+   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, isOpen?: boolean) => {
         setSceneData(prevData => {
             if (!prevData) return null;
-            const updatedObjects = prevData.objects.map(obj =>
-                obj.id === objectId ? { ...obj, position: newPos, orientation: newOrientation } : obj
-            );
+            const updatedObjects = prevData.objects.map(obj => {
+                if (obj.id === objectId) {
+                    const updatedObj = { ...obj };
+                    if (newPos) updatedObj.position = newPos;
+                    if (newOrientation !== null) updatedObj.orientation = newOrientation;
+                    if (isOpen !== undefined) updatedObj.isOpen = isOpen;
+                    return updatedObj;
+                }
+                return obj;
+            });
             return { ...prevData, objects: updatedObjects };
         });
-        setTrajectory(prev => [
-            ...prev,
-            { type: "MOVE_OBJECT_TO", objectId, new_pos: newPos, new_orientation: newOrientation },
-        ]);
+
+        if (isOpen !== undefined) {
+            setTrajectory(prev => [
+                ...prev,
+                { type: isOpen ? "OPEN_OBJECT" : "CLOSE_OBJECT", objectId },
+            ]);
+        } else if (newPos && newOrientation !== null) {
+            setTrajectory(prev => [
+                ...prev,
+                { type: "MOVE_OBJECT_TO", objectId, new_pos: newPos, new_orientation: newOrientation },
+            ]);
+        }
     };
 
     // --- Transformer Logic ---
     useEffect(() => {
         if (trRef.current) {
             const selectedNode = selectedId ? objectsRef.current.get(selectedId) : null;
-            if (selectedNode && (currentAction === 'SELECT' || (currentAction === 'PUT_NEAR' && putNearState === 'MANIPULATE'))) {
+            if (selectedNode && (currentAction === 'SELECT' || actionState === 'MANIPULATE')) {
                 trRef.current.nodes([selectedNode]);
                 trRef.current.enabledAnchors([]);
                 trRef.current.rotateEnabled(true);
@@ -171,11 +186,11 @@ const App: React.FC = () => {
             }
             trRef.current.getLayer()?.batchDraw();
         }
-    }, [selectedId, currentAction, putNearState]);
+    }, [selectedId, currentAction, actionState]);
 
     // --- Constrained Drag for 'Put Near' ---
     const constrainedDrag = (pos: { x: number; y: number }) => {
-        if (!dragStartPos || currentAction !== 'PUT_NEAR' || putNearState !== 'MANIPULATE') return pos;
+        if (!dragStartPos || currentAction !== 'PUT_NEAR' || actionState !== 'MANIPULATE') return pos;
         const dx = Math.abs(pos.x - dragStartPos.x);
         const dy = Math.abs(pos.y - dragStartPos.y);
         return dx > dy ? { x: pos.x, y: dragStartPos.y } : { x: dragStartPos.x, y: pos.y };
@@ -186,7 +201,7 @@ const App: React.FC = () => {
         if (e.target === e.target.getStage()) {
             setSelectedId(null);
             setReferenceId(null);
-            if (currentAction === 'PUT_NEAR') setPutNearState('SELECT_TARGET');
+            setActionState('SELECT_TARGET');
         }
     };
 
@@ -194,47 +209,59 @@ const App: React.FC = () => {
         e.evt.stopPropagation();
         const id = objData.id;
 
-        switch (currentAction) {
-            case 'SELECT':
-                setSelectedId(id);
-                break;
-            case 'PUT_IN':
-            case 'PUT_ON':
-                if (!selectedId) {
-                    setSelectedId(id);
-                } else if (id !== selectedId) {
-                    const targetContainer = sceneData?.objects.find(o => o.id === id);
-                    const movingObj = sceneData?.objects.find(o => o.id === selectedId);
+        if (currentAction === 'SELECT') {
+            setSelectedId(id);
+            return;
+        }
 
-                    if (targetContainer && movingObj && ['basket', 'support', 'bowl', 'container'].includes(targetContainer.category)) {
-                        // Target container's center is its position
-                        const targetWorldCenterX = targetContainer.position[0];
-                        const targetWorldCenterY = targetContainer.position[1];
-                        
-                        // Moving object's new position (center) will be the target's center
-                        const newMovingObjWorldX = targetWorldCenterX;
-                        const newMovingObjWorldY = targetWorldCenterY;
-                        
-                        const newZ = targetContainer.position[2] + targetContainer.size[2]; // Stack on top
-                        updateObjectState(selectedId, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0);
-                        setSelectedId(null);
+        if (actionState === 'SELECT_TARGET') {
+            setSelectedId(id);
+            setActionState('SELECT_REFERENCE');
+
+            if (currentAction === 'OPEN' || currentAction === 'CLOSE') {
+                const targetObj = sceneData?.objects.find(o => o.id === id);
+                if (targetObj) {
+                    updateObjectState(id, null, 0, currentAction === 'OPEN');
+                    setSelectedId(null);
+                    setActionState('SELECT_TARGET');
+                }
+            }
+        } else if (actionState === 'SELECT_REFERENCE' && id !== selectedId) {
+            setReferenceId(id);
+
+            const targetObj = sceneData?.objects.find(o => o.id === id);
+            const movingObj = sceneData?.objects.find(o => o.id === selectedId);
+
+            if (targetObj && movingObj) {
+                const targetWorldCenterX = targetObj.position[0];
+                const targetWorldCenterY = targetObj.position[1];
+                const newMovingObjWorldX = targetWorldCenterX;
+                const newMovingObjWorldY = targetWorldCenterY;
+
+                let newZ = targetObj.position[2] + targetObj.size[2];
+
+                if (currentAction === 'PUT_IN') {
+                    if (['basket', 'bowl', 'container'].includes(targetObj.category)) {
+                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0);
                     }
+                } else if (currentAction === 'PUT_ON') {
+                    if (['support'].includes(targetObj.category)) {
+                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0);
+                    }
+                } else if (currentAction === 'PUT_NEAR') {
+                    setActionState('MANIPULATE');
+                    return;
                 }
-                break;
-            case 'PUT_NEAR':
-                if (putNearState === 'SELECT_TARGET') {
-                    setSelectedId(id);
-                    setPutNearState('SELECT_REFERENCE');
-                } else if (putNearState === 'SELECT_REFERENCE' && id !== selectedId) {
-                    setReferenceId(id);
-                    setPutNearState('MANIPULATE');
-                }
-                break;
+
+                setSelectedId(null);
+                setReferenceId(null);
+                setActionState('SELECT_TARGET');
+            }
         }
     };
 
     const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        if (currentAction === 'PUT_NEAR' && putNearState === 'MANIPULATE') {
+        if (actionState === 'MANIPULATE') {
             setDragStartPos({ x: e.target.x(), y: e.target.y() });
         } else {
             setDragStartPos(null);
@@ -246,9 +273,8 @@ const App: React.FC = () => {
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (!currentObj) return;
 
-        // node.x() and node.y() are canvas center coordinates
-        const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN; // world horizontal center (obj.position[1])
-        const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN; // world vertical center (obj.position[0])
+        const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN;
+        const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
 
         updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation());
         setDragStartPos(null);
@@ -273,7 +299,7 @@ const App: React.FC = () => {
                 setCurrentAction(action);
                 setSelectedId(null);
                 setReferenceId(null);
-                setPutNearState('SELECT_TARGET');
+                setActionState('SELECT_TARGET');
             }}
         >
             {label}
@@ -326,16 +352,52 @@ const App: React.FC = () => {
                 ref={stageRef}
              >
                 <Layer ref={layerRef}>
+                    {/* Grid and Axes */}
+                    {[...Array(Math.floor(worldDisplayRangeY * 10) + 1)].map((_, i) => (
+                        <Line
+                            key={`v_line_${i}`}
+                            points={[
+                                (i / 10 + WORLD_Y_MIN - WORLD_Y_MIN) * worldToCanvasScale,
+                                0,
+                                (i / 10 + WORLD_Y_MIN - WORLD_Y_MIN) * worldToCanvasScale,
+                                stageSize.height,
+                            ]}
+                            stroke="#ccc"
+                            strokeWidth={0.5}
+                        />
+                    ))}
+                    {[...Array(Math.floor(worldDisplayRangeX * 10) + 1)].map((_, i) => (
+                        <Line
+                            key={`h_line_${i}`}
+                            points={[
+                                0,
+                                (i / 10) * worldToCanvasScale + canvasOffsetY,
+                                stageSize.width,
+                                (i / 10) * worldToCanvasScale + canvasOffsetY,
+                            ]}
+                            stroke="#ccc"
+                            strokeWidth={0.5}
+                        />
+                    ))}
+                    <Line
+                        points={[(-WORLD_Y_MIN) * worldToCanvasScale, 0, (-WORLD_Y_MIN) * worldToCanvasScale, stageSize.height]}
+                        stroke="black"
+                        strokeWidth={1}
+                    />
+                    <Line
+                        points={[0, canvasOffsetY, stageSize.width, canvasOffsetY]}
+                        stroke="black"
+                        strokeWidth={1}
+                    />
+
                     {sceneData && sceneData.objects.map(obj => {
                         const isSelected = obj.id === selectedId;
                         const isDraggable = currentAction === 'SELECT' ||
-                                           (currentAction === 'PUT_NEAR' && putNearState === 'MANIPULATE' && obj.id === selectedId);
+                                           (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && obj.id === selectedId);
 
-                        // obj.size[1] is world_width_horizontal, obj.size[0] is world_depth_vertical
                         const rectCanvasWidth = obj.size[0] * worldToCanvasScale;
                         const rectCanvasHeight = obj.size[1] * worldToCanvasScale;
 
-                        // obj.position[1] is world_y_horizontal_CENTER, obj.position[0] is world_x_vertical_CENTER
                         const groupCanvasX = (obj.position[1] - WORLD_Y_MIN) * worldToCanvasScale;
                         const groupCanvasY = ((obj.position[0] - WORLD_X_MIN) * worldToCanvasScale) + canvasOffsetY;
 
@@ -346,9 +408,9 @@ const App: React.FC = () => {
                                     if (node) objectsRef.current.set(obj.id, node);
                                     else objectsRef.current.delete(obj.id);
                                 }}
-                                x={groupCanvasX} // Canvas X for group (center of the object)
-                                y={groupCanvasY} // Canvas Y for group (center of the object)
-                                rotation={obj.orientation} // Konva rotates clockwise for positive values
+                                x={groupCanvasX}
+                                y={groupCanvasY}
+                                rotation={obj.orientation}
                                 draggable={isDraggable}
                                 onClick={(e) => handleObjectClick(obj, e)}
                                 onTap={(e) => handleObjectClick(obj, e)}
@@ -356,11 +418,10 @@ const App: React.FC = () => {
                                 onTransformEnd={(e) => handleTransformEnd(e, obj.id)}
                                 onDragStart={handleDragStart}
                                 dragBoundFunc={isDraggable && currentAction === 'PUT_NEAR' ? constrainedDrag : undefined}
-                                // Offset the group so rotation happens around its center (which is where x,y is set)
-                                offsetX={0} // Group's origin is its center, rect is drawn relative to this
+                                offsetX={0}
                                 offsetY={0}
                             >
-                                <Rect // Rect is drawn centered within the Group
+                                <Rect
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
                                     fill={getObjectColor(obj.category)}
@@ -368,9 +429,9 @@ const App: React.FC = () => {
                                     strokeWidth={isSelected ? 3 : (obj.id === referenceId ? 2 : 0.5)}
                                     shadowBlur={isSelected ? 10 : 0}
                                     shadowColor={isSelected ? 'red' : 'transparent'}
-                                    offsetX={rectCanvasWidth / 2} // Center the rect shape itself
+                                    offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
-                                    opacity={0.5} // Set opacity to 50%
+                                    opacity={0.5}
                                 />
                                 <Text
                                     text={obj.name}
@@ -380,7 +441,7 @@ const App: React.FC = () => {
                                     verticalAlign="middle"
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
-                                    offsetX={rectCanvasWidth / 2} // Center the text shape
+                                    offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
                                     listening={false}
                                     padding={2}
@@ -406,14 +467,13 @@ const App: React.FC = () => {
 
         {/* --- Right Column --- */}
         <div className="column right-column">
-
-
              <div className="section">
                 <h2>Actions</h2>
                 <div className="button-group">
-                    <ActionButton action="SELECT" label="Select / Rotate" />
-                    <ActionButton action="PUT_IN" label="Put In Basket/Bowl" />
-                    <ActionButton action="PUT_ON" label="Put On Support" />
+                    <ActionButton action="OPEN" label="Open" />
+                    <ActionButton action="CLOSE" label="Close" />
+                    <ActionButton action="PUT_IN" label="Put In" />
+                    <ActionButton action="PUT_ON" label="Put On" />
                     <ActionButton action="PUT_NEAR" label="Put Near" />
                 </div>
              </div>
@@ -422,15 +482,14 @@ const App: React.FC = () => {
                 <h2>Current State</h2>
                 <p>Action: <b>{currentAction || 'None'}</b></p>
                 <p>Selected: <b>{selectedId || 'None'}</b></p>
-                {currentAction === 'PUT_NEAR' && <p>Put Near State: <b>{putNearState}</b></p>}
-                {currentAction === 'PUT_NEAR' && referenceId && <p>Reference: <b>{referenceId}</b></p>}
+                <p>Action State: <b>{actionState}</b></p>
+                {referenceId && <p>Reference: <b>{referenceId}</b></p>}
              </div>
 
              <div className="section">
                 <h2>Trajectory</h2>
                 <pre className="trajectory-pre">{JSON.stringify(trajectory, null, 2)}</pre>
              </div>
-
 
              {sceneData && (
                  <div className="section">
@@ -442,7 +501,6 @@ const App: React.FC = () => {
                     </ul>
                  </div>
               )}
-
         </div>
     </div>
   );

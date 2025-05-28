@@ -1,0 +1,22 @@
+(define (problem generated)
+  (:domain manip)
+  (:objects
+    kitchen_06 kitchen_12 kitchen_19 kitchen_23 kitchen_27 kitchen_29 - item
+  )
+  (:init
+    (clear kitchen_06)
+    (clear kitchen_12)
+    (clear kitchen_19)
+    (clear kitchen_23)
+    (clear kitchen_27)
+    (clear kitchen_29)
+    (handempty)
+    (ontable kitchen_06)
+    (ontable kitchen_12)
+    (ontable kitchen_19)
+    (ontable kitchen_23)
+    (ontable kitchen_27)
+    (ontable kitchen_29)
+  )
+  (:goal (and))
+)

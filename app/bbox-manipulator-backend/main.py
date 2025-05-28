@@ -23,6 +23,8 @@ app.add_middleware(
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 POSES_FILE = os.path.join(ASSETS_DIR, "poses.json")
+PDDL_DIR = "/Users/ykj/Desktop/github/ROMBUS/planner/instances/init_state_id/"
+
 app.mount("/images", StaticFiles(directory=DATA_DIR))
 
 
@@ -54,9 +56,9 @@ def load_scene_data(scene_id: str):
         raise HTTPException(status_code=404, detail="Scene not found")
 
 def load_pddl_data(scene_id: str):
-    """Loads and parses PDDL data (simplified for 'on' and 'in')."""
-    pddl_file = f"/Users/ykj/Desktop/github/ROMBUS/planner/instances/init_state_id/{scene_id}.pddl"  # Assuming a pddl_data directory
-    relations = {"on": [], "in": []}
+    """Loads and parses PDDL data (simplified for 'on', 'in', 'open', 'closed')."""
+    pddl_file = os.path.join(PDDL_DIR, f"{scene_id}.pddl")
+    relations = {"on": [], "in": [], "open": [], "closed": []} # Include open and closed
 
     if not os.path.exists(pddl_file):
         return relations  # Return empty if PDDL not found
@@ -73,6 +75,12 @@ def load_pddl_data(scene_id: str):
             elif in_init_section and line.startswith("(in "):
                 parts = line.replace("(", "").replace(")", "").split()
                 relations["in"].append({"obj1": parts[1], "obj2": parts[2]})
+            elif in_init_section and line.startswith("(open "): # Parse open
+                parts = line.replace("(", "").replace(")", "").split()
+                relations["open"].append({"obj1": parts[1]})
+            elif in_init_section and line.startswith("(closed "): # Parse closed
+                parts = line.replace("(", "").replace(")", "").split()
+                relations["closed"].append({"obj1": parts[1]})
             elif in_init_section and line == ")":
                 break  # End of init section
 

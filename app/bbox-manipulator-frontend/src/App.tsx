@@ -11,7 +11,6 @@ interface ObjectData {
   position: [number, number, number]; // [world_x_vertical_CENTER, world_y_horizontal_CENTER, world_z_CENTER]
   orientation: number;
   size: [number, number, number]; // [world_depth_vertical_SIZE, world_width_horizontal_SIZE, world_height_z_SIZE]
-  isOpen?: boolean;
 }
 
 interface SceneData {
@@ -28,6 +27,7 @@ type ActionState = 'SELECT_TARGET' | 'SELECT_REFERENCE' | 'MANIPULATE';
 interface Action {
   type: ActionType;
   objectId: string;
+  refObjectId?: string; // Also load and save refobjectid
   new_pos?: [number, number, number];
   new_orientation?: number;
 }
@@ -56,7 +56,7 @@ const App: React.FC = () => {
     const [sceneId, setSceneId] = useState<string>('01_0');
     const [sceneList, setSceneList] = useState<string[]>([]); // New state for scene list
     const [sceneData, setSceneData] = useState<SceneData | null>(null);
-    const [pddlRelations, setPddlRelations] = useState<any>(null);
+    const [pddlRelations, setPddlRelations] = useState<any>({ on: [], in: [], open: [], closed: [] }); // Initialize with open and closed
     const [trajectory, setTrajectory] = useState<any[]>([]);
     const [currentAction, setCurrentAction] = useState<ActionType>(null);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -109,7 +109,7 @@ const App: React.FC = () => {
 
         return { worldToCanvasScale: scale, canvasOffsetX: offX, canvasOffsetY: offY };
 
-    }, [stageSize.width, stageSize.height, worldDisplayRangeX, worldDisplayRangeY]);
+    }, [stageSize.width, stageSize.height]);
 
 
     // --- World to Canvas Conversion ---
@@ -219,7 +219,7 @@ const App: React.FC = () => {
     };
 
    // --- Update Scene and Trajectory ---
-   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, isOpen?: boolean) => {
+   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, refId?: string) => {
         if (!currentStepAction && sceneData) {
             setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o })));
         } else if (!sceneData) {
@@ -233,7 +233,6 @@ const App: React.FC = () => {
                     const updatedObj = { ...obj };
                     if (newPos) updatedObj.position = newPos;
                     if (newOrientation !== null) updatedObj.orientation = newOrientation;
-                    if (isOpen !== undefined) updatedObj.isOpen = isOpen;
                     return updatedObj;
                 }
                 return obj;
@@ -241,11 +240,10 @@ const App: React.FC = () => {
             return { ...prevData, objects: updatedObjects };
         });
 
-        if (isOpen !== undefined) {
-            setCurrentStepAction({ type: actionType, objectId });
-        } else if (newPos && newOrientation !== null) {
-            setCurrentStepAction({ type: actionType, objectId, new_pos: newPos, new_orientation: newOrientation });
+        if (newPos && newOrientation !== null) {
+            setCurrentStepAction({ type: actionType, objectId, refObjectId: refId, new_pos: newPos, new_orientation: newOrientation});
         }
+        updatePddlRelations(objectId, actionType, refId); // Update PDDL
     };
 
     // --- Transformer Logic ---
@@ -291,7 +289,7 @@ const App: React.FC = () => {
             setSelectedId(id);
             setActionState('SELECT_REFERENCE');
             if (currentAction === 'OPEN' || currentAction === 'CLOSE') {
-                updateObjectState(id, null, 0, currentAction, currentAction === 'OPEN');
+                updateObjectState(id, null, 0, currentAction, id);
             }
         } else if (actionState === 'SELECT_REFERENCE' && id !== selectedId) {
             setReferenceId(id);
@@ -302,10 +300,10 @@ const App: React.FC = () => {
                 const [refX, refY, refZ] = refObj.position;
                 const [, , targetZ] = targetObj.size;
 
-                if (currentAction === 'PUT_IN' && ['container'].includes(refObj.category)) {
-                    updateObjectState(selectedId!, [refX, refY, targetZ / 2], 0, currentAction);
+                if (currentAction === 'PUT_IN' && ['container', 'bowl'].includes(refObj.category)) { // Include bowl
+                    updateObjectState(selectedId!, [refX, refY, targetZ / 2], 0, currentAction, id);
                 } else if (currentAction === 'PUT_ON') {
-                    updateObjectState(selectedId!, [refX, refY, refZ + targetZ / 2], 0, currentAction);
+                    updateObjectState(selectedId!, [refX, refY, refZ + targetZ / 2], 0, currentAction, id);
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE');
                     return; // Don't reset yet
@@ -340,7 +338,7 @@ const App: React.FC = () => {
         const newWorldPosX = canvasToWorldX(node.y());
         const newWorldPosY = canvasToWorldY(node.x());
 
-        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
+        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.size[2] / 2], node.rotation(), currentAction, referenceId || undefined);
         setDragStartPos(null);
     };
 
@@ -351,7 +349,7 @@ const App: React.FC = () => {
         if (node && currentObj) {
             const newWorldPosX = canvasToWorldX(node.y());
             const newWorldPosY = canvasToWorldY(node.x());
-            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
+            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.size[2] / 2], node.rotation(), currentAction, referenceId || undefined);
         }
     };
 
@@ -395,6 +393,33 @@ const App: React.FC = () => {
             {label}
         </button>
     );
+
+    // --- PDDL Update Logic ---
+    const updatePddlRelations = (objectId: string, actionType: ActionType, refId?: string) => {
+        setPddlRelations((prevPddl: any) => {
+            const newPddl = { ...prevPddl };
+            const object = sceneData?.objects.find(o => o.id === objectId);
+            const refObject = sceneData?.objects.find(o => o.id === refId);
+
+            if (actionType === 'PUT_ON' && refObject) {
+                newPddl.on = [...newPddl.on.filter((r: any) => r.obj1 !== objectId), { obj1: objectId, obj2: refId }];
+                if (object?.category === 'lid' && refObject?.category === 'bowl') {
+                    newPddl.closed = [...newPddl.closed.filter((r: any) => r.obj1 !== refId), { obj1: refId }];
+                    newPddl.open = newPddl.open.filter((r: any) => r.obj1 !== refId);
+                }
+            } else if (actionType === 'PUT_IN' && refObject) {
+                newPddl.in = [...newPddl.in.filter((r: any) => r.obj1 !== objectId), { obj1: objectId, obj2: refId }];
+            } else if (actionType === 'OPEN' && object?.category === 'bowl') {
+                newPddl.open = [...newPddl.open.filter((r: any) => r.obj1 !== objectId), { obj1: objectId }];
+                newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== objectId);
+            } else if (actionType === 'CLOSE' && object?.category === 'bowl') {
+                newPddl.closed = [...newPddl.closed.filter((r: any) => r.obj1 !== objectId), { obj1: objectId }];
+                newPddl.open = newPddl.open.filter((r: any) => r.obj1 !== objectId);
+            }
+
+            return newPddl;
+        });
+    };
 
     // --- Render Axes and Grid ---
     const renderAxesAndGrid = () => {

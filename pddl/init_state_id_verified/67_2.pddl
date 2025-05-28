@@ -1,0 +1,25 @@
+(define (problem generated)
+  (:domain manip)
+  (:objects
+    container_01 container_02 - container
+    office_01 office_04 office_06 office_07 office_08 tool_08 - item
+  )
+  (:init
+    (clear office_01)
+    (clear office_04)
+    (clear office_06)
+    (clear office_07)
+    (clear office_08)
+    (clear tool_08)
+    (handempty)
+    (in office_08 container_01)
+    (in tool_08 container_02)
+    (ontable container_01)
+    (ontable container_02)
+    (ontable office_01)
+    (ontable office_04)
+    (ontable office_06)
+    (ontable office_07)
+  )
+  (:goal (and))
+)

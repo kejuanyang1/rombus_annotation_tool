@@ -1,0 +1,22 @@
+(define (problem generated)
+  (:domain manip)
+  (:objects
+    shape_03_1 shape_03_2 shape_04 shape_09 shape_20 shape_24_1 shape_24_2 - item
+  )
+  (:init
+    (clear shape_03_1)
+    (clear shape_03_2)
+    (clear shape_04)
+    (clear shape_20)
+    (clear shape_24_2)
+    (handempty)
+    (on shape_04 shape_09)
+    (on shape_20 shape_24_1)
+    (ontable shape_03_1)
+    (ontable shape_03_2)
+    (ontable shape_09)
+    (ontable shape_24_1)
+    (ontable shape_24_2)
+  )
+  (:goal (and))
+)

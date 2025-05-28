@@ -1,0 +1,20 @@
+(define (problem generated)
+  (:domain manip)
+  (:objects
+    tool_01 tool_02 tool_03 tool_04 tool_05 - item
+  )
+  (:init
+    (clear tool_01)
+    (clear tool_02)
+    (clear tool_03)
+    (clear tool_04)
+    (clear tool_05)
+    (handempty)
+    (ontable tool_01)
+    (ontable tool_02)
+    (ontable tool_03)
+    (ontable tool_04)
+    (ontable tool_05)
+  )
+  (:goal (and))
+)

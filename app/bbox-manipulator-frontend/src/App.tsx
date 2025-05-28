@@ -144,7 +144,7 @@ const App: React.FC = () => {
     };
 
    // --- Update Scene and Trajectory ---
-   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, isOpen?: boolean) => {
+   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, isOpen?: boolean) => {
         setSceneData(prevData => {
             if (!prevData) return null;
             const updatedObjects = prevData.objects.map(obj => {
@@ -163,12 +163,12 @@ const App: React.FC = () => {
         if (isOpen !== undefined) {
             setTrajectory(prev => [
                 ...prev,
-                { type: isOpen ? "OPEN_OBJECT" : "CLOSE_OBJECT", objectId },
+                { type: actionType, objectId },
             ]);
         } else if (newPos && newOrientation !== null) {
             setTrajectory(prev => [
                 ...prev,
-                { type: "MOVE_OBJECT_TO", objectId, new_pos: newPos, new_orientation: newOrientation },
+                { type: actionType, objectId, new_pos: newPos, new_orientation: newOrientation },
             ]);
         }
     };
@@ -221,7 +221,7 @@ const App: React.FC = () => {
             if (currentAction === 'OPEN' || currentAction === 'CLOSE') {
                 const targetObj = sceneData?.objects.find(o => o.id === id);
                 if (targetObj) {
-                    updateObjectState(id, null, 0, currentAction === 'OPEN');
+                    updateObjectState(id, null, 0, currentAction, currentAction === 'OPEN');
                     setSelectedId(null);
                     setActionState('SELECT_TARGET');
                 }
@@ -242,11 +242,11 @@ const App: React.FC = () => {
 
                 if (currentAction === 'PUT_IN') {
                     if (['basket', 'bowl', 'container'].includes(targetObj.category)) {
-                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0);
+                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0, currentAction);
                     }
                 } else if (currentAction === 'PUT_ON') {
                     if (['support'].includes(targetObj.category)) {
-                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0);
+                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0, currentAction);
                     }
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE');
@@ -261,22 +261,21 @@ const App: React.FC = () => {
     };
 
     const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-      if (actionState === 'MANIPULATE') {
-          if (referenceId && objectsRef.current.has(referenceId)) {
-              const referenceNode = objectsRef.current.get(referenceId);
-              if (referenceNode) { // Check if referenceNode is defined
-                  setDragStartPos({ x: referenceNode.x(), y: referenceNode.y() });
-              } else {
-                  // Fallback if referenceNode is undefined (shouldn't happen with 'has' check, but good for safety)
-                  setDragStartPos({ x: e.target.x(), y: e.target.y() });
-              }
-          } else {
-              setDragStartPos({ x: e.target.x(), y: e.target.y() });
-          }
-      } else {
-          setDragStartPos(null);
-      }
-  };
+        if (actionState === 'MANIPULATE') {
+            if (referenceId && objectsRef.current.has(referenceId)) {
+                const referenceNode = objectsRef.current.get(referenceId);
+                if (referenceNode) {
+                    setDragStartPos({ x: referenceNode.x(), y: referenceNode.y() });
+                } else {
+                    setDragStartPos({ x: e.target.x(), y: e.target.y() });
+                }
+            } else {
+                setDragStartPos({ x: e.target.x(), y: e.target.y() });
+            }
+        } else {
+            setDragStartPos(null);
+        }
+    };
 
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>, objectId: string) => {
         const node = e.target as Konva.Group;
@@ -286,7 +285,7 @@ const App: React.FC = () => {
         const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN;
         const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
 
-        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation());
+        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
         setDragStartPos(null);
     };
 
@@ -297,7 +296,7 @@ const App: React.FC = () => {
             const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN;
             const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
 
-            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation());
+            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
         }
     };
 

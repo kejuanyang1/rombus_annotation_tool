@@ -40,3 +40,160 @@
 .read-the-docs {
   color: #888;
 }
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.column {
+  padding: 15px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+  box-sizing: border-box; /* Include padding in width */
+}
+
+.left-column {
+  flex: 0.25;
+  background-color: #f8f9fa;
+}
+
+.center-column {
+  flex: 0.5;
+  position: relative;
+  border: 1px solid black;
+  background-color: #ffffff; /* White background for canvas area */
+  padding: 0; /* Remove padding */
+  border-right: 1px solid #ccc;
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+.right-column {
+  flex: 0.25;
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+    margin-top: 0;
+    font-size: 1.1em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.scene-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  display: block; /* Ensure it behaves like a block element */
+}
+
+.pddl-pre {
+  background: #eee;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap; /* Wrap long lines */
+  word-wrap: break-word; /* Break words if needed */
+  font-size: 0.9em;
+}
+
+.input-group {
+  margin-bottom: 10px;
+}
+
+.input-group input {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.controls-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.controls-buttons button {
+    padding: 10px 15px;
+    flex: 1;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    border-radius: 3px;
+}
+.controls-buttons button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Increased gap */
+}
+
+.action-button {
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.action-button.active {
+    background-color: #007bff; /* Blue for active */
+    font-weight: bold;
+}
+
+.action-button.inactive {
+    background-color: #6c757d; /* Grey for inactive */
+}
+.action-button:hover:not(.active) {
+    background-color: #5a6268;
+}
+
+.trajectory-pre {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #e9ecef;
+  padding: 10px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.scene-info-list {
+  list-style: none;
+  padding-left: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 0.9em;
+  margin: 0;
+}
+.scene-info-list li {
+    padding: 3px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.scene-info-list li:last-child {
+    border-bottom: none;
+}

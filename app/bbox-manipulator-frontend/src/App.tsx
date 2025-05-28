@@ -328,6 +328,19 @@ const App: React.FC = () => {
             }
         };
 
+        const sendToBottom = (objectId: string) => {
+            if (objectsRef.current.has(objectId)) {
+                objectsRef.current.get(objectId)?.moveToBottom();
+            }
+        };
+
+        // Send containers to bottom first
+        sceneData?.objects.forEach(obj => {
+            if (obj.category === 'container') {
+                sendToBottom(obj.id);
+            }
+        });
+
         // Bring objects 'on' top
         pddlRelations.on.forEach(relation => bringToTop(relation.obj1));
 

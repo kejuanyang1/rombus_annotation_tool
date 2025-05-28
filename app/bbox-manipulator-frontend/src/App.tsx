@@ -416,10 +416,10 @@ const App: React.FC = () => {
             if (targetObj && refObj) {
                 const [refX, refY, refZ] = refObj.position;
 
-                if (currentAction === 'PUT_IN' && ['container', 'bowl'].includes(refObj.category)) {
-                    updateObjectState(selectedId!, [refX, refY, refObj.position[2] + (refObj.size[2]/2) - (targetObj.size[2]/2) ], 0, currentAction, clickedObjectId);
-                } else if (currentAction === 'PUT_ON') {
-                     const newTargetZ = refObj.position[2] + (refObj.size[2] / 2) + (targetObj.size[2] / 2);
+                if (currentAction === 'PUT_IN' && ['container'].includes(refObj.category)) {
+                    updateObjectState(selectedId!, [refX, refY, refZ + (refObj.size[2]/2) - (targetObj.size[2]/2) ], 0, currentAction, clickedObjectId);
+                } else if (currentAction === 'PUT_ON' && refObj.category !== "container") {
+                    const newTargetZ = refZ + (refObj.size[2] / 2) + (targetObj.size[2] / 2);
                     updateObjectState(selectedId!, [refX, refY, newTargetZ], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE'); // Enter drag/rotate mode
@@ -676,12 +676,6 @@ const App: React.FC = () => {
                   <ul className="scene-info-list">
                       {sceneData.objects.map(o => <li key={o.id}>{o.name} ({o.category} - {o.id})</li>)}
                   </ul>
-                </div>
-            )}
-             {Object.keys(bowlToLidMap).length > 0 && (
-                <div className="section">
-                    <h2>Bowl-Lid Map</h2>
-                    <pre className="pddl-pre">{JSON.stringify(bowlToLidMap, null, 2)}</pre>
                 </div>
             )}
 

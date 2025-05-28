@@ -284,6 +284,23 @@ const App: React.FC = () => {
     <div className="app-container">
         {/* --- Left Column --- */}
         <div className="column left-column">
+          <div className="section">
+                  <h2>Controls</h2>
+                  <div className="input-group">
+                      <input
+                          type="text"
+                          placeholder="Enter Scene ID (e.g., 01_0)"
+                          value={sceneId}
+                          onChange={(e) => setSceneId(e.target.value)}
+                      />
+                  </div>
+                  <div className="controls-buttons">
+                      <button onClick={loadScene}>Load Scene</button>
+                      <button onClick={saveTrajectory} disabled={trajectory.length === 0}>
+                          Save Trajectory
+                      </button>
+                  </div>
+              </div>
             <div className="section">
                  <h2>Original Scene</h2>
                  <img
@@ -389,23 +406,7 @@ const App: React.FC = () => {
 
         {/* --- Right Column --- */}
         <div className="column right-column">
-             <div className="section">
-                <h2>Controls</h2>
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="Enter Scene ID (e.g., 01_0)"
-                        value={sceneId}
-                        onChange={(e) => setSceneId(e.target.value)}
-                    />
-                </div>
-                 <div className="controls-buttons">
-                    <button onClick={loadScene}>Load Scene</button>
-                    <button onClick={saveTrajectory} disabled={trajectory.length === 0}>
-                        Save Trajectory
-                    </button>
-                 </div>
-             </div>
+
 
              <div className="section">
                 <h2>Actions</h2>
@@ -425,7 +426,13 @@ const App: React.FC = () => {
                 {currentAction === 'PUT_NEAR' && referenceId && <p>Reference: <b>{referenceId}</b></p>}
              </div>
 
-              {sceneData && (
+             <div className="section">
+                <h2>Trajectory</h2>
+                <pre className="trajectory-pre">{JSON.stringify(trajectory, null, 2)}</pre>
+             </div>
+
+
+             {sceneData && (
                  <div className="section">
                     <h2>Scene Info</h2>
                     <p>Task ID: {sceneData.task_id}</p>
@@ -436,10 +443,6 @@ const App: React.FC = () => {
                  </div>
               )}
 
-             <div className="section">
-                <h2>Trajectory</h2>
-                <pre className="trajectory-pre">{JSON.stringify(trajectory, null, 2)}</pre>
-             </div>
         </div>
     </div>
   );

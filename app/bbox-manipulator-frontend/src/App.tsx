@@ -202,6 +202,7 @@ const App: React.FC = () => {
             setSelectedId(null);
             setReferenceId(null);
             setActionState('SELECT_TARGET');
+            setCurrentAction(null); // Set currentAction to null when clicking on stage
         }
     };
 
@@ -209,8 +210,7 @@ const App: React.FC = () => {
         e.evt.stopPropagation();
         const id = objData.id;
 
-        if (currentAction === 'SELECT') {
-            setSelectedId(id);
+        if (currentAction === null) { // Disable interaction if no action is selected
             return;
         }
 
@@ -401,8 +401,7 @@ const App: React.FC = () => {
 
                     {sceneData && sceneData.objects.map(obj => {
                         const isSelected = obj.id === selectedId;
-                        const isDraggable = currentAction === 'SELECT' ||
-                                           (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && obj.id === selectedId);
+                        const isDraggable = (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && obj.id === selectedId);
 
                         const rectCanvasWidth = obj.size[0] * worldToCanvasScale;
                         const rectCanvasHeight = obj.size[1] * worldToCanvasScale;
@@ -420,7 +419,7 @@ const App: React.FC = () => {
                                 x={groupCanvasX}
                                 y={groupCanvasY}
                                 rotation={obj.orientation}
-                                draggable={isDraggable}
+                                draggable={isDraggable && currentAction !== null} // Disable dragging if no action is selected
                                 onClick={(e) => handleObjectClick(obj, e)}
                                 onTap={(e) => handleObjectClick(obj, e)}
                                 onDragEnd={(e) => handleDragEnd(e, obj.id)}

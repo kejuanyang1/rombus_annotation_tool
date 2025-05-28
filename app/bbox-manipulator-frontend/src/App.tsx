@@ -47,13 +47,15 @@ const App: React.FC = () => {
     const [sceneData, setSceneData] = useState<SceneData | null>(null);
     const [pddlRelations, setPddlRelations] = useState<any>(null);
     const [trajectory, setTrajectory] = useState<any[]>([]);
-    const [currentAction, setCurrentAction] = useState<ActionType>('SELECT');
+    const [currentAction, setCurrentAction] = useState<ActionType>(null); // Initialized to null
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [referenceId, setReferenceId] = useState<string | null>(null);
     const [actionState, setActionState] = useState<ActionState>('SELECT_TARGET');
     const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
     const [stageSize, setStageSize] = useState({ width: 800, height: 400 });
     const [currentStepAction, setCurrentStepAction] = useState<Action | null>(null);
+    const [sceneObjectsBeforeStep, setSceneObjectsBeforeStep] = useState<ObjectData[] | null>(null);
+
 
     // --- Konva Refs ---
     const stageRef = useRef<Konva.Stage>(null);
@@ -111,9 +113,10 @@ const App: React.FC = () => {
             setTrajectory([]);
             setSelectedId(null);
             setReferenceId(null);
-            setCurrentAction('SELECT');
+            setCurrentAction(null);
             setActionState('SELECT_TARGET');
             setCurrentStepAction(null);
+            setSceneObjectsBeforeStep(null);
         } catch (error) {
             console.error("Error loading scene:", error);
             alert(`Error loading scene: ${error instanceof Error ? error.message : String(error)}`);
@@ -154,6 +157,12 @@ const App: React.FC = () => {
 
    // --- Update Scene and Trajectory ---
    const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, isOpen?: boolean) => {
+        if (!currentStepAction && sceneData) {
+            setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o }))); // Store copy of objects
+        } else if (!sceneData) {
+            setSceneObjectsBeforeStep(null);
+        }
+
         setSceneData(prevData => {
             if (!prevData) return null;
             const updatedObjects = prevData.objects.map(obj => {
@@ -180,9 +189,11 @@ const App: React.FC = () => {
     useEffect(() => {
         if (trRef.current) {
             const selectedNode = selectedId ? objectsRef.current.get(selectedId) : null;
-            if (selectedNode && (currentAction === 'SELECT' || actionState === 'MANIPULATE')) {
+            // Enable transformer if an object is selected and an action is active (not null)
+            // or if in MANIPULATE state (which implies an action is active)
+            if (selectedNode && (currentAction !== null || actionState === 'MANIPULATE')) {
                 trRef.current.nodes([selectedNode]);
-                trRef.current.enabledAnchors([]);
+                trRef.current.enabledAnchors([]); // Only rotation for now
                 trRef.current.rotateEnabled(true);
             } else {
                 trRef.current.nodes([]);
@@ -190,6 +201,7 @@ const App: React.FC = () => {
             trRef.current.getLayer()?.batchDraw();
         }
     }, [selectedId, currentAction, actionState]);
+
 
     // --- Constrained Drag for 'Put Near' ---
     const constrainedDrag = (pos: { x: number; y: number }) => {
@@ -205,7 +217,9 @@ const App: React.FC = () => {
             setSelectedId(null);
             setReferenceId(null);
             setActionState('SELECT_TARGET');
-            setCurrentAction(null); // Set currentAction to null when clicking on stage
+            setCurrentAction(null);
+            // Do not clear currentStepAction or sceneObjectsBeforeStep here,
+            // as the user might want to finish/cancel an ongoing step.
         }
     };
 
@@ -213,8 +227,8 @@ const App: React.FC = () => {
         e.evt.stopPropagation();
         const id = objData.id;
 
-        if (currentAction === null) { // Disable interaction if no action is selected
-            return;
+        if (currentAction === null) {
+            return; // Interaction disabled if no action is active
         }
 
         if (actionState === 'SELECT_TARGET') {
@@ -255,7 +269,7 @@ const App: React.FC = () => {
     };
 
     const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        if (actionState === 'MANIPULATE') {
+        if (actionState === 'MANIPULATE' && currentAction !== null) { // Ensure an action is active
             if (referenceId && objectsRef.current.has(referenceId)) {
                 const referenceNode = objectsRef.current.get(referenceId);
                 if (referenceNode) {
@@ -272,6 +286,8 @@ const App: React.FC = () => {
     };
 
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>, objectId: string) => {
+        if (currentAction === null) return; // No action, no state update
+
         const node = e.target as Konva.Group;
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (!currentObj) return;
@@ -284,6 +300,8 @@ const App: React.FC = () => {
     };
 
     const handleTransformEnd = (e: Konva.KonvaEventObject<Event>, objectId: string) => {
+        if (currentAction === null) return; // No action, no state update
+
         const node = objectsRef.current.get(objectId);
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (node && currentObj) {
@@ -298,6 +316,7 @@ const App: React.FC = () => {
         if (currentStepAction) {
             setTrajectory(prev => [...prev, currentStepAction]);
             setCurrentStepAction(null);
+            setSceneObjectsBeforeStep(null);
             setCurrentAction(null);
             setSelectedId(null);
             setReferenceId(null);
@@ -305,15 +324,36 @@ const App: React.FC = () => {
         }
     };
 
+    const handleCancelAction = () => {
+        if (sceneObjectsBeforeStep && sceneData) {
+            setSceneData(prevData => {
+                if (!prevData) return null;
+                return {
+                    ...prevData,
+                    objects: sceneObjectsBeforeStep.map(o => ({ ...o })) // Revert to stored state
+                };
+            });
+        }
+        setCurrentStepAction(null);
+        setSceneObjectsBeforeStep(null);
+        setCurrentAction(null);
+        setSelectedId(null);
+        setReferenceId(null);
+        setActionState('SELECT_TARGET');
+    };
+
+
     // --- UI Elements ---
     const ActionButton: React.FC<{ action: ActionType; label: string }> = ({ action, label }) => (
         <button
             className={`action-button ${currentAction === action ? 'active' : 'inactive'}`}
             onClick={() => {
                 setCurrentAction(action);
-                setSelectedId(null);
+                setSelectedId(null); // Reset selection when a new action is chosen
                 setReferenceId(null);
                 setActionState('SELECT_TARGET');
+                setCurrentStepAction(null); // Clear any pending step from a previous action
+                setSceneObjectsBeforeStep(null);
             }}
         >
             {label}
@@ -424,7 +464,7 @@ const App: React.FC = () => {
                                 x={groupCanvasX}
                                 y={groupCanvasY}
                                 rotation={obj.orientation}
-                                draggable={isDraggable && currentAction !== null} // Disable dragging if no action is selected
+                                draggable={isDraggable && currentAction !== null}
                                 onClick={(e) => handleObjectClick(obj, e)}
                                 onTap={(e) => handleObjectClick(obj, e)}
                                 onDragEnd={(e) => handleDragEnd(e, obj.id)}
@@ -438,10 +478,10 @@ const App: React.FC = () => {
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
                                     fill={getObjectColor(obj.category)}
-                                    stroke={isSelected ? 'red' : (obj.id === referenceId ? 'blue' : 'black')}
-                                    strokeWidth={isSelected ? 3 : (obj.id === referenceId ? 2 : 0.5)}
-                                    shadowBlur={isSelected ? 10 : 0}
-                                    shadowColor={isSelected ? 'red' : 'transparent'}
+                                    stroke={isSelected && currentAction !== null ? 'red' : (obj.id === referenceId && currentAction !== null ? 'blue' : 'black')}
+                                    strokeWidth={isSelected && currentAction !== null ? 3 : (obj.id === referenceId && currentAction !== null ? 2 : 0.5)}
+                                    shadowBlur={isSelected && currentAction !== null ? 10 : 0}
+                                    shadowColor={isSelected && currentAction !== null ? 'red' : 'transparent'}
                                     offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
                                     opacity={0.5}
@@ -489,21 +529,38 @@ const App: React.FC = () => {
                     <ActionButton action="PUT_ON" label="Put On" />
                     <ActionButton action="PUT_NEAR" label="Put Near" />
                 </div>
-                <button
-                    onClick={handleFinishAction}
-                    disabled={!currentStepAction}
-                    style={{
-                        backgroundColor: currentStepAction ? '#4CAF50' : '#ccc', // Green when active, gray when inactive
-                        color: 'white',
-                        padding: '10px 15px',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: currentStepAction ? 'pointer' : 'not-allowed',
-                        marginTop: '15px' // Add space above the button
-                    }}
-                >
-                    Finish Current Action
-                </button>
+                <div style={{ display: 'flex', marginTop: '15px', gap: '10px' }}>
+                    <button
+                        onClick={handleFinishAction}
+                        disabled={!currentStepAction}
+                        style={{
+                            backgroundColor: currentStepAction ? '#4CAF50' : '#ccc',
+                            color: 'white',
+                            padding: '10px 15px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: currentStepAction ? 'pointer' : 'not-allowed',
+                            flex: 1
+                        }}
+                    >
+                        Finish Current Action
+                    </button>
+                    <button
+                        onClick={handleCancelAction}
+                        disabled={!currentStepAction}
+                        style={{
+                            backgroundColor: currentStepAction ? '#f44336' : '#ccc', // Red when active, gray when inactive
+                            color: 'white',
+                            padding: '10px 15px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: currentStepAction ? 'pointer' : 'not-allowed',
+                            flex: 1
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </div>
              </div>
 
              <div className="section">

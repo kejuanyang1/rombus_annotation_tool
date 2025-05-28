@@ -47,7 +47,35 @@ uvicorn main:app --reload --port 8000
 ```
 
 
-## Bbox Annotaion using OwlViT
+# 3D table-top Manipulation Game
+## frontend
+
+```shell
+cd app/bbox-manipulator-frontend
+npm install
+```
+
+```shell
+npm run dev
+```
+
+
+## backend
+
+```shell
+conda create -n 3danno python==3.10
+conda activate 3danno
+cd app/bbox-manipulator-backend
+pip install -r requirements.txt
+```
+
+```shell
+uvicorn main:app --reload --port 8000
+```
+
+
+
+# Bbox Annotaion using OwlViT
 
 Install GPU compatible Pytorch first, then
 
@@ -59,7 +87,7 @@ pip install transformers
 python inference.py --img_dir /your_dataset_path
 ```
 
-## PDDL Spatial Relation Validation Guide
+# PDDL Spatial Relation Validation Guide
 
 Check pddl domain definition file in `pddl/manip_domain.pddl`.
 GPT generated initial state pddl files are in `pddl/init_state_name/{task_id}.pddl`

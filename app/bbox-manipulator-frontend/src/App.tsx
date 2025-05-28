@@ -38,16 +38,27 @@ const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
 const WORLD_Y_MIN = -0.7; // Horizontal world axis (obj.position[1]) - min value
 const WORLD_Y_MAX = 0.3;  // Horizontal world axis (obj.position[1]) - max value
 
-const worldDisplayRangeX = WORLD_X_MAX - WORLD_X_MIN; // Total height of the world viewport (0.5)
-const worldDisplayRangeY = WORLD_Y_MAX - WORLD_Y_MIN; // Total width of the world viewport (1.0)
+const worldDisplayRangeX = WORLD_X_MAX - WORLD_X_MIN; // Total height (0.5)
+const worldDisplayRangeY = WORLD_Y_MAX - WORLD_Y_MIN; // Total width (1.0)
+
+// --- Axis Configuration ---
+const TICK_INTERVAL = 0.1; // World units
+const AXIS_COLOR = '#888888';
+const GRID_COLOR = '#CCCCCC';
+const AXIS_WIDTH = 1.5;
+const TICK_WIDTH = 1;
+const LABEL_FONT_SIZE = 10;
+const LABEL_COLOR = '#333333';
+const AXIS_PADDING = 30; // Pixels - Increased padding
 
 const App: React.FC = () => {
     // --- State Variables ---
     const [sceneId, setSceneId] = useState<string>('01_0');
+    const [sceneList, setSceneList] = useState<string[]>([]); // New state for scene list
     const [sceneData, setSceneData] = useState<SceneData | null>(null);
     const [pddlRelations, setPddlRelations] = useState<any>(null);
     const [trajectory, setTrajectory] = useState<any[]>([]);
-    const [currentAction, setCurrentAction] = useState<ActionType>(null); // Initialized to null
+    const [currentAction, setCurrentAction] = useState<ActionType>(null);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [referenceId, setReferenceId] = useState<string | null>(null);
     const [actionState, setActionState] = useState<ActionState>('SELECT_TARGET');
@@ -55,7 +66,6 @@ const App: React.FC = () => {
     const [stageSize, setStageSize] = useState({ width: 800, height: 400 });
     const [currentStepAction, setCurrentStepAction] = useState<Action | null>(null);
     const [sceneObjectsBeforeStep, setSceneObjectsBeforeStep] = useState<ObjectData[] | null>(null);
-
 
     // --- Konva Refs ---
     const stageRef = useRef<Konva.Stage>(null);
@@ -79,30 +89,68 @@ const App: React.FC = () => {
         return () => window.removeEventListener('resize', updateSize);
     }, []);
 
-    // --- Calculate Uniform Scale and Vertical Offset ---
-    const worldToCanvasScale = useMemo(() => {
-        if (stageSize.width > 0 && worldDisplayRangeY > 0) {
-            return stageSize.width / worldDisplayRangeY;
-        }
-        return 100;
-    }, [stageSize.width, worldDisplayRangeY]);
+    // --- Calculate Uniform Scale and Offsets ---
+    const { worldToCanvasScale, canvasOffsetX, canvasOffsetY } = useMemo(() => {
+        if (!stageSize.width || !stageSize.height) return { worldToCanvasScale: 100, canvasOffsetX: AXIS_PADDING, canvasOffsetY: AXIS_PADDING };
 
-    const canvasOffsetY = useMemo(() => {
-        if (stageSize.height > 0 && worldDisplayRangeX > 0 && worldToCanvasScale > 0) {
-            const contentActualCanvasHeight = worldDisplayRangeX * worldToCanvasScale;
-            return (stageSize.height - contentActualCanvasHeight) / 2;
-        }
-        return 0;
-    }, [stageSize.height, worldDisplayRangeX, worldToCanvasScale]);
+        const availableWidth = stageSize.width - 2 * AXIS_PADDING;
+        const availableHeight = stageSize.height - 2 * AXIS_PADDING;
+
+        const scaleX = availableHeight / worldDisplayRangeX;
+        const scaleY = availableWidth / worldDisplayRangeY;
+
+        const scale = Math.min(scaleX, scaleY); // Use min to fit both dimensions
+
+        const contentW = worldDisplayRangeY * scale;
+        const contentH = worldDisplayRangeX * scale;
+
+        const offX = (availableWidth - contentW) / 2 + AXIS_PADDING;
+        const offY = (availableHeight - contentH) / 2 + AXIS_PADDING;
+
+        return { worldToCanvasScale: scale, canvasOffsetX: offX, canvasOffsetY: offY };
+
+    }, [stageSize.width, stageSize.height, worldDisplayRangeX, worldDisplayRangeY]);
+
+
+    // --- World to Canvas Conversion ---
+    const worldToCanvasX = (worldY: number) => (worldY - WORLD_Y_MIN) * worldToCanvasScale + canvasOffsetX;
+    const worldToCanvasY = (worldX: number) => (worldX - WORLD_X_MIN) * worldToCanvasScale + canvasOffsetY;
+
+    // --- Canvas to World Conversion ---
+    const canvasToWorldX = (canvasY: number) => ((canvasY - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
+    const canvasToWorldY = (canvasX: number) => ((canvasX - canvasOffsetX) / worldToCanvasScale) + WORLD_Y_MIN;
+
 
     // --- Data Loading ---
-    const loadScene = async () => {
-        if (!sceneId) {
-            alert("Please enter a Scene ID.");
-            return;
+    useEffect(() => {
+        const fetchSceneList = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/scenes');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                setSceneList(data.scene_ids || []);
+                if (data.scene_ids && data.scene_ids.length > 0 && !sceneList.includes(sceneId)) {
+                   setSceneId(data.scene_ids[0]); // Set initial if not already set or invalid
+                }
+            } catch (error) {
+                console.error("Error loading scene list:", error);
+                alert("Error loading scene list.");
+            }
+        };
+        fetchSceneList();
+    }, []); // Run only once on mount
+
+    useEffect(() => {
+        if (sceneId) {
+            loadScene(sceneId);
         }
+    }, [sceneId]); // Reload when sceneId changes
+
+    const loadScene = async (idToLoad: string) => {
+        if (!idToLoad) return;
+        console.log(`Loading scene: ${idToLoad}`);
         try {
-            const response = await fetch(`http://localhost:8000/scene/${sceneId}`);
+            const response = await fetch(`http://localhost:8000/scene/${idToLoad}`);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
                 throw new Error(`HTTP error! status: ${response.status}, ${errorData.detail}`);
@@ -119,9 +167,24 @@ const App: React.FC = () => {
             setSceneObjectsBeforeStep(null);
         } catch (error) {
             console.error("Error loading scene:", error);
-            alert(`Error loading scene: ${error instanceof Error ? error.message : String(error)}`);
+            alert(`Error loading scene ${idToLoad}: ${error instanceof Error ? error.message : String(error)}`);
             setSceneData(null);
             setPddlRelations(null);
+        }
+    };
+
+     // --- Navigation Handlers ---
+    const handleLoadSceneClick = () => loadScene(sceneId);
+
+    const handlePrev = () => {
+        const currentIndex = sceneList.indexOf(sceneId);
+        if (currentIndex > 0) setSceneId(sceneList[currentIndex - 1]);
+    };
+
+    const handleNext = () => {
+        const currentIndex = sceneList.indexOf(sceneId);
+        if (currentIndex !== -1 && currentIndex < sceneList.length - 1) {
+            setSceneId(sceneList[currentIndex + 1]);
         }
     };
 
@@ -158,7 +221,7 @@ const App: React.FC = () => {
    // --- Update Scene and Trajectory ---
    const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, isOpen?: boolean) => {
         if (!currentStepAction && sceneData) {
-            setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o }))); // Store copy of objects
+            setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o })));
         } else if (!sceneData) {
             setSceneObjectsBeforeStep(null);
         }
@@ -189,11 +252,9 @@ const App: React.FC = () => {
     useEffect(() => {
         if (trRef.current) {
             const selectedNode = selectedId ? objectsRef.current.get(selectedId) : null;
-            // Enable transformer if an object is selected and an action is active (not null)
-            // or if in MANIPULATE state (which implies an action is active)
             if (selectedNode && (currentAction !== null || actionState === 'MANIPULATE')) {
                 trRef.current.nodes([selectedNode]);
-                trRef.current.enabledAnchors([]); // Only rotation for now
+                trRef.current.enabledAnchors([]);
                 trRef.current.rotateEnabled(true);
             } else {
                 trRef.current.nodes([]);
@@ -203,7 +264,7 @@ const App: React.FC = () => {
     }, [selectedId, currentAction, actionState]);
 
 
-    // --- Constrained Drag for 'Put Near' ---
+    // --- Constrained Drag ---
     const constrainedDrag = (pos: { x: number; y: number }) => {
         if (!dragStartPos || currentAction !== 'PUT_NEAR' || actionState !== 'MANIPULATE') return pos;
         const dx = Math.abs(pos.x - dragStartPos.x);
@@ -218,51 +279,36 @@ const App: React.FC = () => {
             setReferenceId(null);
             setActionState('SELECT_TARGET');
             setCurrentAction(null);
-            // Do not clear currentStepAction or sceneObjectsBeforeStep here,
-            // as the user might want to finish/cancel an ongoing step.
         }
     };
 
     const handleObjectClick = (objData: ObjectData, e: Konva.KonvaEventObject<MouseEvent>) => {
         e.evt.stopPropagation();
         const id = objData.id;
-
-        if (currentAction === null) {
-            return; // Interaction disabled if no action is active
-        }
+        if (currentAction === null) return;
 
         if (actionState === 'SELECT_TARGET') {
             setSelectedId(id);
             setActionState('SELECT_REFERENCE');
-
             if (currentAction === 'OPEN' || currentAction === 'CLOSE') {
-                const targetObj = sceneData?.objects.find(o => o.id === id);
-                if (targetObj) {
-                    updateObjectState(id, null, 0, currentAction, currentAction === 'OPEN');
-                }
+                updateObjectState(id, null, 0, currentAction, currentAction === 'OPEN');
             }
         } else if (actionState === 'SELECT_REFERENCE' && id !== selectedId) {
             setReferenceId(id);
-
             const refObj = sceneData?.objects.find(o => o.id === id);
             const targetObj = sceneData?.objects.find(o => o.id === selectedId);
 
             if (targetObj && refObj) {
-                const targetWorldCenterX = refObj.position[0];
-                const targetWorldCenterY = refObj.position[1];
-                const newTargetObjWorldX = targetWorldCenterX;
-                const newTargetObjWorldY = targetWorldCenterY;    
+                const [refX, refY, refZ] = refObj.position;
+                const [, , targetZ] = targetObj.size;
 
-                if (currentAction === 'PUT_IN') {
-                    if (['container'].includes(refObj.category)) {
-                        updateObjectState(selectedId!, [newTargetObjWorldX, newTargetObjWorldY, targetObj.size[2] / 2], 0, currentAction);
-                    }
+                if (currentAction === 'PUT_IN' && ['container'].includes(refObj.category)) {
+                    updateObjectState(selectedId!, [refX, refY, targetZ / 2], 0, currentAction);
                 } else if (currentAction === 'PUT_ON') {
-                    let newZ = refObj.position[2] + targetObj.size[2] / 2;
-                    updateObjectState(selectedId!, [newTargetObjWorldX, newTargetObjWorldY, newZ], 0, currentAction);
+                    updateObjectState(selectedId!, [refX, refY, refZ + targetZ / 2], 0, currentAction);
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE');
-                    return;
+                    return; // Don't reset yet
                 }
             }
         }
@@ -286,28 +332,25 @@ const App: React.FC = () => {
     };
 
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>, objectId: string) => {
-        if (currentAction === null) return; // No action, no state update
-
+        if (currentAction === null) return;
         const node = e.target as Konva.Group;
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (!currentObj) return;
 
-        const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN;
-        const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
+        const newWorldPosX = canvasToWorldX(node.y());
+        const newWorldPosY = canvasToWorldY(node.x());
 
         updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
         setDragStartPos(null);
     };
 
-    const handleTransformEnd = (e: Konva.KonvaEventObject<Event>, objectId: string) => {
-        if (currentAction === null) return; // No action, no state update
-
+     const handleTransformEnd = (e: Konva.KonvaEventObject<Event>, objectId: string) => {
+        if (currentAction === null) return;
         const node = objectsRef.current.get(objectId);
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (node && currentObj) {
-            const newWorldPosY = (node.x() / worldToCanvasScale) + WORLD_Y_MIN;
-            const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
-
+            const newWorldPosX = canvasToWorldX(node.y());
+            const newWorldPosY = canvasToWorldY(node.x());
             updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
         }
     };
@@ -326,13 +369,7 @@ const App: React.FC = () => {
 
     const handleCancelAction = () => {
         if (sceneObjectsBeforeStep && sceneData) {
-            setSceneData(prevData => {
-                if (!prevData) return null;
-                return {
-                    ...prevData,
-                    objects: sceneObjectsBeforeStep.map(o => ({ ...o })) // Revert to stored state
-                };
-            });
+            setSceneData(prevData => prevData ? { ...prevData, objects: sceneObjectsBeforeStep } : null);
         }
         setCurrentStepAction(null);
         setSceneObjectsBeforeStep(null);
@@ -342,17 +379,16 @@ const App: React.FC = () => {
         setActionState('SELECT_TARGET');
     };
 
-
     // --- UI Elements ---
     const ActionButton: React.FC<{ action: ActionType; label: string }> = ({ action, label }) => (
         <button
             className={`action-button ${currentAction === action ? 'active' : 'inactive'}`}
             onClick={() => {
                 setCurrentAction(action);
-                setSelectedId(null); // Reset selection when a new action is chosen
+                setSelectedId(null);
                 setReferenceId(null);
                 setActionState('SELECT_TARGET');
-                setCurrentStepAction(null); // Clear any pending step from a previous action
+                setCurrentStepAction(null);
                 setSceneObjectsBeforeStep(null);
             }}
         >
@@ -360,25 +396,93 @@ const App: React.FC = () => {
         </button>
     );
 
+    // --- Render Axes and Grid ---
+    const renderAxesAndGrid = () => {
+        const ticks: { x: number[], y: number[] } = { x: [], y: [] };
+        const stageW = stageSize.width;
+        const stageH = stageSize.height;
+
+        // Calculate ticks
+        for (let y = Math.ceil(WORLD_Y_MIN / TICK_INTERVAL) * TICK_INTERVAL; y <= WORLD_Y_MAX; y += TICK_INTERVAL) {
+            ticks.y.push(parseFloat(y.toFixed(1)));
+        }
+        for (let x = Math.ceil(WORLD_X_MIN / TICK_INTERVAL) * TICK_INTERVAL; x <= WORLD_X_MAX; x += TICK_INTERVAL) {
+            ticks.x.push(parseFloat(x.toFixed(1)));
+        }
+
+        const xAxisY = worldToCanvasY(WORLD_X_MIN); // Y-position of X-axis
+        const yAxisX = worldToCanvasX(WORLD_Y_MIN); // X-position of Y-axis
+
+        const elements = [];
+
+        // Grid Lines
+        ticks.y.forEach((y, i) => {
+            const x = worldToCanvasX(y);
+            elements.push(<Line key={`v_grid_${i}`} points={[x, canvasOffsetY, x, stageH - canvasOffsetY]} stroke={GRID_COLOR} strokeWidth={0.5} dash={[2, 2]} listening={false}/>);
+        });
+        ticks.x.forEach((x, i) => {
+            const y = worldToCanvasY(x);
+            elements.push(<Line key={`h_grid_${i}`} points={[canvasOffsetX, y, stageW - canvasOffsetX, y]} stroke={GRID_COLOR} strokeWidth={0.5} dash={[2, 2]} listening={false}/>);
+        });
+
+        // Axes Lines (drawn on top of grid)
+        elements.push(<Line key="x_axis" points={[canvasOffsetX, xAxisY, stageW - canvasOffsetX, xAxisY]} stroke={AXIS_COLOR} strokeWidth={AXIS_WIDTH} listening={false}/>);
+        elements.push(<Line key="y_axis" points={[yAxisX, canvasOffsetY, yAxisX, stageH - canvasOffsetY]} stroke={AXIS_COLOR} strokeWidth={AXIS_WIDTH} listening={false}/>);
+
+        // X-Axis Ticks & Labels
+        ticks.y.forEach((y, i) => {
+            const x = worldToCanvasX(y);
+            elements.push(<Line key={`x_tick_${i}`} points={[x, xAxisY - 4, x, xAxisY + 4]} stroke={AXIS_COLOR} strokeWidth={TICK_WIDTH} listening={false}/>);
+            elements.push(<Text key={`x_label_${i}`} x={x} y={xAxisY + 7} text={y.toFixed(1)} fontSize={LABEL_FONT_SIZE} fill={LABEL_COLOR} offsetX={LABEL_FONT_SIZE * y.toFixed(1).length / 4} listening={false}/>);
+        });
+
+        // Y-Axis Ticks & Labels
+        ticks.x.forEach((x, i) => {
+            const y = worldToCanvasY(x);
+            elements.push(<Line key={`y_tick_${i}`} points={[yAxisX - 4, y, yAxisX + 4, y]} stroke={AXIS_COLOR} strokeWidth={TICK_WIDTH} listening={false}/>);
+            elements.push(<Text key={`y_label_${i}`} x={yAxisX - 30} y={y} text={x.toFixed(1)} fontSize={LABEL_FONT_SIZE} fill={LABEL_COLOR} offsetY={LABEL_FONT_SIZE / 2} width={25} align="right" listening={false}/>);
+        });
+
+         // Axis Titles
+        elements.push(<Text key="x_title" x={stageW / 2} y={AXIS_PADDING} text="World Y" fontSize={LABEL_FONT_SIZE + 1} fill="black" listening={false} />);
+        elements.push(<Text key="y_title" x={AXIS_PADDING} y={stageH / 2} text="World X" fontSize={LABEL_FONT_SIZE + 1} fill="black" rotation={-90} listening={false}/>);
+
+
+        return elements;
+    };
+
+
   return (
     <div className="app-container">
         {/* --- Left Column --- */}
         <div className="column left-column">
           <div className="section">
                   <h2>Task</h2>
-                  <div className="input-group">
-                      <input
-                          type="text"
-                          placeholder="Enter Scene ID (e.g., 01_0)"
-                          value={sceneId}
-                          onChange={(e) => setSceneId(e.target.value)}
-                      />
-                  </div>
-                  <div className="controls-buttons">
-                      <button onClick={loadScene}>Load Scene</button>
-                      <button onClick={saveTrajectory} disabled={trajectory.length === 0}>
-                          Save Trajectory
-                      </button>
+                   <div className="input-group">
+                       <input
+                           type="text"
+                           placeholder="Enter Scene ID"
+                           value={sceneId}
+                           onChange={(e) => setSceneId(e.target.value)}
+                           list="scene-ids" // Link to datalist
+                       />
+                       <datalist id="scene-ids">
+                           {sceneList.map(id => <option key={id} value={id} />)}
+                       </datalist>
+                   </div>
+                   <div className="controls-buttons" style={{ display: 'flex', gap: '5px', marginTop: '5px' }}>
+                       <button onClick={handlePrev} disabled={sceneList.indexOf(sceneId) <= 0}>
+                           &lt; Prev
+                       </button>
+                       <button onClick={handleLoadSceneClick}>Load</button>
+                       <button onClick={handleNext} disabled={sceneList.indexOf(sceneId) < 0 || sceneList.indexOf(sceneId) >= sceneList.length - 1}>
+                           Next &gt;
+                       </button>
+                   </div>
+                  <div className="controls-buttons" style={{ marginTop: '10px' }}>
+                       <button onClick={saveTrajectory} disabled={trajectory.length === 0}>
+                           Save Trajectory
+                       </button>
                   </div>
               </div>
             <div className="section">
@@ -416,53 +520,20 @@ const App: React.FC = () => {
                 ref={stageRef}
              >
                 <Layer ref={layerRef}>
-                    {/* Grid and Axes */}
-                    {[...Array(Math.floor(worldDisplayRangeY * 10) + 1)].map((_, i) => (
-                        <Line
-                            key={`v_line_${i}`}
-                            points={[
-                                (i / 10 + WORLD_Y_MIN - WORLD_Y_MIN) * worldToCanvasScale,
-                                0,
-                                (i / 10 + WORLD_Y_MIN - WORLD_Y_MIN) * worldToCanvasScale,
-                                stageSize.height,
-                            ]}
-                            stroke="#ccc"
-                            strokeWidth={0.5}
-                        />
-                    ))}
-                    {[...Array(Math.floor(worldDisplayRangeX * 10) + 1)].map((_, i) => (
-                        <Line
-                            key={`h_line_${i}`}
-                            points={[
-                                0,
-                                (i / 10) * worldToCanvasScale + canvasOffsetY,
-                                stageSize.width,
-                                (i / 10) * worldToCanvasScale + canvasOffsetY,
-                            ]}
-                            stroke="#ccc"
-                            strokeWidth={0.5}
-                        />
-                    ))}
-                    <Line
-                        points={[(-WORLD_Y_MIN) * worldToCanvasScale, 0, (-WORLD_Y_MIN) * worldToCanvasScale, stageSize.height]}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
-                    <Line
-                        points={[0, canvasOffsetY, stageSize.width, canvasOffsetY]}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
+                   {/* Render Axes and Grid */}
+                   {renderAxesAndGrid()}
 
+                    {/* Render Objects */}
                     {sceneData && sceneData.objects.map(obj => {
                         const isSelected = obj.id === selectedId;
-                        const isDraggable = (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && obj.id === selectedId);
-
+                        // Use size[1] for width (Y) and size[0] for height (X)
                         const rectCanvasWidth = obj.size[0] * worldToCanvasScale;
                         const rectCanvasHeight = obj.size[1] * worldToCanvasScale;
+                        // Use worldToCanvasX for Y and worldToCanvasY for X
+                        const groupCanvasX = worldToCanvasX(obj.position[1]);
+                        const groupCanvasY = worldToCanvasY(obj.position[0]);
+                        const isDraggable = (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && isSelected);
 
-                        const groupCanvasX = (obj.position[1] - WORLD_Y_MIN) * worldToCanvasScale;
-                        const groupCanvasY = ((obj.position[0] - WORLD_X_MIN) * worldToCanvasScale) + canvasOffsetY;
 
                         return (
                             <Group
@@ -474,53 +545,54 @@ const App: React.FC = () => {
                                 x={groupCanvasX}
                                 y={groupCanvasY}
                                 rotation={obj.orientation}
-                                draggable={isDraggable && currentAction !== null}
+                                draggable={isDraggable}
                                 onClick={(e) => handleObjectClick(obj, e)}
                                 onDragEnd={(e) => handleDragEnd(e, obj.id)}
                                 onTransformEnd={(e) => handleTransformEnd(e, obj.id)}
                                 onDragStart={handleDragStart}
-                                dragBoundFunc={isDraggable && currentAction === 'PUT_NEAR' ? constrainedDrag : undefined}
-                                offsetX={0}
+                                dragBoundFunc={isDraggable ? constrainedDrag : undefined}
+                                offsetX={0} // Offset set on Rect/Text
                                 offsetY={0}
                             >
                                 <Rect
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
                                     fill={getObjectColor(obj.category)}
-                                    stroke={isSelected && currentAction !== null ? 'red' : (obj.id === referenceId && currentAction !== null ? 'blue' : 'black')}
-                                    strokeWidth={isSelected && currentAction !== null ? 3 : (obj.id === referenceId && currentAction !== null ? 2 : 0.5)}
-                                    shadowBlur={isSelected && currentAction !== null ? 10 : 0}
-                                    shadowColor={isSelected && currentAction !== null ? 'red' : 'transparent'}
+                                    stroke={isSelected && currentAction !== null ? '#FF0000' : (obj.id === referenceId && currentAction !== null ? '#0000FF' : '#333333')}
+                                    strokeWidth={isSelected && currentAction !== null ? 2.5 : (obj.id === referenceId && currentAction !== null ? 2 : 1)}
+                                    shadowBlur={isSelected && currentAction !== null ? 8 : 0}
+                                    shadowColor={isSelected && currentAction !== null ? '#FF4500' : 'transparent'}
                                     offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
-                                    opacity={0.5}
+                                    opacity={0.65}
                                 />
                                 <Text
                                     text={obj.name}
-                                    fontSize={10}
-                                    fill="black"
+                                    fontSize={LABEL_FONT_SIZE - 1} // Slightly smaller text
+                                    fill="#000000"
                                     align="center"
                                     verticalAlign="middle"
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
                                     offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
-                                    listening={false}
-                                    padding={2}
+                                    listening={false} // Text doesn't capture clicks
+                                    padding={1}
+                                    wrap="char" // Wrap if needed (less likely here)
                                 />
                             </Group>
                         );
                     })}
                     <Transformer
                         ref={trRef}
-                        keepRatio={true}
-                        anchorStroke="red"
-                        anchorFill="white"
-                        anchorSize={10}
-                        borderStroke="red"
-                        borderDash={[3, 3]}
-                        rotateAnchorOffset={25}
-                        enabledAnchors={[]}
+                        keepRatio={false} // Allow rotation without keeping ratio
+                        anchorStroke="#FF0000"
+                        anchorFill="#FFFFFF"
+                        anchorSize={8}
+                        borderStroke="#FF0000"
+                        borderDash={[4, 4]}
+                        rotateAnchorOffset={20}
+                        enabledAnchors={[]} // Only rotation enabled
                         rotateEnabled={true}
                     />
                 </Layer>
@@ -579,8 +651,6 @@ const App: React.FC = () => {
                     </button>
                 </div>
              </div>
-
-
 
              <div className="section">
                 <h2>Trajectory</h2>

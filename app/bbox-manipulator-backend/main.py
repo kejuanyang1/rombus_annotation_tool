@@ -20,8 +20,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data") # Assumes data is one level up from backend
+DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data")
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
+POSES_FILE = os.path.join(ASSETS_DIR, "poses.json")
 app.mount("/images", StaticFiles(directory=DATA_DIR))
+
+
+def load_all_scene_ids():
+    """Loads all task_ids from the poses.json file."""
+    if not os.path.exists(POSES_FILE):
+         raise HTTPException(status_code=500, detail=f"Poses file not found at {POSES_FILE}")
+    try:
+        with open(POSES_FILE, "r") as f:
+            all_data = json.load(f)
+        return sorted([data['task_id'] for data in all_data])
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Error decoding poses JSON")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading scene IDs: {e}")
+
 
 # --- Data Loading ---
 def load_scene_data(scene_id: str):
@@ -62,6 +79,12 @@ def load_pddl_data(scene_id: str):
     return relations
 
 # --- API Endpoints ---
+@app.get("/scenes")
+async def get_scenes_list():
+    """Endpoint to get the list of all scene IDs."""
+    scene_ids = load_all_scene_ids()
+    return {"scene_ids": scene_ids}
+
 @app.get("/scene/{scene_id}")
 async def get_scene(scene_id: str):
     """Endpoint to get scene data and PDDL relations."""

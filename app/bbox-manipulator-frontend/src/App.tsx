@@ -27,9 +27,22 @@ type ActionState = 'SELECT_TARGET' | 'SELECT_REFERENCE' | 'MANIPULATE';
 interface Action {
   type: ActionType;
   objectId: string;
-  refObjectId?: string; // Also load and save refobjectid
+  refObjectId?: string;
   new_pos?: [number, number, number];
   new_orientation?: number;
+}
+
+interface BowlToLidMap {
+    [bowlId: string]: string;
+}
+
+interface PddlSingleObjectRelation {
+  obj1: string;
+}
+
+interface PddlTwoObjectRelation {
+  obj1: string;
+  obj2: string;
 }
 
 // --- World Coordinate Display Range ---
@@ -51,12 +64,19 @@ const LABEL_FONT_SIZE = 10;
 const LABEL_COLOR = '#333333';
 const AXIS_PADDING = 30; // Pixels - Increased padding
 
+
+
 const App: React.FC = () => {
     // --- State Variables ---
     const [sceneId, setSceneId] = useState<string>('01_0');
-    const [sceneList, setSceneList] = useState<string[]>([]); // New state for scene list
+    const [sceneList, setSceneList] = useState<string[]>([]);
     const [sceneData, setSceneData] = useState<SceneData | null>(null);
-    const [pddlRelations, setPddlRelations] = useState<any>({ on: [], in: [], open: [], closed: [] }); // Initialize with open and closed
+    const [pddlRelations, setPddlRelations] = useState<{
+      on: PddlTwoObjectRelation[];
+      in: PddlTwoObjectRelation[];
+      closed: PddlSingleObjectRelation[];
+  }>({ on: [], in: [], closed: [] });    
+    const [bowlToLidMap, setBowlToLidMap] = useState<BowlToLidMap>({});
     const [trajectory, setTrajectory] = useState<any[]>([]);
     const [currentAction, setCurrentAction] = useState<ActionType>(null);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -99,7 +119,7 @@ const App: React.FC = () => {
         const scaleX = availableHeight / worldDisplayRangeX;
         const scaleY = availableWidth / worldDisplayRangeY;
 
-        const scale = Math.min(scaleX, scaleY); // Use min to fit both dimensions
+        const scale = Math.min(scaleX, scaleY);
 
         const contentW = worldDisplayRangeY * scale;
         const contentH = worldDisplayRangeX * scale;
@@ -130,7 +150,7 @@ const App: React.FC = () => {
                 const data = await response.json();
                 setSceneList(data.scene_ids || []);
                 if (data.scene_ids && data.scene_ids.length > 0 && !sceneList.includes(sceneId)) {
-                   setSceneId(data.scene_ids[0]); // Set initial if not already set or invalid
+                   setSceneId(data.scene_ids[0]);
                 }
             } catch (error) {
                 console.error("Error loading scene list:", error);
@@ -138,13 +158,13 @@ const App: React.FC = () => {
             }
         };
         fetchSceneList();
-    }, []); // Run only once on mount
+    }, []);
 
     useEffect(() => {
         if (sceneId) {
             loadScene(sceneId);
         }
-    }, [sceneId]); // Reload when sceneId changes
+    }, [sceneId]);
 
     const loadScene = async (idToLoad: string) => {
         if (!idToLoad) return;
@@ -157,7 +177,8 @@ const App: React.FC = () => {
             }
             const data = await response.json();
             setSceneData(data.scene);
-            setPddlRelations(data.pddl);
+            setPddlRelations(data.pddl || { on: [], in: [], closed: [] });
+            setBowlToLidMap(data.bowl_to_lid_map || {});
             setTrajectory([]);
             setSelectedId(null);
             setReferenceId(null);
@@ -169,11 +190,11 @@ const App: React.FC = () => {
             console.error("Error loading scene:", error);
             alert(`Error loading scene ${idToLoad}: ${error instanceof Error ? error.message : String(error)}`);
             setSceneData(null);
-            setPddlRelations(null);
+            setPddlRelations({ on: [], in: [], closed: [] });
+            setBowlToLidMap({});
         }
     };
 
-     // --- Navigation Handlers ---
     const handleLoadSceneClick = () => loadScene(sceneId);
 
     const handlePrev = () => {
@@ -188,7 +209,6 @@ const App: React.FC = () => {
         }
     };
 
-    // --- Save Trajectory ---
     const saveTrajectory = async () => {
         if (!sceneData) return;
         try {
@@ -204,7 +224,6 @@ const App: React.FC = () => {
         }
     };
 
-    // --- Color Mapping ---
     const getObjectColor = (category: string) => {
         switch (category.toLowerCase()) {
             case 'lid': return '#3498DB';
@@ -218,8 +237,13 @@ const App: React.FC = () => {
         }
     };
 
-   // --- Update Scene and Trajectory ---
-   const updateObjectState = (objectId: string, newPos: [number, number, number] | null, newOrientation: number | null, actionType: ActionType, refId?: string) => {
+   const updateObjectState = (
+        objectId: string, // The ID of the object whose state (pos/rot) is changing
+        newPos: [number, number, number] | null,
+        newOrientation: number | null,
+        actionTypeForPddl: ActionType, // The semantic action type for PDDL update
+        pddlContextObjectId?: string // The object the action is primarily on/with (e.g., bowl for OPEN/CLOSE)
+    ) => {
         if (!currentStepAction && sceneData) {
             setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o })));
         } else if (!sceneData) {
@@ -239,14 +263,37 @@ const App: React.FC = () => {
             });
             return { ...prevData, objects: updatedObjects };
         });
+        
+        const actualActionTypeForTrajectory = currentAction; // Use the globally set currentAction for trajectory
 
-        if (newPos && newOrientation !== null) {
-            setCurrentStepAction({ type: actionType, objectId, refObjectId: refId, new_pos: newPos, new_orientation: newOrientation});
-        }
-        updatePddlRelations(objectId, actionType, refId); // Update PDDL
+        if (newPos && newOrientation !== null && actualActionTypeForTrajectory) {
+          setCurrentStepAction({
+             type: actualActionTypeForTrajectory,
+             objectId: objectId, // object being moved for OPEN/CLOSE this is the lid
+             refObjectId: pddlContextObjectId ? pddlContextObjectId : (referenceId === null ? undefined : referenceId), // For OPEN/CLOSE, this is the bowl
+             new_pos: newPos,
+             new_orientation: newOrientation
+         });
+     } else if (actionTypeForPddl === 'OPEN' || actionTypeForPddl === 'CLOSE') {
+          // For OPEN/CLOSE, this block primarily sets the action if the bowl itself isn't moving
+          // but an action (like OPEN/CLOSE) is performed on it, causing a related object (lid) to move.
+         if (actualActionTypeForTrajectory && pddlContextObjectId) { // pddlContextObjectId is the bowl
+              setCurrentStepAction({
+                 type: actualActionTypeForTrajectory,
+                 objectId: pddlContextObjectId, // Bowl is the primary target of the semantic action
+                 refObjectId: objectId, // objectId here is the manipulatedObjId (the lid)
+                                        // Type string is assignable to string | undefined, so this is okay.
+             });
+         }
+     }
+
+
+        // Pass the objectId of the item whose position/rotation actually changed (manipulatedObjId)
+        // and the objectId that is the context of the PDDL change (pddlContextObjectId)
+        updatePddlRelations(objectId, actionTypeForPddl, pddlContextObjectId);
     };
 
-    // --- Transformer Logic ---
+
     useEffect(() => {
         if (trRef.current) {
             const selectedNode = selectedId ? objectsRef.current.get(selectedId) : null;
@@ -262,7 +309,6 @@ const App: React.FC = () => {
     }, [selectedId, currentAction, actionState]);
 
 
-    // --- Constrained Drag ---
     const constrainedDrag = (pos: { x: number; y: number }) => {
         if (!dragStartPos || currentAction !== 'PUT_NEAR' || actionState !== 'MANIPULATE') return pos;
         const dx = Math.abs(pos.x - dragStartPos.x);
@@ -270,50 +316,118 @@ const App: React.FC = () => {
         return dx > dy ? { x: pos.x, y: dragStartPos.y } : { x: dragStartPos.x, y: pos.y };
     };
 
-    // --- Event Handlers ---
     const handleStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (e.target === e.target.getStage()) {
             setSelectedId(null);
             setReferenceId(null);
             setActionState('SELECT_TARGET');
-            setCurrentAction(null);
+            // setCurrentAction(null); // Do not nullify current action here, allow selection then action
         }
     };
 
     const handleObjectClick = (objData: ObjectData, e: Konva.KonvaEventObject<MouseEvent>) => {
         e.evt.stopPropagation();
-        const id = objData.id;
+        const clickedObjectId = objData.id;
         if (currentAction === null) return;
 
         if (actionState === 'SELECT_TARGET') {
-            setSelectedId(id);
-            setActionState('SELECT_REFERENCE');
-            if (currentAction === 'OPEN' || currentAction === 'CLOSE') {
-                updateObjectState(id, null, 0, currentAction, id);
+            setSelectedId(clickedObjectId);
+
+            if (currentAction === 'OPEN') {
+                if (!bowlToLidMap || !sceneData || !pddlRelations) {
+                    alert("Scene data, bowl-lid map, or PDDL relations not loaded.");
+                    setCurrentAction(null); return;
+                }
+                const bowlId = clickedObjectId;
+                const lidId = bowlToLidMap[bowlId];
+
+                if (!lidId) {
+                    alert("This bowl does not have a mapped lid for the 'OPEN' action.");
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+                const lidObject = sceneData.objects.find(o => o.id === lidId);
+                if (!lidObject) {
+                    alert(`Lid object with ID ${lidId} not found.`);
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+
+                const isBowlClosed = pddlRelations.closed.some(r => r.obj1 === bowlId);
+                if (!isBowlClosed) {
+                    alert("Cannot open: Bowl is not closed.");
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+
+                const bowlObject = sceneData.objects.find(o => o.id === bowlId)!;
+                // Move lid slightly away (e.g., shift by its own width in Y from the bowl's edge)
+                 const newLidPos: [number, number, number] = [
+                    bowlObject.position[0] + 0.03, // example offset
+                    bowlObject.position[1],
+                    lidObject.size[2] / 2 // Keep original Z or align with bowl's top surface
+                ];
+                updateObjectState(lidId, newLidPos, lidObject.orientation, 'OPEN', bowlId);
+
+            } else if (currentAction === 'CLOSE') {
+                if (!bowlToLidMap || !sceneData || !pddlRelations) {
+                    alert("Scene data, bowl-lid map, or PDDL relations not loaded.");
+                    setCurrentAction(null); return;
+                }
+                const bowlId = clickedObjectId;
+                const lidId = bowlToLidMap[bowlId];
+
+                if (!lidId) {
+                    alert("This bowl does not have a mapped lid for the 'CLOSE' action.");
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+                 const lidObject = sceneData.objects.find(o => o.id === lidId);
+                if (!lidObject) {
+                    alert(`Lid object with ID ${lidId} not found.`);
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+
+                const isBowlClosed = pddlRelations.closed.some(r => r.obj1 === bowlId);
+                if (isBowlClosed) {
+                    alert("Cannot close: Bowl is already closed.");
+                    setCurrentAction(null); setSelectedId(null); return;
+                }
+
+                const bowlObject = sceneData.objects.find(o => o.id === bowlId)!;
+                // Position lid on top of the bowl
+                const newLidPos: [number, number, number] = [
+                    bowlObject.position[0],
+                    bowlObject.position[1],
+                    bowlObject.position[2] + (bowlObject.size[2] / 2) + (lidObject.size[2] / 2) // Assuming Z is center
+                ];
+                updateObjectState(lidId, newLidPos, bowlObject.orientation, 'CLOSE', bowlId);
+            } else {
+                setActionState('SELECT_REFERENCE');
             }
-        } else if (actionState === 'SELECT_REFERENCE' && id !== selectedId) {
-            setReferenceId(id);
-            const refObj = sceneData?.objects.find(o => o.id === id);
-            const targetObj = sceneData?.objects.find(o => o.id === selectedId);
+        } else if (actionState === 'SELECT_REFERENCE' && clickedObjectId !== selectedId) {
+            setReferenceId(clickedObjectId);
+            const targetObj = sceneData?.objects.find(o => o.id === selectedId); // item to move
+            const refObj = sceneData?.objects.find(o => o.id === clickedObjectId); // destination/surface
 
             if (targetObj && refObj) {
                 const [refX, refY, refZ] = refObj.position;
-                const [, , targetZ] = targetObj.size;
 
-                if (currentAction === 'PUT_IN' && ['container', 'bowl'].includes(refObj.category)) { // Include bowl
-                    updateObjectState(selectedId!, [refX, refY, targetZ / 2], 0, currentAction, id);
+                if (currentAction === 'PUT_IN' && ['container', 'bowl'].includes(refObj.category)) {
+                    updateObjectState(selectedId!, [refX, refY, refObj.position[2] + (refObj.size[2]/2) - (targetObj.size[2]/2) ], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_ON') {
-                    updateObjectState(selectedId!, [refX, refY, refZ + targetZ / 2], 0, currentAction, id);
+                     const newTargetZ = refObj.position[2] + (refObj.size[2] / 2) + (targetObj.size[2] / 2);
+                    updateObjectState(selectedId!, [refX, refY, newTargetZ], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_NEAR') {
-                    setActionState('MANIPULATE');
-                    return; // Don't reset yet
+                    setActionState('MANIPULATE'); // Enter drag/rotate mode
+                    // Initial position for PUT_NEAR might be set here if needed, or rely on drag.
+                    // For now, we let drag handle the final position for PUT_NEAR.
+                    return;
                 }
+                 // For PUT_IN and PUT_ON, action is completed by selecting reference if valid
             }
         }
     };
 
+
     const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        if (actionState === 'MANIPULATE' && currentAction !== null) { // Ensure an action is active
+        if (actionState === 'MANIPULATE' && currentAction !== null) {
             if (referenceId && objectsRef.current.has(referenceId)) {
                 const referenceNode = objectsRef.current.get(referenceId);
                 if (referenceNode) {
@@ -330,44 +444,34 @@ const App: React.FC = () => {
     };
 
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>, objectId: string) => {
-        if (currentAction === null) return;
+        if (currentAction === null || actionState !== 'MANIPULATE') return; // Only allow drag for MANIPULATE state
         const node = e.target as Konva.Group;
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (!currentObj) return;
 
         const newWorldPosX = canvasToWorldX(node.y());
         const newWorldPosY = canvasToWorldY(node.x());
-
-        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.size[2] / 2], node.rotation(), currentAction, referenceId || undefined);
+        
+        // For PUT_NEAR, the referenceId is the object we are putting near to.
+        // updateObjectState's pddlContextObjectId should be referenceId for PUT_NEAR
+        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction, referenceId || undefined);
         setDragStartPos(null);
     };
 
      const handleTransformEnd = (e: Konva.KonvaEventObject<Event>, objectId: string) => {
-        if (currentAction === null) return;
+        if (currentAction === null || actionState !== 'MANIPULATE') return;
         const node = objectsRef.current.get(objectId);
         const currentObj = sceneData?.objects.find(o => o.id === objectId);
         if (node && currentObj) {
             const newWorldPosX = canvasToWorldX(node.y());
             const newWorldPosY = canvasToWorldY(node.x());
-            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.size[2] / 2], node.rotation(), currentAction, referenceId || undefined);
+            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction, referenceId || undefined);
         }
     };
 
     const handleFinishAction = () => {
         if (currentStepAction) {
             setTrajectory(prev => [...prev, currentStepAction]);
-            setCurrentStepAction(null);
-            setSceneObjectsBeforeStep(null);
-            setCurrentAction(null);
-            setSelectedId(null);
-            setReferenceId(null);
-            setActionState('SELECT_TARGET');
-        }
-    };
-
-    const handleCancelAction = () => {
-        if (sceneObjectsBeforeStep && sceneData) {
-            setSceneData(prevData => prevData ? { ...prevData, objects: sceneObjectsBeforeStep } : null);
         }
         setCurrentStepAction(null);
         setSceneObjectsBeforeStep(null);
@@ -377,16 +481,34 @@ const App: React.FC = () => {
         setActionState('SELECT_TARGET');
     };
 
-    // --- UI Elements ---
+    const handleCancelAction = () => {
+        if (sceneObjectsBeforeStep && sceneData) {
+            setSceneData(prevData => prevData ? { ...prevData, objects: sceneObjectsBeforeStep } : null);
+            // Need to also revert PDDL to the state before this step.
+            // This requires storing PDDL state alongside sceneObjectsBeforeStep or re-evaluating.
+            // For simplicity now, PDDL might not revert perfectly on cancel if multiple PDDL changes happened.
+            // A better way: loadScene(sceneId) effectively cancels all uncommitted steps.
+            // Or, store pddlRelationsBeforeStep.
+            if (sceneId) loadScene(sceneId); // Simplest way to revert everything to last saved/loaded state.
+
+        }
+        setCurrentStepAction(null);
+        setSceneObjectsBeforeStep(null);
+        setCurrentAction(null);
+        setSelectedId(null);
+        setReferenceId(null);
+        setActionState('SELECT_TARGET');
+    };
+
     const ActionButton: React.FC<{ action: ActionType; label: string }> = ({ action, label }) => (
         <button
             className={`action-button ${currentAction === action ? 'active' : 'inactive'}`}
             onClick={() => {
                 setCurrentAction(action);
-                setSelectedId(null);
+                setSelectedId(null); // Reset selections when a new action type is chosen
                 setReferenceId(null);
                 setActionState('SELECT_TARGET');
-                setCurrentStepAction(null);
+                setCurrentStepAction(null); // Clear any pending step
                 setSceneObjectsBeforeStep(null);
             }}
         >
@@ -394,40 +516,78 @@ const App: React.FC = () => {
         </button>
     );
 
-    // --- PDDL Update Logic ---
-    const updatePddlRelations = (objectId: string, actionType: ActionType, refId?: string) => {
+    // manipulatedObjId: The object whose physical state (pos/rot) changed.
+    // actionType: The semantic action performed (e.g., 'OPEN', 'PUT_ON').
+    // pddlContextObjId: The object that is the context of the PDDL relation
+    // (e.g., for 'OPEN' bowl, manipulatedObjId is lid, pddlContextObjId is bowl).
+    const updatePddlRelations = (manipulatedObjId: string, actionType: ActionType, pddlContextObjId?: string) => {
         setPddlRelations((prevPddl: any) => {
-            const newPddl = { ...prevPddl };
-            const object = sceneData?.objects.find(o => o.id === objectId);
-            const refObject = sceneData?.objects.find(o => o.id === refId);
+            const newPddl = JSON.parse(JSON.stringify(prevPddl));
+            const manipulatedObject = sceneData?.objects.find(o => o.id === manipulatedObjId);
+            const contextObject = sceneData?.objects.find(o => o.id === pddlContextObjId);
 
-            if (actionType === 'PUT_ON' && refObject) {
-                newPddl.on = [...newPddl.on.filter((r: any) => r.obj1 !== objectId), { obj1: objectId, obj2: refId }];
-                if (object?.category === 'lid' && refObject?.category === 'bowl') {
-                    newPddl.closed = [...newPddl.closed.filter((r: any) => r.obj1 !== refId), { obj1: refId }];
-                    newPddl.open = newPddl.open.filter((r: any) => r.obj1 !== refId);
+            // Generic cleanup: Remove manipulatedObjId from 'on' and 'in' before re-adding, if it's being moved.
+            newPddl.on = newPddl.on.filter((r: any) => r.obj1 !== manipulatedObjId);
+            newPddl.in = newPddl.in.filter((r: any) => r.obj1 !== manipulatedObjId);
+
+            // If the manipulated object was a lid, and it's not a CLOSE action on its bowl,
+            // its original bowl should no longer be considered closed by this lid.
+            if (manipulatedObject?.category === 'lid') {
+                const itsMappedBowlId = Object.keys(bowlToLidMap).find(bowlId => bowlToLidMap[bowlId] === manipulatedObjId);
+                if (itsMappedBowlId) {
+                    // If the action is not closing this specific bowl with this lid, mark the bowl as not closed.
+                    if (!(actionType === 'CLOSE' && pddlContextObjId === itsMappedBowlId)) {
+                        newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== itsMappedBowlId);
+                    }
                 }
-            } else if (actionType === 'PUT_IN' && refObject) {
-                newPddl.in = [...newPddl.in.filter((r: any) => r.obj1 !== objectId), { obj1: objectId, obj2: refId }];
-            } else if (actionType === 'OPEN' && object?.category === 'bowl') {
-                newPddl.open = [...newPddl.open.filter((r: any) => r.obj1 !== objectId), { obj1: objectId }];
-                newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== objectId);
-            } else if (actionType === 'CLOSE' && object?.category === 'bowl') {
-                newPddl.closed = [...newPddl.closed.filter((r: any) => r.obj1 !== objectId), { obj1: objectId }];
-                newPddl.open = newPddl.open.filter((r: any) => r.obj1 !== objectId);
             }
+
+            if (actionType === 'PUT_ON' && contextObject) {
+                // contextObject is the surface (e.g., bowl, table)
+                // manipulatedObjId is the item being placed (e.g., lid, apple)
+                if (manipulatedObject?.category === 'lid' && contextObject?.category === 'bowl' && bowlToLidMap[contextObject.id] === manipulatedObjId) {
+                    // Lid on its mapped bowl: becomes 'closed'
+                    if (!newPddl.closed.some(r => r.obj1 === contextObject.id)) {
+                        newPddl.closed.push({ obj1: contextObject.id });
+                    }
+                    // Explicitly remove from 'on' as 'closed' takes precedence
+                    newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
+                } else {
+                    // Regular 'on' relation
+                    newPddl.on.push({ obj1: manipulatedObjId, obj2: contextObject.id });
+                }
+            } else if (actionType === 'PUT_IN' && contextObject) {
+                newPddl.in.push({ obj1: manipulatedObjId, obj2: contextObject.id });
+            } else if (actionType === 'OPEN' && contextObject?.category === 'bowl') {
+                // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
+                // Bowl is no longer closed.
+                newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== contextObject.id);
+                // Lid is no longer 'on' this bowl (it has been moved).
+                newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
+            } else if (actionType === 'CLOSE' && contextObject?.category === 'bowl') {
+                // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
+                // Bowl becomes closed if it's the correct lid.
+                if (bowlToLidMap[contextObject.id] === manipulatedObjId) {
+                    if (!newPddl.closed.some(r => r.obj1 === contextObject.id)) {
+                        newPddl.closed.push({ obj1: contextObject.id });
+                    }
+                    // The 'on(lid, bowl)' relation is represented by 'closed', so remove from 'on'.
+                    newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
+                }
+            }
+             // Ensure uniqueness in closed list, just in case
+             newPddl.closed = Array.from(new Set(newPddl.closed.map((item: {obj1: string}) => JSON.stringify(item)))).map(item => JSON.parse(item));
 
             return newPddl;
         });
     };
 
-    // --- Render Axes and Grid ---
+
     const renderAxesAndGrid = () => {
         const ticks: { x: number[], y: number[] } = { x: [], y: [] };
         const stageW = stageSize.width;
         const stageH = stageSize.height;
 
-        // Calculate ticks
         for (let y = Math.ceil(WORLD_Y_MIN / TICK_INTERVAL) * TICK_INTERVAL; y <= WORLD_Y_MAX; y += TICK_INTERVAL) {
             ticks.y.push(parseFloat(y.toFixed(1)));
         }
@@ -435,12 +595,10 @@ const App: React.FC = () => {
             ticks.x.push(parseFloat(x.toFixed(1)));
         }
 
-        const xAxisY = worldToCanvasY(WORLD_X_MIN); // Y-position of X-axis
-        const yAxisX = worldToCanvasX(WORLD_Y_MIN); // X-position of Y-axis
-
+        const xAxisY = worldToCanvasY(WORLD_X_MIN);
+        const yAxisX = worldToCanvasX(WORLD_Y_MIN);
         const elements = [];
 
-        // Grid Lines
         ticks.y.forEach((y, i) => {
             const x = worldToCanvasX(y);
             elements.push(<Line key={`v_grid_${i}`} points={[x, canvasOffsetY, x, stageH - canvasOffsetY]} stroke={GRID_COLOR} strokeWidth={0.5} dash={[2, 2]} listening={false}/>);
@@ -450,28 +608,23 @@ const App: React.FC = () => {
             elements.push(<Line key={`h_grid_${i}`} points={[canvasOffsetX, y, stageW - canvasOffsetX, y]} stroke={GRID_COLOR} strokeWidth={0.5} dash={[2, 2]} listening={false}/>);
         });
 
-        // Axes Lines (drawn on top of grid)
         elements.push(<Line key="x_axis" points={[canvasOffsetX, xAxisY, stageW - canvasOffsetX, xAxisY]} stroke={AXIS_COLOR} strokeWidth={AXIS_WIDTH} listening={false}/>);
         elements.push(<Line key="y_axis" points={[yAxisX, canvasOffsetY, yAxisX, stageH - canvasOffsetY]} stroke={AXIS_COLOR} strokeWidth={AXIS_WIDTH} listening={false}/>);
 
-        // X-Axis Ticks & Labels
         ticks.y.forEach((y, i) => {
             const x = worldToCanvasX(y);
             elements.push(<Line key={`x_tick_${i}`} points={[x, xAxisY - 4, x, xAxisY + 4]} stroke={AXIS_COLOR} strokeWidth={TICK_WIDTH} listening={false}/>);
             elements.push(<Text key={`x_label_${i}`} x={x} y={xAxisY + 7} text={y.toFixed(1)} fontSize={LABEL_FONT_SIZE} fill={LABEL_COLOR} offsetX={LABEL_FONT_SIZE * y.toFixed(1).length / 4} listening={false}/>);
         });
 
-        // Y-Axis Ticks & Labels
         ticks.x.forEach((x, i) => {
             const y = worldToCanvasY(x);
             elements.push(<Line key={`y_tick_${i}`} points={[yAxisX - 4, y, yAxisX + 4, y]} stroke={AXIS_COLOR} strokeWidth={TICK_WIDTH} listening={false}/>);
             elements.push(<Text key={`y_label_${i}`} x={yAxisX - 30} y={y} text={x.toFixed(1)} fontSize={LABEL_FONT_SIZE} fill={LABEL_COLOR} offsetY={LABEL_FONT_SIZE / 2} width={25} align="right" listening={false}/>);
         });
 
-         // Axis Titles
         elements.push(<Text key="x_title" x={stageW / 2} y={AXIS_PADDING * 10} text="World Y" fontSize={LABEL_FONT_SIZE + 1} fill="black" offsetX={LABEL_FONT_SIZE + 1} offsetY={3 * LABEL_FONT_SIZE} listening={false} />);
         elements.push(<Text key="y_title" x={AXIS_PADDING} y={stageH / 2} text="World X" fontSize={LABEL_FONT_SIZE + 1} fill="black" rotation={-90} offsetX={LABEL_FONT_SIZE} offsetY={-LABEL_FONT_SIZE} listening={false}/>);
-
 
         return elements;
     };
@@ -479,7 +632,6 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-        {/* --- Left Column --- */}
         <div className="column left-column">
           <div className="section">
                   <h2>Task</h2>
@@ -489,7 +641,7 @@ const App: React.FC = () => {
                            placeholder="Enter Scene ID"
                            value={sceneId}
                            onChange={(e) => setSceneId(e.target.value)}
-                           list="scene-ids" // Link to datalist
+                           list="scene-ids"
                        />
                        <datalist id="scene-ids">
                            {sceneList.map(id => <option key={id} value={id} />)}
@@ -533,10 +685,15 @@ const App: React.FC = () => {
                   </ul>
                 </div>
             )}
+             {Object.keys(bowlToLidMap).length > 0 && (
+                <div className="section">
+                    <h2>Bowl-Lid Map</h2>
+                    <pre className="pddl-pre">{JSON.stringify(bowlToLidMap, null, 2)}</pre>
+                </div>
+            )}
 
         </div>
 
-        {/* --- Center Column --- */}
         <div className="column center-column" ref={centerColRef}>
              <Stage
                 width={stageSize.width}
@@ -545,19 +702,15 @@ const App: React.FC = () => {
                 ref={stageRef}
              >
                 <Layer ref={layerRef}>
-                   {/* Render Axes and Grid */}
                    {renderAxesAndGrid()}
-
-                    {/* Render Objects */}
                     {sceneData && sceneData.objects.map(obj => {
-                        const isSelected = obj.id === selectedId;
-                        // Use size[1] for width (Y) and size[0] for height (X)
+                        const isSelectedObj = obj.id === selectedId;
+                        const isReferenceObj = obj.id === referenceId;
                         const rectCanvasWidth = obj.size[0] * worldToCanvasScale;
                         const rectCanvasHeight = obj.size[1] * worldToCanvasScale;
-                        // Use worldToCanvasX for Y and worldToCanvasY for X
                         const groupCanvasX = worldToCanvasX(obj.position[1]);
                         const groupCanvasY = worldToCanvasY(obj.position[0]);
-                        const isDraggable = (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && isSelected);
+                        const isDraggable = (currentAction === 'PUT_NEAR' && actionState === 'MANIPULATE' && isSelectedObj);
 
 
                         return (
@@ -576,24 +729,24 @@ const App: React.FC = () => {
                                 onTransformEnd={(e) => handleTransformEnd(e, obj.id)}
                                 onDragStart={handleDragStart}
                                 dragBoundFunc={isDraggable ? constrainedDrag : undefined}
-                                offsetX={0} // Offset set on Rect/Text
+                                offsetX={0} 
                                 offsetY={0}
                             >
                                 <Rect
                                     width={rectCanvasWidth}
                                     height={rectCanvasHeight}
                                     fill={getObjectColor(obj.category)}
-                                    stroke={isSelected && currentAction !== null ? '#FF0000' : (obj.id === referenceId && currentAction !== null ? '#0000FF' : '#333333')}
-                                    strokeWidth={isSelected && currentAction !== null ? 2.5 : (obj.id === referenceId && currentAction !== null ? 2 : 1)}
-                                    shadowBlur={isSelected && currentAction !== null ? 8 : 0}
-                                    shadowColor={isSelected && currentAction !== null ? '#FF4500' : 'transparent'}
+                                    stroke={isSelectedObj && currentAction !== null ? '#FF0000' : (isReferenceObj && currentAction !== null ? '#0000FF' : '#333333')}
+                                    strokeWidth={isSelectedObj && currentAction !== null ? 2.5 : (isReferenceObj && currentAction !== null ? 2 : 1)}
+                                    shadowBlur={isSelectedObj && currentAction !== null ? 8 : 0}
+                                    shadowColor={isSelectedObj && currentAction !== null ? '#FF4500' : 'transparent'}
                                     offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
                                     opacity={0.65}
                                 />
                                 <Text
                                     text={obj.name}
-                                    fontSize={12} // Slightly smaller text
+                                    fontSize={12}
                                     fill="#000000"
                                     align="center"
                                     verticalAlign="middle"
@@ -601,30 +754,29 @@ const App: React.FC = () => {
                                     height={rectCanvasHeight}
                                     offsetX={rectCanvasWidth / 2}
                                     offsetY={rectCanvasHeight / 2}
-                                    listening={false} // Text doesn't capture clicks
+                                    listening={false}
                                     padding={1}
-                                    wrap="char" // Wrap if needed (less likely here)
+                                    wrap="char"
                                 />
                             </Group>
                         );
                     })}
                     <Transformer
                         ref={trRef}
-                        keepRatio={false} // Allow rotation without keeping ratio
+                        keepRatio={false}
                         anchorStroke="#FF0000"
                         anchorFill="#FFFFFF"
                         anchorSize={8}
                         borderStroke="#FF0000"
                         borderDash={[4, 4]}
                         rotateAnchorOffset={20}
-                        enabledAnchors={[]} // Only rotation enabled
+                        enabledAnchors={[]}
                         rotateEnabled={true}
                     />
                 </Layer>
             </Stage>
         </div>
 
-        {/* --- Right Column --- */}
         <div className="column right-column">
         <div className="section">
                 <h2>Current State</h2>
@@ -661,14 +813,14 @@ const App: React.FC = () => {
                     </button>
                     <button
                         onClick={handleCancelAction}
-                        disabled={!currentStepAction}
+                        disabled={!currentStepAction && !currentAction} // Enable if an action is selected or a step is pending
                         style={{
-                            backgroundColor: currentStepAction ? '#f44336' : '#ccc', // Red when active, gray when inactive
+                            backgroundColor: (currentStepAction || currentAction) ? '#f44336' : '#ccc',
                             color: 'white',
                             padding: '10px 15px',
                             border: 'none',
                             borderRadius: '5px',
-                            cursor: currentStepAction ? 'pointer' : 'not-allowed',
+                            cursor: (currentStepAction || currentAction) ? 'pointer' : 'not-allowed',
                             flex: 1
                         }}
                     >

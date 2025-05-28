@@ -468,7 +468,7 @@ const App: React.FC = () => {
                         setActionState('SELECT_TARGET');
                         return; // Prevent the action
                     }
-                    updateObjectState(selectedId!, [refX, refY, refZ - refObj.size[2]/2 + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
+                    updateObjectState(selectedId!, [refX + (Math.random() - 0.5) * refObj.size[0], refY + (Math.random() - 0.5) * refObj.size[1], refZ - refObj.size[2]/2 + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_ON' && refObj.category !== "container") {
                     const newTargetZ = refZ + (refObj.size[2]/2) + (targetObj.size[2]/2);
                     updateObjectState(selectedId!, [refX, refY, newTargetZ], 0, currentAction, clickedObjectId);

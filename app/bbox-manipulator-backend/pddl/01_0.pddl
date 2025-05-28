@@ -11,8 +11,8 @@
     lid_03 - lid
   )
   (:init
-    (on kitchen_11 kitchen_23)
-    (in kitchen_07 container_02)
+    (on kitchen_23 kitchen_07)
+    (in kitchen_09 container_02)
     (closed container_09)
   )
   (:goal

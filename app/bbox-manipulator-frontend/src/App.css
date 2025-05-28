@@ -110,6 +110,7 @@
   white-space: pre-wrap; /* Wrap long lines */
   word-wrap: break-word; /* Break words if needed */
   font-size: 0.9em;
+  text-align: left;
 }
 
 .input-group {
@@ -180,6 +181,7 @@
   font-size: 0.85em;
   white-space: pre-wrap;
   word-wrap: break-word;
+  text-align: left;
 }
 
 .scene-info-list {

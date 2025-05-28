@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 import os
+from typing import List, Dict, Any
+
 
 app = FastAPI()
 
@@ -24,6 +26,13 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 POSES_FILE = os.path.join(ASSETS_DIR, "poses.json")
 PDDL_DIR = "/Users/ykj/Desktop/github/ROMBUS/planner/instances/init_state_id/"
+
+FIXED_BOWL_TO_LID_MAP = {
+    "container_07": "lid_01",  # blue bowl -> blue lid
+    "container_08": "lid_02",  # orange bowl -> orange lid
+    "container_09": "lid_03",  # green bowl -> green lid
+    "container_10": "lid_04",  # pink bowl -> pink lid
+}
 
 app.mount("/images", StaticFiles(directory=DATA_DIR))
 
@@ -56,9 +65,9 @@ def load_scene_data(scene_id: str):
         raise HTTPException(status_code=404, detail="Scene not found")
 
 def load_pddl_data(scene_id: str):
-    """Loads and parses PDDL data (simplified for 'on', 'in', 'open', 'closed')."""
+    """Loads and parses PDDL data (simplified for 'on', 'in', 'closed')."""
     pddl_file = os.path.join(PDDL_DIR, f"{scene_id}.pddl")
-    relations = {"on": [], "in": [], "open": [], "closed": []} # Include open and closed
+    relations = {"on": [], "in": [], "closed": []} 
 
     if not os.path.exists(pddl_file):
         return relations  # Return empty if PDDL not found
@@ -75,9 +84,6 @@ def load_pddl_data(scene_id: str):
             elif in_init_section and line.startswith("(in "):
                 parts = line.replace("(", "").replace(")", "").split()
                 relations["in"].append({"obj1": parts[1], "obj2": parts[2]})
-            elif in_init_section and line.startswith("(open "): # Parse open
-                parts = line.replace("(", "").replace(")", "").split()
-                relations["open"].append({"obj1": parts[1]})
             elif in_init_section and line.startswith("(closed "): # Parse closed
                 parts = line.replace("(", "").replace(")", "").split()
                 relations["closed"].append({"obj1": parts[1]})
@@ -85,6 +91,41 @@ def load_pddl_data(scene_id: str):
                 break  # End of init section
 
     return relations
+
+def transform_pddl_for_frontend(raw_pddl_relations: Dict, bowl_to_lid_map: Dict):
+    """
+    Transforms raw PDDL relations for frontend consumption.
+    If a lid is on its mapped bowl, the bowl is 'closed', and this 'on' is not sent.
+    """
+    frontend_pddl = {"on": [], "in": [], "closed": []}
+    
+    frontend_pddl["in"] = raw_pddl_relations.get("in", [])
+    
+    # Process 'on' relations:
+    for on_relation in raw_pddl_relations.get("on", []):
+        lid_candidate_id = on_relation["obj1"]
+        bowl_candidate_id = on_relation["obj2"]
+
+        # Check if this is a lid on its designated bowl
+        if bowl_candidate_id in bowl_to_lid_map and bowl_to_lid_map[bowl_candidate_id] == lid_candidate_id:
+            # This bowl is closed by its lid. Add to 'closed' list.
+            if not any(c["obj1"] == bowl_candidate_id for c in frontend_pddl["closed"]):
+                frontend_pddl["closed"].append({"obj1": bowl_candidate_id})
+            # Do NOT add this specific 'on' relation to the frontend's 'on' list.
+        else:
+            # It's a regular 'on' relation (not a mapped lid closing its bowl)
+            frontend_pddl["on"].append(on_relation)
+            
+    # Add any other items that were explicitly 'closed' in the PDDL
+    # (e.g., other types of containers, or bowls closed by non-standard means)
+    for closed_relation in raw_pddl_relations.get("closed", []):
+        if not any(c["obj1"] == closed_relation["obj1"] for c in frontend_pddl["closed"]):
+            frontend_pddl["closed"].append(closed_relation)
+            
+    # Ensure uniqueness in closed list
+    frontend_pddl["closed"] = [dict(t) for t in {tuple(d.items()) for d in frontend_pddl["closed"]}]
+
+    return frontend_pddl
 
 # --- API Endpoints ---
 @app.get("/scenes")
@@ -98,7 +139,8 @@ async def get_scene(scene_id: str):
     """Endpoint to get scene data and PDDL relations."""
     scene_data = load_scene_data(scene_id)
     pddl_relations = load_pddl_data(scene_id)
-    return {"scene": scene_data, "pddl": pddl_relations}
+    frontend_pddl = transform_pddl_for_frontend(pddl_relations, FIXED_BOWL_TO_LID_MAP)
+    return {"scene": scene_data, "pddl": frontend_pddl, "bowl_to_lid_map": FIXED_BOWL_TO_LID_MAP}
 
 @app.post("/save_trajectory/{scene_id}")
 async def save_trajectory(scene_id: str, trajectory: list):

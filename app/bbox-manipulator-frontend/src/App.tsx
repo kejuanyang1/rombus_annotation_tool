@@ -75,7 +75,7 @@ const App: React.FC = () => {
       on: PddlTwoObjectRelation[];
       in: PddlTwoObjectRelation[];
       closed: PddlSingleObjectRelation[];
-  }>({ on: [], in: [], closed: [] });    
+  }>({ on: [], in: [], closed: [] });
     const [bowlToLidMap, setBowlToLidMap] = useState<BowlToLidMap>({});
     const [trajectory, setTrajectory] = useState<any[]>([]);
     const [currentAction, setCurrentAction] = useState<ActionType>(null);
@@ -263,7 +263,7 @@ const App: React.FC = () => {
             });
             return { ...prevData, objects: updatedObjects };
         });
-        
+
         const actualActionTypeForTrajectory = currentAction; // Use the globally set currentAction for trajectory
 
         if (newPos && newOrientation !== null && actualActionTypeForTrajectory) {
@@ -451,7 +451,7 @@ const App: React.FC = () => {
 
         const newWorldPosX = canvasToWorldX(node.y());
         const newWorldPosY = canvasToWorldY(node.x());
-        
+
         // For PUT_NEAR, the referenceId is the object we are putting near to.
         // updateObjectState's pddlContextObjectId should be referenceId for PUT_NEAR
         updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction, referenceId || undefined);
@@ -543,40 +543,27 @@ const App: React.FC = () => {
             }
 
             if (actionType === 'PUT_ON' && contextObject) {
-                // contextObject is the surface (e.g., bowl, table)
-                // manipulatedObjId is the item being placed (e.g., lid, apple)
-                if (manipulatedObject?.category === 'lid' && contextObject?.category === 'bowl' && bowlToLidMap[contextObject.id] === manipulatedObjId) {
-                    // Lid on its mapped bowl: becomes 'closed'
-                    if (!newPddl.closed.some(r => r.obj1 === contextObject.id)) {
-                        newPddl.closed.push({ obj1: contextObject.id });
-                    }
-                    // Explicitly remove from 'on' as 'closed' takes precedence
-                    newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
-                } else {
-                    // Regular 'on' relation
-                    newPddl.on.push({ obj1: manipulatedObjId, obj2: contextObject.id });
-                }
+                newPddl.on.push({ obj1: manipulatedObjId, obj2: contextObject.id });
             } else if (actionType === 'PUT_IN' && contextObject) {
                 newPddl.in.push({ obj1: manipulatedObjId, obj2: contextObject.id });
-            } else if (actionType === 'OPEN' && contextObject?.category === 'bowl') {
+            } else if (actionType === 'OPEN' && contextObject?.name?.includes('bowl')) {
                 // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
                 // Bowl is no longer closed.
                 newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== contextObject.id);
                 // Lid is no longer 'on' this bowl (it has been moved).
                 newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
-            } else if (actionType === 'CLOSE' && contextObject?.category === 'bowl') {
+            } else if (actionType === 'CLOSE' && contextObject?.name?.includes('bowl')) {
                 // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
                 // Bowl becomes closed if it's the correct lid.
                 if (bowlToLidMap[contextObject.id] === manipulatedObjId) {
-                    if (!newPddl.closed.some(r => r.obj1 === contextObject.id)) {
-                        newPddl.closed.push({ obj1: contextObject.id });
-                    }
+                    // Always add when CLOSE action is performed, set will handle duplicates
+                    newPddl.closed.push({ obj1: contextObject.id });
                     // The 'on(lid, bowl)' relation is represented by 'closed', so remove from 'on'.
                     newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
                 }
             }
-             // Ensure uniqueness in closed list, just in case
-             newPddl.closed = Array.from(new Set(newPddl.closed.map((item: {obj1: string}) => JSON.stringify(item)))).map(item => JSON.parse(item));
+             // Ensure uniqueness in closed list
+             newPddl.closed = Array.from(new Set(newPddl.closed.map((item: {obj1: string}) => JSON.stringify(item)))).map(item => JSON.parse(item as string));
 
             return newPddl;
         });
@@ -729,7 +716,7 @@ const App: React.FC = () => {
                                 onTransformEnd={(e) => handleTransformEnd(e, obj.id)}
                                 onDragStart={handleDragStart}
                                 dragBoundFunc={isDraggable ? constrainedDrag : undefined}
-                                offsetX={0} 
+                                offsetX={0}
                                 offsetY={0}
                             >
                                 <Rect
@@ -785,7 +772,7 @@ const App: React.FC = () => {
                 <p>Action State: <b>{actionState}</b></p>
                 {referenceId && <p>Reference: <b>{referenceId}</b></p>}
              </div>
-             
+
              <div className="section">
                 <h2>Actions</h2>
                 <div className="button-group">

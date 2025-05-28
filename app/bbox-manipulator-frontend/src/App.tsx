@@ -466,7 +466,6 @@ const App: React.FC = () => {
                                 rotation={obj.orientation}
                                 draggable={isDraggable && currentAction !== null}
                                 onClick={(e) => handleObjectClick(obj, e)}
-                                onTap={(e) => handleObjectClick(obj, e)}
                                 onDragEnd={(e) => handleDragEnd(e, obj.id)}
                                 onTransformEnd={(e) => handleTransformEnd(e, obj.id)}
                                 onDragStart={handleDragStart}

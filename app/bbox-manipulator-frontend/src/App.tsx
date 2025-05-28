@@ -57,6 +57,8 @@ const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
 const WORLD_Y_MIN = -0.6; // Horizontal world axis (obj.position[1]) - min value
 const WORLD_Y_MAX = 0.2;  // Horizontal world axis (obj.position[1]) - max value
 
+const TABLE_HEIGHT = -0.2;
+
 const worldDisplayRangeX = WORLD_X_MAX - WORLD_X_MIN; // Total height (0.5)
 const worldDisplayRangeY = WORLD_Y_MAX - WORLD_Y_MIN; // Total width (1.0)
 
@@ -214,15 +216,17 @@ const App: React.FC = () => {
         }
     };
 
+    // --- Save Trajectory (Updated) ---
     const saveTrajectory = async () => {
         if (!sceneData) return;
         try {
             await fetch(`http://localhost:8000/save_trajectory/${sceneData.task_id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                // Send both trajectory and PDDL relations
                 body: JSON.stringify({ trajectory, pddl: pddlRelations }),
             });
-            alert('Trajectory saved!');
+            alert('Trajectory and PDDL saved!');
         } catch (error) {
             console.error('Error saving trajectory:', error);
             alert('Error saving trajectory.');
@@ -294,10 +298,11 @@ const App: React.FC = () => {
          }
      }
 
-
-        // Pass the objectId of the item whose position/rotation actually changed (manipulatedObjId)
-        // and the objectId that is the context of the PDDL change (pddlContextObjectId)
         updatePddlRelations(objectId, actionTypeForPddl, pddlContextObjectId);
+
+        // --- Layering Logic (Move to Top) ---
+        // We move the object to the top *visually* when it's placed ON something.
+        // This is handled by a dedicated useEffect hook now.
     };
 
 
@@ -314,6 +319,30 @@ const App: React.FC = () => {
             trRef.current.getLayer()?.batchDraw();
         }
     }, [selectedId, currentAction, actionState]);
+
+    // --- New useEffect for Layering ---
+    useEffect(() => {
+        const bringToTop = (objectId: string) => {
+            if (objectsRef.current.has(objectId)) {
+                objectsRef.current.get(objectId)?.moveToTop();
+            }
+        };
+
+        // Bring objects 'on' top
+        pddlRelations.on.forEach(relation => bringToTop(relation.obj1));
+
+        // Bring 'closed' lids on top
+        pddlRelations.closed.forEach(relation => {
+            const lidId = bowlToLidMap[relation.obj1];
+            if (lidId) {
+                bringToTop(lidId);
+            }
+        });
+
+        // Redraw the layer to reflect changes
+        layerRef.current?.batchDraw();
+
+    }, [pddlRelations, bowlToLidMap, sceneData]); // Rerun when PDDL, map or sceneData changes
 
 
     const constrainedDrag = (pos: { x: number; y: number }) => {
@@ -369,7 +398,7 @@ const App: React.FC = () => {
                  const newLidPos: [number, number, number] = [
                     bowlObject.position[0] + 0.03, // example offset
                     bowlObject.position[1],
-                    lidObject.size[2] / 2 // Keep original Z or align with bowl's top surface
+                    bowlObject.position[2] - bowlObject.size[2]/2 + lidObject.size[2]/2 // Table
                 ];
                 updateObjectState(lidId, newLidPos, lidObject.orientation, 'OPEN', bowlId);
 
@@ -402,7 +431,7 @@ const App: React.FC = () => {
                 const newLidPos: [number, number, number] = [
                     bowlObject.position[0],
                     bowlObject.position[1],
-                    bowlObject.position[2] + (bowlObject.size[2] / 2) + (lidObject.size[2] / 2) // Assuming Z is center
+                    bowlObject.position[2] + (bowlObject.size[2]/2) + (lidObject.size[2]/2) // Assuming Z is center
                 ];
                 updateObjectState(lidId, newLidPos, bowlObject.orientation, 'CLOSE', bowlId);
             } else {
@@ -416,10 +445,10 @@ const App: React.FC = () => {
             if (targetObj && refObj) {
                 const [refX, refY, refZ] = refObj.position;
 
-                if (currentAction === 'PUT_IN' && ['container'].includes(refObj.category)) {
-                    updateObjectState(selectedId!, [refX, refY, refZ + (refObj.size[2]/2) - (targetObj.size[2]/2) ], 0, currentAction, clickedObjectId);
+                if (currentAction === 'PUT_IN' && refObj.category === "container") {
+                    updateObjectState(selectedId!, [refX, refY, refZ - refObj.size[2]/2 + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_ON' && refObj.category !== "container") {
-                    const newTargetZ = refZ + (refObj.size[2] / 2) + (targetObj.size[2] / 2);
+                    const newTargetZ = refZ + (refObj.size[2]/2) + (targetObj.size[2]/2);
                     updateObjectState(selectedId!, [refX, refY, newTargetZ], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE'); // Enter drag/rotate mode
@@ -445,6 +474,9 @@ const App: React.FC = () => {
             } else {
                 setDragStartPos({ x: e.target.x(), y: e.target.y() });
             }
+             // Bring dragged object to top during drag
+            e.target.moveToTop();
+            layerRef.current?.batchDraw();
         } else {
             setDragStartPos(null);
         }
@@ -651,7 +683,7 @@ const App: React.FC = () => {
                    </div>
                   <div className="controls-buttons" style={{ marginTop: '10px' }}>
                        <button onClick={saveTrajectory} disabled={trajectory.length === 0}>
-                           Save Trajectory
+                           Save Trajectory & PDDL
                        </button>
                   </div>
               </div>

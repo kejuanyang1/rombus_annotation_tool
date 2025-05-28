@@ -446,6 +446,15 @@ const App: React.FC = () => {
                 const [refX, refY, refZ] = refObj.position;
 
                 if (currentAction === 'PUT_IN' && refObj.category === "container") {
+                    const isContainerClosed = pddlRelations.closed.some(r => r.obj1 === refObj.id);
+                    if (isContainerClosed) {
+                        alert("Cannot put item in: The container is closed.");
+                        // Reset selection, or handle as needed
+                        setSelectedId(null);
+                        setReferenceId(null);
+                        setActionState('SELECT_TARGET');
+                        return; // Prevent the action
+                    }
                     updateObjectState(selectedId!, [refX, refY, refZ - refObj.size[2]/2 + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_ON' && refObj.category !== "container") {
                     const newTargetZ = refZ + (refObj.size[2]/2) + (targetObj.size[2]/2);

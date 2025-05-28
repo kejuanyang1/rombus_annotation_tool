@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Body 
 from pydantic import BaseModel
 import json
 import os
@@ -143,7 +144,7 @@ async def get_scene(scene_id: str):
     return {"scene": scene_data, "pddl": frontend_pddl, "bowl_to_lid_map": FIXED_BOWL_TO_LID_MAP}
 
 @app.post("/save_trajectory/{scene_id}")
-async def save_trajectory(scene_id: str, trajectory: list):
+async def save_trajectory(scene_id: str, trajectory: list = Body(...)):
     """Endpoint to save the interaction trajectory."""
     filename = f"trajectories/{scene_id}.json"
     os.makedirs(os.path.dirname(filename), exist_ok=True)

@@ -45,6 +45,12 @@ interface PddlTwoObjectRelation {
   obj2: string;
 }
 
+interface PddlRelationsType {
+  on: PddlTwoObjectRelation[];
+  in: PddlTwoObjectRelation[];
+  closed: PddlSingleObjectRelation[];
+}
+
 // --- World Coordinate Display Range ---
 const WORLD_X_MIN = 0;    // Vertical world axis (obj.position[0]) - min value
 const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
@@ -71,11 +77,7 @@ const App: React.FC = () => {
     const [sceneId, setSceneId] = useState<string>('01_0');
     const [sceneList, setSceneList] = useState<string[]>([]);
     const [sceneData, setSceneData] = useState<SceneData | null>(null);
-    const [pddlRelations, setPddlRelations] = useState<{
-      on: PddlTwoObjectRelation[];
-      in: PddlTwoObjectRelation[];
-      closed: PddlSingleObjectRelation[];
-  }>({ on: [], in: [], closed: [] });
+    const [pddlRelations, setPddlRelations] = useState<PddlRelationsType>({ on: [], in: [], closed: [] });
     const [bowlToLidMap, setBowlToLidMap] = useState<BowlToLidMap>({});
     const [trajectory, setTrajectory] = useState<any[]>([]);
     const [currentAction, setCurrentAction] = useState<ActionType>(null);
@@ -86,6 +88,8 @@ const App: React.FC = () => {
     const [stageSize, setStageSize] = useState({ width: 800, height: 0 });
     const [currentStepAction, setCurrentStepAction] = useState<Action | null>(null);
     const [sceneObjectsBeforeStep, setSceneObjectsBeforeStep] = useState<ObjectData[] | null>(null);
+    const [pddlRelationsBeforeStep, setPddlRelationsBeforeStep] = useState<PddlRelationsType | null>(null);
+
 
     // --- Konva Refs ---
     const stageRef = useRef<Konva.Stage>(null);
@@ -186,6 +190,7 @@ const App: React.FC = () => {
             setActionState('SELECT_TARGET');
             setCurrentStepAction(null);
             setSceneObjectsBeforeStep(null);
+            setPddlRelationsBeforeStep(null);
         } catch (error) {
             console.error("Error loading scene:", error);
             alert(`Error loading scene ${idToLoad}: ${error instanceof Error ? error.message : String(error)}`);
@@ -246,8 +251,10 @@ const App: React.FC = () => {
     ) => {
         if (!currentStepAction && sceneData) {
             setSceneObjectsBeforeStep(sceneData.objects.map(o => ({ ...o })));
+            setPddlRelationsBeforeStep(JSON.parse(JSON.stringify(pddlRelations))); // Store PDDL state
         } else if (!sceneData) {
             setSceneObjectsBeforeStep(null);
+            setPddlRelationsBeforeStep(null);
         }
 
         setSceneData(prevData => {
@@ -475,6 +482,7 @@ const App: React.FC = () => {
         }
         setCurrentStepAction(null);
         setSceneObjectsBeforeStep(null);
+        setPddlRelationsBeforeStep(null);
         setCurrentAction(null);
         setSelectedId(null);
         setReferenceId(null);
@@ -484,16 +492,13 @@ const App: React.FC = () => {
     const handleCancelAction = () => {
         if (sceneObjectsBeforeStep && sceneData) {
             setSceneData(prevData => prevData ? { ...prevData, objects: sceneObjectsBeforeStep } : null);
-            // Need to also revert PDDL to the state before this step.
-            // This requires storing PDDL state alongside sceneObjectsBeforeStep or re-evaluating.
-            // For simplicity now, PDDL might not revert perfectly on cancel if multiple PDDL changes happened.
-            // A better way: loadScene(sceneId) effectively cancels all uncommitted steps.
-            // Or, store pddlRelationsBeforeStep.
-            if (sceneId) loadScene(sceneId); // Simplest way to revert everything to last saved/loaded state.
-
+            if (pddlRelationsBeforeStep) {
+                setPddlRelations(pddlRelationsBeforeStep);
+            }
         }
         setCurrentStepAction(null);
         setSceneObjectsBeforeStep(null);
+        setPddlRelationsBeforeStep(null);
         setCurrentAction(null);
         setSelectedId(null);
         setReferenceId(null);
@@ -510,6 +515,7 @@ const App: React.FC = () => {
                 setActionState('SELECT_TARGET');
                 setCurrentStepAction(null); // Clear any pending step
                 setSceneObjectsBeforeStep(null);
+                setPddlRelationsBeforeStep(null);
             }}
         >
             {label}
@@ -521,14 +527,14 @@ const App: React.FC = () => {
     // pddlContextObjId: The object that is the context of the PDDL relation
     // (e.g., for 'OPEN' bowl, manipulatedObjId is lid, pddlContextObjId is bowl).
     const updatePddlRelations = (manipulatedObjId: string, actionType: ActionType, pddlContextObjId?: string) => {
-        setPddlRelations((prevPddl: any) => {
+        setPddlRelations((prevPddl: PddlRelationsType) => {
             const newPddl = JSON.parse(JSON.stringify(prevPddl));
             const manipulatedObject = sceneData?.objects.find(o => o.id === manipulatedObjId);
             const contextObject = sceneData?.objects.find(o => o.id === pddlContextObjId);
 
             // Generic cleanup: Remove manipulatedObjId from 'on' and 'in' before re-adding, if it's being moved.
-            newPddl.on = newPddl.on.filter((r: any) => r.obj1 !== manipulatedObjId);
-            newPddl.in = newPddl.in.filter((r: any) => r.obj1 !== manipulatedObjId);
+            newPddl.on = newPddl.on.filter((r: PddlTwoObjectRelation) => r.obj1 !== manipulatedObjId);
+            newPddl.in = newPddl.in.filter((r: PddlTwoObjectRelation) => r.obj1 !== manipulatedObjId);
 
             // If the manipulated object was a lid, and it's not a CLOSE action on its bowl,
             // its original bowl should no longer be considered closed by this lid.
@@ -537,7 +543,7 @@ const App: React.FC = () => {
                 if (itsMappedBowlId) {
                     // If the action is not closing this specific bowl with this lid, mark the bowl as not closed.
                     if (!(actionType === 'CLOSE' && pddlContextObjId === itsMappedBowlId)) {
-                        newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== itsMappedBowlId);
+                        newPddl.closed = newPddl.closed.filter((r: PddlSingleObjectRelation) => r.obj1 !== itsMappedBowlId);
                     }
                 }
             }
@@ -549,9 +555,9 @@ const App: React.FC = () => {
             } else if (actionType === 'OPEN' && contextObject?.name?.includes('bowl')) {
                 // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
                 // Bowl is no longer closed.
-                newPddl.closed = newPddl.closed.filter((r: any) => r.obj1 !== contextObject.id);
+                newPddl.closed = newPddl.closed.filter((r: PddlSingleObjectRelation) => r.obj1 !== contextObject.id);
                 // Lid is no longer 'on' this bowl (it has been moved).
-                newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
+                newPddl.on = newPddl.on.filter((r: PddlTwoObjectRelation) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
             } else if (actionType === 'CLOSE' && contextObject?.name?.includes('bowl')) {
                 // pddlContextObjId (contextObject.id) is the bowl. manipulatedObjId is the lid.
                 // Bowl becomes closed if it's the correct lid.
@@ -559,7 +565,7 @@ const App: React.FC = () => {
                     // Always add when CLOSE action is performed, set will handle duplicates
                     newPddl.closed.push({ obj1: contextObject.id });
                     // The 'on(lid, bowl)' relation is represented by 'closed', so remove from 'on'.
-                    newPddl.on = newPddl.on.filter((r: any) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
+                    newPddl.on = newPddl.on.filter((r: PddlTwoObjectRelation) => !(r.obj1 === manipulatedObjId && r.obj2 === contextObject.id));
                 }
             }
              // Ensure uniqueness in closed list

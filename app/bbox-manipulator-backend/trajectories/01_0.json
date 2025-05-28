@@ -1,0 +1,24 @@
+[
+    {
+        "type": "OPEN",
+        "objectId": "lid_03",
+        "refObjectId": "container_09",
+        "new_pos": [
+            0.165,
+            -0.063,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "CLOSE",
+        "objectId": "lid_03",
+        "refObjectId": "container_09",
+        "new_pos": [
+            0.135,
+            -0.063,
+            0.023
+        ],
+        "new_orientation": 0
+    }
+]

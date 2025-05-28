@@ -261,12 +261,22 @@ const App: React.FC = () => {
     };
 
     const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        if (actionState === 'MANIPULATE') {
-            setDragStartPos({ x: e.target.x(), y: e.target.y() });
-        } else {
-            setDragStartPos(null);
-        }
-    };
+      if (actionState === 'MANIPULATE') {
+          if (referenceId && objectsRef.current.has(referenceId)) {
+              const referenceNode = objectsRef.current.get(referenceId);
+              if (referenceNode) { // Check if referenceNode is defined
+                  setDragStartPos({ x: referenceNode.x(), y: referenceNode.y() });
+              } else {
+                  // Fallback if referenceNode is undefined (shouldn't happen with 'has' check, but good for safety)
+                  setDragStartPos({ x: e.target.x(), y: e.target.y() });
+              }
+          } else {
+              setDragStartPos({ x: e.target.x(), y: e.target.y() });
+          }
+      } else {
+          setDragStartPos(null);
+      }
+  };
 
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>, objectId: string) => {
         const node = e.target as Konva.Group;

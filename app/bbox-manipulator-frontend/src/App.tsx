@@ -365,7 +365,7 @@ const App: React.FC = () => {
         {/* --- Left Column --- */}
         <div className="column left-column">
           <div className="section">
-                  <h2>Controls</h2>
+                  <h2>Task</h2>
                   <div className="input-group">
                       <input
                           type="text"
@@ -395,6 +395,16 @@ const App: React.FC = () => {
                     <pre className="pddl-pre">{JSON.stringify(pddlRelations, null, 2)}</pre>
                 </div>
             )}
+            {sceneData && (
+                <div className="section">
+                  <h2>Scene Info</h2>
+                  <p>Objects ({sceneData.objects.length}):</p>
+                  <ul className="scene-info-list">
+                      {sceneData.objects.map(o => <li key={o.id}>{o.name} ({o.category} - {o.id})</li>)}
+                  </ul>
+                </div>
+            )}
+
         </div>
 
         {/* --- Center Column --- */}
@@ -519,6 +529,14 @@ const App: React.FC = () => {
 
         {/* --- Right Column --- */}
         <div className="column right-column">
+        <div className="section">
+                <h2>Current State</h2>
+                <p>Action: <b>{currentAction || 'None'}</b></p>
+                <p>Selected: <b>{selectedId || 'None'}</b></p>
+                <p>Action State: <b>{actionState}</b></p>
+                {referenceId && <p>Reference: <b>{referenceId}</b></p>}
+             </div>
+             
              <div className="section">
                 <h2>Actions</h2>
                 <div className="button-group">
@@ -562,29 +580,13 @@ const App: React.FC = () => {
                 </div>
              </div>
 
-             <div className="section">
-                <h2>Current State</h2>
-                <p>Action: <b>{currentAction || 'None'}</b></p>
-                <p>Selected: <b>{selectedId || 'None'}</b></p>
-                <p>Action State: <b>{actionState}</b></p>
-                {referenceId && <p>Reference: <b>{referenceId}</b></p>}
-             </div>
+
 
              <div className="section">
                 <h2>Trajectory</h2>
                 <pre className="trajectory-pre">{JSON.stringify(trajectory, null, 2)}</pre>
              </div>
 
-             {sceneData && (
-                 <div className="section">
-                    <h2>Scene Info</h2>
-                    <p>Task ID: {sceneData.task_id}</p>
-                    <p>Objects ({sceneData.objects.length}):</p>
-                    <ul className="scene-info-list">
-                        {sceneData.objects.map(o => <li key={o.id}>{o.name} ({o.category} - {o.id})</li>)}
-                    </ul>
-                 </div>
-              )}
         </div>
     </div>
   );

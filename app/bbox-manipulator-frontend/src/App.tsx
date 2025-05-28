@@ -35,8 +35,8 @@ interface Action {
 // --- World Coordinate Display Range ---
 const WORLD_X_MIN = 0;    // Vertical world axis (obj.position[0]) - min value
 const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
-const WORLD_Y_MIN = -0.7; // Horizontal world axis (obj.position[1]) - min value
-const WORLD_Y_MAX = 0.3;  // Horizontal world axis (obj.position[1]) - max value
+const WORLD_Y_MIN = -0.6; // Horizontal world axis (obj.position[1]) - min value
+const WORLD_Y_MAX = 0.2;  // Horizontal world axis (obj.position[1]) - max value
 
 const worldDisplayRangeX = WORLD_X_MAX - WORLD_X_MIN; // Total height (0.5)
 const worldDisplayRangeY = WORLD_Y_MAX - WORLD_Y_MIN; // Total width (1.0)
@@ -63,7 +63,7 @@ const App: React.FC = () => {
     const [referenceId, setReferenceId] = useState<string | null>(null);
     const [actionState, setActionState] = useState<ActionState>('SELECT_TARGET');
     const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
-    const [stageSize, setStageSize] = useState({ width: 800, height: 400 });
+    const [stageSize, setStageSize] = useState({ width: 800, height: 0 });
     const [currentStepAction, setCurrentStepAction] = useState<Action | null>(null);
     const [sceneObjectsBeforeStep, setSceneObjectsBeforeStep] = useState<ObjectData[] | null>(null);
 
@@ -444,8 +444,8 @@ const App: React.FC = () => {
         });
 
          // Axis Titles
-        elements.push(<Text key="x_title" x={stageW / 2} y={AXIS_PADDING} text="World Y" fontSize={LABEL_FONT_SIZE + 1} fill="black" listening={false} />);
-        elements.push(<Text key="y_title" x={AXIS_PADDING} y={stageH / 2} text="World X" fontSize={LABEL_FONT_SIZE + 1} fill="black" rotation={-90} listening={false}/>);
+        elements.push(<Text key="x_title" x={stageW / 2} y={AXIS_PADDING * 10} text="World Y" fontSize={LABEL_FONT_SIZE + 1} fill="black" offsetX={LABEL_FONT_SIZE + 1} offsetY={3 * LABEL_FONT_SIZE} listening={false} />);
+        elements.push(<Text key="y_title" x={AXIS_PADDING} y={stageH / 2} text="World X" fontSize={LABEL_FONT_SIZE + 1} fill="black" rotation={-90} offsetX={LABEL_FONT_SIZE} offsetY={-LABEL_FONT_SIZE} listening={false}/>);
 
 
         return elements;
@@ -568,7 +568,7 @@ const App: React.FC = () => {
                                 />
                                 <Text
                                     text={obj.name}
-                                    fontSize={LABEL_FONT_SIZE - 1} // Slightly smaller text
+                                    fontSize={12} // Slightly smaller text
                                     fill="#000000"
                                     align="center"
                                     verticalAlign="middle"

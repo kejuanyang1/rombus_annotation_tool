@@ -25,6 +25,13 @@ interface SceneData {
 type ActionType = 'SELECT' | 'PUT_NEAR' | 'PUT_IN' | 'PUT_ON' | 'OPEN' | 'CLOSE' | null;
 type ActionState = 'SELECT_TARGET' | 'SELECT_REFERENCE' | 'MANIPULATE';
 
+interface Action {
+  type: ActionType;
+  objectId: string;
+  new_pos?: [number, number, number];
+  new_orientation?: number;
+}
+
 // --- World Coordinate Display Range ---
 const WORLD_X_MIN = 0;    // Vertical world axis (obj.position[0]) - min value
 const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
@@ -46,6 +53,7 @@ const App: React.FC = () => {
     const [actionState, setActionState] = useState<ActionState>('SELECT_TARGET');
     const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
     const [stageSize, setStageSize] = useState({ width: 800, height: 400 });
+    const [currentStepAction, setCurrentStepAction] = useState<Action | null>(null);
 
     // --- Konva Refs ---
     const stageRef = useRef<Konva.Stage>(null);
@@ -105,6 +113,7 @@ const App: React.FC = () => {
             setReferenceId(null);
             setCurrentAction('SELECT');
             setActionState('SELECT_TARGET');
+            setCurrentStepAction(null);
         } catch (error) {
             console.error("Error loading scene:", error);
             alert(`Error loading scene: ${error instanceof Error ? error.message : String(error)}`);
@@ -161,15 +170,9 @@ const App: React.FC = () => {
         });
 
         if (isOpen !== undefined) {
-            setTrajectory(prev => [
-                ...prev,
-                { type: actionType, objectId },
-            ]);
+            setCurrentStepAction({ type: actionType, objectId });
         } else if (newPos && newOrientation !== null) {
-            setTrajectory(prev => [
-                ...prev,
-                { type: actionType, objectId, new_pos: newPos, new_orientation: newOrientation },
-            ]);
+            setCurrentStepAction({ type: actionType, objectId, new_pos: newPos, new_orientation: newOrientation });
         }
     };
 
@@ -222,40 +225,31 @@ const App: React.FC = () => {
                 const targetObj = sceneData?.objects.find(o => o.id === id);
                 if (targetObj) {
                     updateObjectState(id, null, 0, currentAction, currentAction === 'OPEN');
-                    setSelectedId(null);
-                    setActionState('SELECT_TARGET');
                 }
             }
         } else if (actionState === 'SELECT_REFERENCE' && id !== selectedId) {
             setReferenceId(id);
 
-            const targetObj = sceneData?.objects.find(o => o.id === id);
-            const movingObj = sceneData?.objects.find(o => o.id === selectedId);
+            const refObj = sceneData?.objects.find(o => o.id === id);
+            const targetObj = sceneData?.objects.find(o => o.id === selectedId);
 
-            if (targetObj && movingObj) {
-                const targetWorldCenterX = targetObj.position[0];
-                const targetWorldCenterY = targetObj.position[1];
-                const newMovingObjWorldX = targetWorldCenterX;
-                const newMovingObjWorldY = targetWorldCenterY;
-
-                let newZ = targetObj.position[2] + targetObj.size[2];
+            if (targetObj && refObj) {
+                const targetWorldCenterX = refObj.position[0];
+                const targetWorldCenterY = refObj.position[1];
+                const newTargetObjWorldX = targetWorldCenterX;
+                const newTargetObjWorldY = targetWorldCenterY;    
 
                 if (currentAction === 'PUT_IN') {
-                    if (['basket', 'bowl', 'container'].includes(targetObj.category)) {
-                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0, currentAction);
+                    if (['container'].includes(refObj.category)) {
+                        updateObjectState(selectedId!, [newTargetObjWorldX, newTargetObjWorldY, targetObj.size[2] / 2], 0, currentAction);
                     }
                 } else if (currentAction === 'PUT_ON') {
-                    if (['support'].includes(targetObj.category)) {
-                        updateObjectState(selectedId!, [newMovingObjWorldX, newMovingObjWorldY, newZ], 0, currentAction);
-                    }
+                    let newZ = refObj.position[2] + targetObj.size[2] / 2;
+                    updateObjectState(selectedId!, [newTargetObjWorldX, newTargetObjWorldY, newZ], 0, currentAction);
                 } else if (currentAction === 'PUT_NEAR') {
                     setActionState('MANIPULATE');
                     return;
                 }
-
-                setSelectedId(null);
-                setReferenceId(null);
-                setActionState('SELECT_TARGET');
             }
         }
     };
@@ -297,6 +291,17 @@ const App: React.FC = () => {
             const newWorldPosX = ((node.y() - canvasOffsetY) / worldToCanvasScale) + WORLD_X_MIN;
 
             updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction);
+        }
+    };
+
+    const handleFinishAction = () => {
+        if (currentStepAction) {
+            setTrajectory(prev => [...prev, currentStepAction]);
+            setCurrentStepAction(null);
+            setCurrentAction(null);
+            setSelectedId(null);
+            setReferenceId(null);
+            setActionState('SELECT_TARGET');
         }
     };
 
@@ -484,6 +489,21 @@ const App: React.FC = () => {
                     <ActionButton action="PUT_ON" label="Put On" />
                     <ActionButton action="PUT_NEAR" label="Put Near" />
                 </div>
+                <button
+                    onClick={handleFinishAction}
+                    disabled={!currentStepAction}
+                    style={{
+                        backgroundColor: currentStepAction ? '#4CAF50' : '#ccc', // Green when active, gray when inactive
+                        color: 'white',
+                        padding: '10px 15px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: currentStepAction ? 'pointer' : 'not-allowed',
+                        marginTop: '15px' // Add space above the button
+                    }}
+                >
+                    Finish Current Action
+                </button>
              </div>
 
              <div className="section">

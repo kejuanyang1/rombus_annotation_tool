@@ -19,7 +19,7 @@ from scipy.spatial.transform import Rotation as R
 
 
 # -------------------------------------------------------------- paths -----
-ROOT          = Path(__file__).parent.parent
+ROOT          = Path(__file__).parent.parent.parent
 DATA_DIR      = ROOT / "data"
 OUT_DIR       = ROOT / "output"
 HELPER_DIR    = ROOT / "outputs_helper"

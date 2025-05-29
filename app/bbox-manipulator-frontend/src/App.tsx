@@ -57,7 +57,7 @@ const WORLD_X_MAX = 0.5;  // Vertical world axis (obj.position[0]) - max value
 const WORLD_Y_MIN = -0.6; // Horizontal world axis (obj.position[1]) - min value
 const WORLD_Y_MAX = 0.2;  // Horizontal world axis (obj.position[1]) - max value
 
-const TABLE_HEIGHT = -0.2;
+const TABLE_HEIGHT = 0;
 
 const worldDisplayRangeX = WORLD_X_MAX - WORLD_X_MIN; // Total height (0.5)
 const worldDisplayRangeY = WORLD_Y_MAX - WORLD_Y_MIN; // Total width (1.0)
@@ -409,9 +409,9 @@ const App: React.FC = () => {
                 const bowlObject = sceneData.objects.find(o => o.id === bowlId)!;
                 // Move lid slightly away (e.g., shift by its own width in Y from the bowl's edge)
                  const newLidPos: [number, number, number] = [
-                    bowlObject.position[0] + 0.03, // example offset
+                    bowlObject.position[0] + 0.04, // example offset
                     bowlObject.position[1],
-                    bowlObject.position[2] - bowlObject.size[2]/2 + lidObject.size[2]/2 // Table
+                    TABLE_HEIGHT + lidObject.size[2]/2 // Table
                 ];
                 updateObjectState(lidId, newLidPos, lidObject.orientation, 'OPEN', bowlId);
 
@@ -444,7 +444,7 @@ const App: React.FC = () => {
                 const newLidPos: [number, number, number] = [
                     bowlObject.position[0],
                     bowlObject.position[1],
-                    bowlObject.position[2] + (bowlObject.size[2]/2) + (lidObject.size[2]/2) // Assuming Z is center
+                    bowlObject.position[2] + bowlObject.size[2]/2 + lidObject.size[2]/2 // Assuming Z is center
                 ];
                 updateObjectState(lidId, newLidPos, bowlObject.orientation, 'CLOSE', bowlId);
             } else {
@@ -468,7 +468,7 @@ const App: React.FC = () => {
                         setActionState('SELECT_TARGET');
                         return; // Prevent the action
                     }
-                    updateObjectState(selectedId!, [refX + (Math.random() - 0.5) * refObj.size[0] / 2, refY + (Math.random() - 0.5) * refObj.size[1] / 2, refZ - refObj.size[2]/2 + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
+                    updateObjectState(selectedId!, [refX + (Math.random() - 0.5) * refObj.size[0] / 2, refY + (Math.random() - 0.5) * refObj.size[1] / 2, TABLE_HEIGHT + targetObj.size[2]/2], 0, currentAction, clickedObjectId);
                 } else if (currentAction === 'PUT_ON' && refObj.category !== "container") {
                     const newTargetZ = refZ + (refObj.size[2]/2) + (targetObj.size[2]/2);
                     updateObjectState(selectedId!, [refX, refY, newTargetZ], 0, currentAction, clickedObjectId);
@@ -515,7 +515,7 @@ const App: React.FC = () => {
 
         // For PUT_NEAR, the referenceId is the object we are putting near to.
         // updateObjectState's pddlContextObjectId should be referenceId for PUT_NEAR
-        updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction, referenceId || undefined);
+        updateObjectState(objectId, [newWorldPosX, newWorldPosY, TABLE_HEIGHT + currentObj.size[2]/2], node.rotation(), currentAction, referenceId || undefined);
         setDragStartPos(null);
     };
 
@@ -526,7 +526,7 @@ const App: React.FC = () => {
         if (node && currentObj) {
             const newWorldPosX = canvasToWorldX(node.y());
             const newWorldPosY = canvasToWorldY(node.x());
-            updateObjectState(objectId, [newWorldPosX, newWorldPosY, currentObj.position[2]], node.rotation(), currentAction, referenceId || undefined);
+            updateObjectState(objectId, [newWorldPosX, newWorldPosY, TABLE_HEIGHT + currentObj.size[2]/2], node.rotation(), currentAction, referenceId || undefined);
         }
     };
 

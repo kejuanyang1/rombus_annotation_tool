@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 csv_path = "/Users/ykj/Downloads/_ROMBUS dataset - Scenes.csv"
-objects_json_path = "/Users/ykj/Desktop/github/ROMBUS/assets/objects.json"
+objects_json_path = "assets/objects.json"
 scene_categories = ['kitchen', 'office', 'other', 'shape', 'tool']
 
 with open(objects_json_path) as f:

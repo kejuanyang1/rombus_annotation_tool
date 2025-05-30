@@ -25,7 +25,7 @@ app.add_middleware(
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../..", "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
-POSES_FILE = os.path.join(ASSETS_DIR, "poses.json")
+POSES_FILE = os.path.join(ASSETS_DIR, "poses_updated.json")
 PDDL_DIR = os.path.join(os.path.dirname(__file__), "../..", "pddl/init_state_id_verified")
 
 FIXED_BOWL_TO_LID_MAP = {

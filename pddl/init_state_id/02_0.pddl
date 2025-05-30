@@ -1,0 +1,22 @@
+(define (problem scene1)
+  (:domain manip)
+  (:objects
+    kitchen_02_1 kitchen_02_2 kitchen_13 kitchen_16 kitchen_18 kitchen_20 - item
+  )
+  (:init
+    (ontable kitchen_02_1)
+    (ontable kitchen_02_2)
+    (ontable kitchen_13)
+    (ontable kitchen_16)
+    (ontable kitchen_18)
+    (ontable kitchen_20)
+    (clear kitchen_02_1)
+    (clear kitchen_02_2)
+    (clear kitchen_13)
+    (clear kitchen_16)
+    (clear kitchen_18)
+    (clear kitchen_20)
+    (handempty)
+  )
+  (:goal (and ))
+)

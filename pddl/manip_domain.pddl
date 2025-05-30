@@ -4,7 +4,7 @@
   (:types
     obj                 - object
     pickable container  - obj
-    item  support  lid         - pickable
+    item lid         - pickable
   )
 
   (:predicates
@@ -53,7 +53,7 @@
   )
 
   (:action unstack
-    :parameters (?it - pickable ?under - support)
+    :parameters (?it - pickable ?under - obj)
     :precondition (and (on ?it ?under) (clear ?it) (handempty))
     :effect
       (and
@@ -215,7 +215,7 @@
   )
 
   (:action stack
-    :parameters (?it    - pickable ?under - support)
+    :parameters (?it    - pickable ?under - obj)
     :precondition (and (holding ?it) (clear ?under))
     :effect
       (and

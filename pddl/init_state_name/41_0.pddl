@@ -14,7 +14,7 @@
     (ontable flat green block_1)
     (ontable flat green block_2)
     (ontable small blue triangular prism_2)
-    (ontable small red triangular prism_2)
+    (ontable small blue triangular prism_2)
     (in flat yellow block_1 big green shopping basket)
     (in flat green block_2 big green shopping basket)
     (in long green block big green shopping basket)

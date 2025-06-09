@@ -1,0 +1,46 @@
+[
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_19",
+        "refObjectId": "container_04",
+        "new_pos": [
+            0.07737446881824833,
+            -0.036958841975974877,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_10",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.20613366649599527,
+            -0.409877054681511,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_08",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.15297657727004058,
+            -0.364058007370643,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_13",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.2151006592918236,
+            -0.35711544485785585,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

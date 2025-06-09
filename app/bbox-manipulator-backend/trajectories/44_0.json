@@ -1,0 +1,57 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "shape_02_1",
+        "refObjectId": "shape_18_1",
+        "new_pos": [
+            0.2620000000000002,
+            -0.45371929824561413,
+            0.015
+        ],
+        "new_orientation": -0.9562169550904992
+    },
+    {
+        "type": "PUT_ON",
+        "objectId": "shape_02_2",
+        "refObjectId": "shape_02_1",
+        "new_pos": [
+            0.2620000000000002,
+            -0.45371929824561413,
+            0.045
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "shape_17",
+        "refObjectId": "shape_25",
+        "new_pos": [
+            0.3362280701754373,
+            -0.1699999999999996,
+            0.015
+        ],
+        "new_orientation": -3.0813821899993834
+    },
+    {
+        "type": "PUT_ON",
+        "objectId": "shape_18_1",
+        "refObjectId": "shape_17",
+        "new_pos": [
+            0.3362280701754373,
+            -0.1699999999999996,
+            0.045
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "shape_22",
+        "refObjectId": "shape_26",
+        "new_pos": [
+            0.19800000000000006,
+            -0.203280701754386,
+            0.015
+        ],
+        "new_orientation": -38.841
+    }
+]

@@ -1,0 +1,46 @@
+[
+    {
+        "type": "PUT_IN",
+        "objectId": "tool_06",
+        "refObjectId": "container_05",
+        "new_pos": [
+            0.1717789742492959,
+            -0.15312388180600436,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "tool_08",
+        "refObjectId": "container_05",
+        "new_pos": [
+            0.10969288708656061,
+            -0.14781225484278573,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "tool_07",
+        "refObjectId": "container_04",
+        "new_pos": [
+            0.37118290555420524,
+            -0.1292761043515999,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_09",
+        "refObjectId": "tool_07",
+        "new_pos": [
+            0.37118290555420524,
+            -0.4011228070175439,
+            0.021
+        ],
+        "new_orientation": 22.743
+    }
+]

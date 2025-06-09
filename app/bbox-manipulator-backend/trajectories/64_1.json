@@ -1,0 +1,35 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_06",
+        "refObjectId": "tool_03",
+        "new_pos": [
+            0.14715789473684207,
+            -0.07899999999999996,
+            0.015
+        ],
+        "new_orientation": 1.4306093153269384
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_10",
+        "refObjectId": "tool_03",
+        "new_pos": [
+            0.4369298245614046,
+            -0.07899999999999952,
+            0.015
+        ],
+        "new_orientation": 0.3102539462064987
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_04",
+        "refObjectId": "tool_03",
+        "new_pos": [
+            0.32940350877193086,
+            -0.07899999999999996,
+            0.015
+        ],
+        "new_orientation": 82.7383299898937
+    }
+]

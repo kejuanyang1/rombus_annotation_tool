@@ -1,0 +1,46 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_07",
+        "refObjectId": "tool_06",
+        "new_pos": [
+            0.2730000000000001,
+            -0.10814035087719298,
+            0.015
+        ],
+        "new_orientation": -0.2623448840599923
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_05",
+        "refObjectId": "tool_07",
+        "new_pos": [
+            0.40864912280701965,
+            -0.10814035087719304,
+            0.015
+        ],
+        "new_orientation": -0.9846949878414479
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_09",
+        "refObjectId": "tool_07",
+        "new_pos": [
+            0.2730000000000001,
+            -0.039701754385964905,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "tool_04",
+        "refObjectId": "tool_09",
+        "new_pos": [
+            0.12712280701754455,
+            -0.03970175438596524,
+            0.015
+        ],
+        "new_orientation": -2.192479701008896
+    }
+]

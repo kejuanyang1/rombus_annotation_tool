@@ -1,0 +1,35 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "kitchen_09",
+        "refObjectId": "kitchen_06",
+        "new_pos": [
+            0.3919999999999993,
+            -0.43063157894736837,
+            0.015
+        ],
+        "new_orientation": -41.24687370379193
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_06",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.12592003263464352,
+            0.01527393650184669,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "office_06",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.2034657885944954,
+            0.0024016160106541274,
+            0.043
+        ],
+        "new_orientation": 0
+    }
+]

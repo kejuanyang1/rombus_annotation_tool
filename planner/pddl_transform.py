@@ -372,7 +372,7 @@ def verify_pddl(task_range):
     
 
 if __name__ == "__main__":
-    task_range = (1, 2)
+    task_range = (40, 42)
     revert_pddl(task_range)
     verify_pddl(task_range)
     

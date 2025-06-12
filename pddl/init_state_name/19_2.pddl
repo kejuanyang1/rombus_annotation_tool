@@ -28,8 +28,6 @@
     (clear purple jello box)
     (clear blue bowl)
     (clear pink bowl)
-    (closed blue bowl)
-    (closed pink bowl)
     (handempty)
   )
   (:goal (and ))

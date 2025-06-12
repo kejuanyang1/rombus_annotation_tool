@@ -1,0 +1,24 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "other_02",
+        "refObjectId": "other_01",
+        "new_pos": [
+            0.21799999999999994,
+            -0.08400875656742568,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "other_03",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.27088171288445884,
+            -0.3516225669976035,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

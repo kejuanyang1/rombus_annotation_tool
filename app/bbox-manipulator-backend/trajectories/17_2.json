@@ -1,0 +1,68 @@
+[
+    {
+        "type": "OPEN",
+        "objectId": "lid_01",
+        "refObjectId": "container_07",
+        "new_pos": [
+            0.2,
+            -0.348,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_06",
+        "refObjectId": "container_07",
+        "new_pos": [
+            0.19261779534697887,
+            -0.3386467369970165,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "CLOSE",
+        "objectId": "lid_01",
+        "refObjectId": "container_07",
+        "new_pos": [
+            0.16,
+            -0.348,
+            0.024999999999999998
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "kitchen_12",
+        "refObjectId": "kitchen_24",
+        "new_pos": [
+            0.29000000000000076,
+            0.10126269702276758,
+            0.015
+        ],
+        "new_orientation": -1.7277524524152919
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "kitchen_27",
+        "refObjectId": "kitchen_24",
+        "new_pos": [
+            0.3896147110332754,
+            -0.07700000000000173,
+            0.015
+        ],
+        "new_orientation": -0.5524922467674098
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "kitchen_09",
+        "refObjectId": "kitchen_24",
+        "new_pos": [
+            0.19584413309982487,
+            -0.07699999999999996,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

@@ -1,0 +1,46 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_03",
+        "refObjectId": "office_01",
+        "new_pos": [
+            0.36899999999999994,
+            0.04654816112084059,
+            0.015
+        ],
+        "new_orientation": -8.579
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_09",
+        "refObjectId": "office_08",
+        "new_pos": [
+            0.18508231173380038,
+            -0.3,
+            0.015
+        ],
+        "new_orientation": 7.015
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_07",
+        "refObjectId": "office_03",
+        "new_pos": [
+            0.3005411558669002,
+            0.04654816112084059,
+            0.015
+        ],
+        "new_orientation": 17.504
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_05",
+        "refObjectId": "office_01",
+        "new_pos": [
+            0.29316112084063045,
+            -0.08499999999999996,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

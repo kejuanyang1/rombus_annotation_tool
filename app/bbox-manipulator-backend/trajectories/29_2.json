@@ -1,0 +1,24 @@
+[
+    {
+        "type": "PUT_IN",
+        "objectId": "office_07",
+        "refObjectId": "container_05",
+        "new_pos": [
+            0.2874355986723208,
+            -0.3753919872956722,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "office_02",
+        "refObjectId": "container_05",
+        "new_pos": [
+            0.32459605899696936,
+            -0.3785328024218188,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

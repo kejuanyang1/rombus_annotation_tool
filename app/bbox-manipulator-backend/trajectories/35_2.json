@@ -1,0 +1,35 @@
+[
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_15_2",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.14116501550765242,
+            0.03902745908901192,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "shape_15_1",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.15864123173577216,
+            0.12160501143575007,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_ON",
+        "objectId": "shape_28_1",
+        "refObjectId": "shape_21",
+        "new_pos": [
+            0.259,
+            -0.401,
+            -0.015
+        ],
+        "new_orientation": 0
+    }
+]

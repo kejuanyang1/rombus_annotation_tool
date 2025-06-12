@@ -1,0 +1,35 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "other_02",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.185,
+            -0.4105429071803852,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "other_04",
+        "refObjectId": "other_02",
+        "new_pos": [
+            0.29167775831873904,
+            -0.4105429071803852,
+            0.015
+        ],
+        "new_orientation": 7.478
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "other_01",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.34597898423817863,
+            -0.15900000000000003,
+            0.015
+        ],
+        "new_orientation": 0
+    }
+]

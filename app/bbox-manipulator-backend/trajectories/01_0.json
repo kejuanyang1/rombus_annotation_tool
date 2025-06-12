@@ -4,9 +4,64 @@
         "objectId": "lid_03",
         "refObjectId": "container_09",
         "new_pos": [
-            0.165,
+            0.17500000000000002,
             -0.063,
-            -0.006999999999999999
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_11",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.1644777038607826,
+            -0.25101608876379133,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_09",
+        "refObjectId": "container_09",
+        "new_pos": [
+            0.14784542552943325,
+            -0.04630011593280141,
+            0.015
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_19",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.2054972564409071,
+            -0.275691452414487,
+            0.0465
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_IN",
+        "objectId": "kitchen_23",
+        "refObjectId": "container_02",
+        "new_pos": [
+            0.2211462974290957,
+            -0.35234411681041716,
+            0.04
+        ],
+        "new_orientation": 0
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "kitchen_07",
+        "refObjectId": "container_09",
+        "new_pos": [
+            0.306936952714536,
+            -0.06300000000000006,
+            0.015
         ],
         "new_orientation": 0
     },
@@ -20,38 +75,5 @@
             0.023
         ],
         "new_orientation": 0
-    },
-    {
-        "type": "PUT_IN",
-        "objectId": "kitchen_09",
-        "refObjectId": "container_02",
-        "new_pos": [
-            0.176,
-            -0.3,
-            -0.132
-        ],
-        "new_orientation": 0
-    },
-    {
-        "type": "PUT_ON",
-        "objectId": "kitchen_23",
-        "refObjectId": "kitchen_07",
-        "new_pos": [
-            0.391,
-            -0.409,
-            0.07200000000000001
-        ],
-        "new_orientation": 0
-    },
-    {
-        "type": "PUT_NEAR",
-        "objectId": "kitchen_11",
-        "refObjectId": "kitchen_07",
-        "new_pos": [
-            0.39099999999999835,
-            -0.20049562171628743,
-            0.001
-        ],
-        "new_orientation": 28.780481819987063
     }
 ]

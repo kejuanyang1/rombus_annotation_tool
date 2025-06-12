@@ -28,8 +28,6 @@
     (clear kitchen_25)
     (clear container_07)
     (clear container_10)
-    (closed container_07)
-    (closed container_10)
     (handempty)
   )
   (:goal (and ))

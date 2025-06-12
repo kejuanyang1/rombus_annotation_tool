@@ -1,0 +1,35 @@
+[
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_08",
+        "refObjectId": "office_03",
+        "new_pos": [
+            0.2669999999999998,
+            -0.09239404553414987,
+            0.015
+        ],
+        "new_orientation": -51.06823357928774
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_10",
+        "refObjectId": "office_01",
+        "new_pos": [
+            0.19200000000000042,
+            -0.44979334500875723,
+            0.015
+        ],
+        "new_orientation": 91.16590171249725
+    },
+    {
+        "type": "PUT_NEAR",
+        "objectId": "office_06",
+        "refObjectId": "office_08",
+        "new_pos": [
+            0.26700000000000035,
+            0.09167250437828167,
+            0.015
+        ],
+        "new_orientation": -0.15337313755252435
+    }
+]

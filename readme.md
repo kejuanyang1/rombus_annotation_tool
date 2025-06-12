@@ -92,7 +92,7 @@ python inference.py --img_dir /your_dataset_path
 Check pddl domain definition file in `pddl/manip_domain.pddl`.
 GPT generated initial state pddl files are in `pddl/init_state_name/{task_id}.pddl`
 
-Duplicate objects are indexed from the bottom of the image upward, i.e., the object with smaller x‑coordinate has smaller index.
+Duplicate objects are indexed from the bottom of the image upward, i.e., the object with smaller x‑coordinate has larger index.
 
 ### How to validate
 Check if all these relations are correct, add missing relations:

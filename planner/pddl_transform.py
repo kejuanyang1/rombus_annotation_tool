@@ -101,6 +101,7 @@ class PDDLProblem:
     - ``domain``  : domain name declared in the problem
     - ``objects`` : ``{object_id: type}``
     - ``init``    : list of ground facts, each as ``(predicate, arg1, …)``
+    - ``goal``    : list of goal facts, each as ``(predicate, arg1, …)``
 
     Two extra helpers are provided:
     - :py:meth:`ensure_defaults` — auto‑fill implied predicates such as
@@ -115,10 +116,11 @@ class PDDLProblem:
     # --------------------------------------------------------------- #
     #                             Parsing                            #
     # --------------------------------------------------------------- #
-    def __init__(self, domain: str, objects: Dict[str, str], init: List[Tuple[str, ...]]):
+    def __init__(self, domain: str, objects: Dict[str, str], init: List[Tuple[str, ...]], goal: List[Tuple[str, ...]]):
         self.domain = domain
         self.objects = objects  # {object_id: type}
         self.init = init        # [(predicate, *args)]
+        self.goal = goal        # [(predicate, *args)]
 
     # -- factory helpers -- #
     @classmethod
@@ -131,7 +133,8 @@ class PDDLProblem:
         domain = cls._parse_domain(text)
         objects = cls._parse_objects(text)
         init = cls._parse_init(text)
-        return cls(domain, objects, init)
+        goal = cls._parse_goal(text)
+        return cls(domain, objects, init, goal)
 
     # -- internal parsers -- #
     @staticmethod
@@ -184,6 +187,21 @@ class PDDLProblem:
         for f in cls._FACT_RE.findall(block):
             tokens = f.strip('()').split()
             if tokens and tokens[0].lower() != ':init':
+                facts.append(tuple(tokens))
+        return facts
+
+    @classmethod
+    def _parse_goal(cls, text: str) -> List[Tuple[str, ...]]:
+        pos = text.lower().find('(:goal')
+        if pos == -1:
+            return []
+        start = text.find('(', pos)
+        end = cls._balance(text, start)
+        block = text[start:end + 1]
+        facts: List[Tuple[str, ...]] = []
+        for f in cls._FACT_RE.findall(block):
+            tokens = f.strip('()').split()
+            if tokens and tokens[0].lower() not in (':goal', 'and'):
                 facts.append(tuple(tokens))
         return facts
 
@@ -316,12 +334,15 @@ class PDDLProblem:
             f"    {' '.join(sorted(ids))} - {typ}" for typ, ids in sorted(by_type.items())
         )
         init_block = "\n".join("    (" + " ".join(f) + ")" for f in sorted(self.init))
+        goal_block = "\n".join("    (" + " ".join(g) + ")" for g in sorted(self.goal))
+        if goal_block:
+            goal_block = "\n" + goal_block + "\n  "
         return (
             "(define (problem generated)\n"
             f"  (:domain {self.domain})\n"
             "  (:objects\n" + obj_block + "\n  )\n"
             "  (:init\n" + init_block + "\n  )\n"
-            "  (:goal (and))\n)\n"
+            "  (:goal (and" + goal_block + "))\n)\n"
         )
 
     # --------------------------------------------------------------- #
@@ -339,6 +360,12 @@ class PDDLProblem:
             new_args = [repl.get(a, a) for a in args]
             new_init.append((pred, *new_args))
         self.init = new_init
+        new_goal: List[Tuple[str, ...]] = []
+        for fact in self.goal:
+            pred, *args = fact
+            new_args = [repl.get(a, a) for a in args]
+            new_goal.append((pred, *new_args))
+        self.goal = new_goal
 
 
 
@@ -353,10 +380,10 @@ def revert_pddl(task_range):
         )
         print(reverted_pddl)
 
-def verify_pddl(task_range):
+def verify_pddl(task_range, input_path='pddl/init_state_id', output_path='pddl/init_state_id_verified'):
     selected_set = [f'{scene:02d}_{x}' for scene in range(task_range[0], task_range[1]) for x in range(3)]
     for task_id in selected_set:
-        prob = PDDLProblem.from_file(f"pddl/init_state_id/{task_id}.pddl")
+        prob = PDDLProblem.from_file(f"{input_path}/{task_id}.pddl")
         prob.ensure_defaults()
         print(task_id)
         print(prob.init)
@@ -366,15 +393,36 @@ def verify_pddl(task_range):
             print(task_id)
             print(e)
             exit()
-        save_path = f"pddl/init_state_id_verified/{task_id}.pddl"
+        save_path = f"{output_path}/{task_id}.pddl"
         prob.save(save_path)
         load_pddl_up(save_path) # verify via loading in up
-    
+
+
+def merge_goal_pddl(task_range, input_path='pddl/init_state_id_verified', input_target_path='pddl/goal_state_id_verified', output_path='pddl/goal_state_id_merged'):
+    selected_set = [f'{scene:02d}_{x}' for scene in range(task_range[0], task_range[1]) for x in range(3)]
+    for task_id in selected_set:
+        prob = PDDLProblem.from_file(f"{input_path}/{task_id}.pddl")
+        prob_target = PDDLProblem.from_file(f"{input_target_path}/{task_id}.pddl")
+        prob.goal = prob_target.init.copy()
+        print(task_id)
+        print(prob.init)
+        print(prob.goal)
+        try:
+            prob.verify()
+        except ValueError as e:
+            print(task_id)
+            print(e)
+            exit()
+        save_path = f"{output_path}/{task_id}.pddl"
+        prob.save(save_path)
+        load_pddl_up(save_path) # verify via loading in up        
+            
 
 if __name__ == "__main__":
-    task_range = (40, 42)
-    revert_pddl(task_range)
-    verify_pddl(task_range)
+    task_range = (46, 81)
+    #revert_pddl(task_range)
+    #verify_pddl(task_range, input_path='app/bbox-manipulator-backend/pddl', output_path='pddl/goal_state_id_verified')
+    merge_goal_pddl(task_range)
     
     # prob = PDDLProblem.from_file("instances/init_state_id/01_0.pddl")
     # print(prob.domain)

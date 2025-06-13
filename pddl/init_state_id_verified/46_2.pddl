@@ -1,7 +1,7 @@
 (define (problem generated)
   (:domain manip)
   (:objects
-    shape_02_1 shape_02_2 shape_06 shape_13_1 shape_13_2 shape_19 shape_20 shape_22 shape_23 shape_25 - obj
+    shape_02_1 shape_02_2 shape_06 shape_13_1 shape_13_2 shape_19 shape_20 shape_22 shape_23 shape_25 - item
   )
   (:init
     (clear shape_02_1)
